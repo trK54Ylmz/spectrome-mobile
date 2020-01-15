@@ -1,4 +1,4 @@
-# Spectrome mobile application
+### Spectrome mobile application
 
 The mobile application of Spectrome.
 
