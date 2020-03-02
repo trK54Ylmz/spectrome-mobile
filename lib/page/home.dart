@@ -66,7 +66,7 @@ class _HomeState extends State<HomePage> {
       // Use loading animation
       w = new Center(
         child: new Image.asset(
-          'assets/loading.gif',
+          'assets/images/loading.gif',
           width: 60.0,
           height: 60.0,
         ),

@@ -9,7 +9,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^0.1.2
-  device_info: ^0.4.1+4
+  device_info: ^0.4.1+5
 
 dev_dependencies:
   flutter_test:
@@ -19,7 +19,19 @@ flutter:
   uses-material-design: false
 
   assets:
-    - assets/icon.png
-    - assets/logo.png
-    - assets/logo@2x.png
-    - assets/loading.gif
+    - assets/images/icon.png
+    - assets/images/logo.png
+    - assets/images/logo@2x.png
+    - assets/images/loading.gif
+  
+  fonts:
+    - family: Primary Regular
+      fonts:
+      - asset: assets/fonts/font-primary-regular.ttf
+    - family: Primary Bold
+      fonts:
+      - asset: assets/fonts/font-primary-bold.ttf
+        weight: 700
+    - family: Font Awesome
+      fonts:
+      - asset: assets/fonts/fa-solid.ttf
