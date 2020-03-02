@@ -2,12 +2,14 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:spectrome/pages/home.dart';
+import 'package:spectrome/page/home.dart';
+import 'package:spectrome/page/sign_in.dart';
 
 void main() => runApp(App());
 
 final routes = <String, WidgetBuilder>{
   HomePage.tag: (c) => new HomePage(),
+  SignInPage.tag: (c) => new SignInPage(),
 };
 
 class App extends StatelessWidget {
@@ -17,11 +19,12 @@ class App extends StatelessWidget {
     if (Platform.isIOS) {
       SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     } else {
+      const w = const Color(0xffffffff);
       SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(
-          systemNavigationBarColor: Color(0xffffffff),
-          systemNavigationBarDividerColor: Color(0xffffffff),
-          statusBarColor: Color(0xffffffff),
+          systemNavigationBarColor: w,
+          systemNavigationBarDividerColor: w,
+          statusBarColor: w,
           systemNavigationBarIconBrightness: Brightness.light,
           statusBarIconBrightness: Brightness.dark,
           statusBarBrightness: Brightness.dark,
