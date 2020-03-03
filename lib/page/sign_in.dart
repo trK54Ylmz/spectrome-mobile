@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
@@ -56,18 +57,21 @@ class _SignInState extends State<SignInPage> {
     );
 
     // Create sign-in submit button
-    final sib = new CupertinoButton(
-      onPressed: signIn,
-      borderRadius: BorderRadius.circular(8.0),
-      color: ColorConst.buttonColor,
-      pressedOpacity: 0.9,
-      child: new Text(
-        'Sign In',
-        style: new TextStyle(
-          color: const Color(0xffffffff),
-          fontSize: 14.0,
-          fontWeight: FontWeight.w700,
-          letterSpacing: -0.28,
+    final sib = new SizedBox(
+      width: double.infinity,
+      child: new CupertinoButton(
+        onPressed: signIn,
+        color: ColorConst.buttonColor,
+        borderRadius: BorderRadius.circular(8.0),
+        pressedOpacity: 0.9,
+        child: new Text(
+          'Sign In',
+          style: new TextStyle(
+            color: const Color(0xffffffff),
+            fontSize: 14.0,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.28,
+          ),
         ),
       ),
     );
