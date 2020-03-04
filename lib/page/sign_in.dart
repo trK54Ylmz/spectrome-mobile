@@ -95,5 +95,7 @@ class _SignInState extends State<SignInPage> {
     );
   }
 
-  void signIn() {}
+  void signIn() {
+    
+  }
 }
