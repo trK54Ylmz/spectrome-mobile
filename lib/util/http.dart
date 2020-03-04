@@ -71,7 +71,7 @@ class Http {
     return _client.getUrl(url).then(c).then((r) => _toResponse(r));
   }
 
-  /// Convert [io.HttpClientResponse] to Jupiter [HttpResponse] object
+  /// Convert [HttpClientResponse] to Spectrome [HttpResponse] object
   ///
   /// Uses stream processing
   static Future<Response> _toResponse(HttpClientResponse res) {
