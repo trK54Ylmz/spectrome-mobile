@@ -71,17 +71,6 @@ class Http {
     return _client.getUrl(url).then(c).then((r) => _toResponse(r));
   }
 
-  /// Handle request errors
-  static Response catchError(e, StackTrace s) {
-    if (e is SocketException) {
-      final m = 'Please check your network connection';
-
-      // @TODO add network error
-    }
-
-    return null;
-  }
-
   /// Convert [io.HttpClientResponse] to Jupiter [HttpResponse] object
   ///
   /// Uses stream processing

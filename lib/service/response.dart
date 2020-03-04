@@ -16,6 +16,11 @@ class BasicResponse extends JsonResponse {
 
   bool isNetErr;
 
+  BasicResponse();
+
+  /// Empty object
+  BasicResponse.empty();
+
   /// Bind with custom parameters
   BasicResponse.bind({bool status, String message, bool isNetErr}) {
     this.status = status;
@@ -25,10 +30,17 @@ class BasicResponse extends JsonResponse {
 
   /// Convert http response body as json
   BasicResponse.fromJson(String input) {
+    fromJson(input);
+  }
+
+  /// Create object by using json input
+  Map<String, Object> fromJson(String input) {
     final json = jsonToMap(input);
 
     status = json['status'];
     expired = json['expired'] ?? null;
     message = json['message'] ?? null;
+
+    return json;
   }
 }
