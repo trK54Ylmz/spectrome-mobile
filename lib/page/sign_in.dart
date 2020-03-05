@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:spectrome/item/input.dart';
@@ -77,36 +79,49 @@ class _SignInState extends State<SignInPage> {
         ),
       );
     } else if (_error != null) {
-      final m = new Padding(
+      final icon = new Icon(
+        new IconData(
+          _error.icon,
+          fontFamily: FontConst.fa,
+        ),
+        color: const Color(0xffaaaaaa),
+        size: 32.0,
+      );
+
+      final message = new Padding(
         padding: EdgeInsets.only(top: 8.0),
         child: new Text(_error.error, style: ts),
       );
 
       // Add re-try button
-      final b = new CupertinoButton(
-        onPressed: () {
-          // Reload home screen
-          Navigator.of(context).pushReplacementNamed(SignInPage.tag);
-        },
-        child: new Text(
-          'Try again',
-          style: new TextStyle(
-            color: const Color(0xffffffff),
-            fontFamily: FontConst.primary,
-            fontSize: 16.0,
-            letterSpacing: 0.33,
+      final button = new Padding(
+        padding: EdgeInsets.only(top: 16.0),
+        child: new CupertinoButton(
+          onPressed: () {
+            // Reload sign in screen
+            Navigator.of(context).pushReplacementNamed(SignInPage.tag);
+          },
+          child: new Text(
+            'Try again',
+            style: new TextStyle(
+              color: const Color(0xffffffff),
+              fontFamily: FontConst.primary,
+              fontSize: 14.0,
+              letterSpacing: 0.33,
+            ),
           ),
+          color: const Color(0xffaaaaaa),
         ),
-        color: const Color(0xffaaaaaa),
       );
 
-      // Handle error message
+      // Handle error
       w = new Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          m,
-          b,
+          icon,
+          message,
+          button,
         ],
       );
     } else {
@@ -190,22 +205,33 @@ class _SignInState extends State<SignInPage> {
   ///
   /// Account service must be initialized
   void signIn() {
+    dev.log('Sign in button clicked.');
+
     if (_loading) {
       return;
     }
+
+    dev.log('Sign in request sending.');
 
     // Set loading true
     setState(() => _loading = true);
 
     // Handle HTTP response
     final sc = (SignInResponse r) {
+      dev.log('Sign in request sent.');
+
       if (!r.status) {
-        if (r.isNetErr) {
+        if (r.isNetErr ?? false) {
           // Create network error
           setState(() => _error = ErrorMessage.network());
         } else {
+          // Create custom error
           setState(() => _error = ErrorMessage.custom(r.message));
         }
+
+        // Set loading false
+        setState(() => _loading = false);
+
         return;
       }
 
