@@ -176,6 +176,7 @@ class _SignInState extends State<SignInPage> {
           color: ColorConst.buttonColor,
           borderRadius: BorderRadius.circular(8.0),
           pressedOpacity: 0.9,
+          padding: EdgeInsets.zero,
           child: new Text(
             'Sign In',
             style: new TextStyle(
@@ -196,6 +197,7 @@ class _SignInState extends State<SignInPage> {
           color: ColorConst.grayColor,
           borderRadius: BorderRadius.circular(8.0),
           pressedOpacity: 0.9,
+          padding: EdgeInsets.zero,
           child: new Text(
             'Forgot password',
             style: new TextStyle(

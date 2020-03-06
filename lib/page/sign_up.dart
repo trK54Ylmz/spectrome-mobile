@@ -18,6 +18,8 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUpPage> {
+  final FocusNode _focus = new FocusNode();
+
   // Loading indicator
   bool _loading = false;
 
@@ -206,6 +208,7 @@ class _SignUpState extends State<SignUpPage> {
           color: ColorConst.buttonColor,
           borderRadius: BorderRadius.circular(8.0),
           pressedOpacity: 0.9,
+          padding: EdgeInsets.zero,
           child: new Text(
             'Sign Up',
             style: new TextStyle(
@@ -270,9 +273,14 @@ class _SignUpState extends State<SignUpPage> {
 
     return new CupertinoPageScaffold(
       backgroundColor: const Color(0xffffffff),
-      child: new Padding(
-        padding: EdgeInsets.symmetric(horizontal: pv),
-        child: w,
+      child: new GestureDetector(
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+        child: new Padding(
+          padding: EdgeInsets.symmetric(horizontal: pv),
+          child: w,
+        ),
       ),
     );
   }
