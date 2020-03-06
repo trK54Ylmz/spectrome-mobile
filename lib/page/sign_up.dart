@@ -2,27 +2,27 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/cupertino.dart';
 import 'package:spectrome/item/input.dart';
-import 'package:spectrome/page/sign_up.dart';
+import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/service/account.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/util/error.dart';
 
-class SignInPage extends StatefulWidget {
-  static final tag = 'sign_in';
+class SignUpPage extends StatefulWidget {
+  static const tag = 'sign_up';
 
-  SignInPage() : super();
+  SignUpPage() : super();
 
   @override
-  _SignInState createState() => new _SignInState();
+  _SignUpState createState() => new _SignUpState();
 }
 
-class _SignInState extends State<SignInPage> {
+class _SignUpState extends State<SignUpPage> {
   // Loading indicator
-  bool _loading = true;
+  bool _loading = false;
 
-  SharedPreferences _preferences;
+  // Is sign up operation completed
+  bool _completed = false;
 
   // Account service
   AccountService _as;
@@ -30,24 +30,21 @@ class _SignInState extends State<SignInPage> {
   // Error message
   ErrorMessage _error;
 
-  // Login id means username or e-mail address
-  String _loginId;
+  // E-mail address
+  String _email;
+
+  // Username
+  String _username;
 
   // Account password
   String _password;
 
+  // User's name and surname
+  String _name;
+
   @override
   void initState() {
     super.initState();
-
-    // Shared preferences callback
-    final spc = (SharedPreferences s) {
-      _preferences = s;
-
-      setState(() => _loading = false);
-    };
-
-    SharedPreferences.getInstance().then(spc);
 
     // Initialize account service
     _as = new AccountService();
@@ -84,6 +81,7 @@ class _SignInState extends State<SignInPage> {
           height: 60.0,
         ),
       );
+    } else if (_completed) {
     } else if (_error != null) {
       final icon = new Icon(
         new IconData(
@@ -104,8 +102,8 @@ class _SignInState extends State<SignInPage> {
         padding: EdgeInsets.only(top: 16.0),
         child: new CupertinoButton(
           onPressed: () {
-            // Reload sign in screen
-            Navigator.of(context).pushReplacementNamed(SignInPage.tag);
+            // Reload sign up screen
+            Navigator.of(context).pushReplacementNamed(SignUpPage.tag);
           },
           child: new Text(
             'Try again',
@@ -131,12 +129,10 @@ class _SignInState extends State<SignInPage> {
         ],
       );
     } else {
-      final logo = new Image.asset('assets/images/logo.png');
-
       // Create e-mail address input
       final email = new TextInput(
         hint: 'Username or e-mail address',
-        onChange: (i) => _loginId = i,
+        onChange: (i) => _email = i,
         style: new TextStyle(
           fontFamily: FontConst.primary,
           fontSize: 14.0,
@@ -168,16 +164,50 @@ class _SignInState extends State<SignInPage> {
         ),
       );
 
-      // Create sign-in submit button
-      final sib = new SizedBox(
+      // Create username input
+      final username = new TextInput(
+        hint: 'Username',
+        onChange: (i) => _username = i,
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          fontSize: 14.0,
+          letterSpacing: 0.33,
+        ),
+        hintStyle: new TextStyle(
+          fontFamily: FontConst.primary,
+          fontSize: 14.0,
+          letterSpacing: 0.33,
+          color: const Color(0xffcccccc),
+        ),
+      );
+
+      // Create user name input
+      final name = new TextInput(
+        hint: 'Name',
+        onChange: (i) => _name = i,
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          fontSize: 14.0,
+          letterSpacing: 0.33,
+        ),
+        hintStyle: new TextStyle(
+          fontFamily: FontConst.primary,
+          fontSize: 14.0,
+          letterSpacing: 0.33,
+          color: const Color(0xffcccccc),
+        ),
+      );
+
+      // Create sign-up submit button
+      final sub = new SizedBox(
         width: double.infinity,
         child: new CupertinoButton(
-          onPressed: _signIn,
+          onPressed: _signUp,
           color: ColorConst.buttonColor,
           borderRadius: BorderRadius.circular(8.0),
           pressedOpacity: 0.9,
           child: new Text(
-            'Sign In',
+            'Sign Up',
             style: new TextStyle(
               color: const Color(0xffffffff),
               fontSize: 14.0,
@@ -188,29 +218,9 @@ class _SignInState extends State<SignInPage> {
         ),
       );
 
-      // Forgot password page button
-      final fpb = new SizedBox(
-        width: double.infinity,
-        child: new CupertinoButton(
-          onPressed: _signIn,
-          color: ColorConst.grayColor,
-          borderRadius: BorderRadius.circular(8.0),
-          pressedOpacity: 0.9,
-          child: new Text(
-            'Forgot password',
-            style: new TextStyle(
-              color: const Color(0xffffffff),
-              fontSize: 14.0,
-              fontWeight: FontWeight.w400,
-              letterSpacing: -0.28,
-            ),
-          ),
-        ),
-      );
-
-      // Don't have an account text
-      final sut = new Text(
-        'You do not have an account yet?',
+      // Already have an account text
+      final sit = new Text(
+        'You already have an account?',
         style: new TextStyle(
           fontFamily: FontConst.primary,
           fontSize: 12.0,
@@ -219,15 +229,15 @@ class _SignInState extends State<SignInPage> {
         ),
       );
 
-      // Create sign-up page button
-      final sub = new CupertinoButton(
-        onPressed: () => Navigator.of(context).pushReplacementNamed(SignUpPage.tag),
+      // Create sign-in page button
+      final sib = new CupertinoButton(
+        onPressed: () => Navigator.of(context).pushReplacementNamed(SignInPage.tag),
         color: ColorConst.transparent,
         pressedOpacity: 1,
         padding: EdgeInsets.all(8.0),
         minSize: 4.0,
         child: new Text(
-          'Sign Up',
+          'Sign In',
           style: new TextStyle(
             color: ColorConst.grayColor,
             fontSize: 14.0,
@@ -242,19 +252,18 @@ class _SignInState extends State<SignInPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          pt,
-          logo,
-          ptl,
           email,
           pt,
           password,
           pt,
-          sib,
+          username,
           pt,
-          fpb,
-          ptl,
-          sut,
+          name,
+          pt,
           sub,
+          ptl,
+          sit,
+          sib,
         ],
       );
     }
@@ -268,48 +277,5 @@ class _SignInState extends State<SignInPage> {
     );
   }
 
-  /// Make sign in
-  ///
-  /// Account service must be initialized
-  void _signIn() {
-    dev.log('Sign in button clicked.');
-
-    if (_loading) {
-      return;
-    }
-
-    dev.log('Sign in request sending.');
-
-    // Set loading true
-    setState(() => _loading = true);
-
-    // Handle HTTP response
-    final sc = (SignInResponse r) {
-      dev.log('Sign in request sent.');
-
-      if (!r.status) {
-        if (r.isNetErr ?? false) {
-          // Create network error
-          setState(() => _error = ErrorMessage.network());
-        } else {
-          // Create custom error
-          setState(() => _error = ErrorMessage.custom(r.message));
-        }
-
-        // Set loading false
-        setState(() => _loading = false);
-
-        return;
-      }
-
-      // Create new auth key
-      _preferences.setString('auth', r.auth);
-
-      // Set loading false
-      setState(() => _loading = false);
-    };
-
-    // Send sign in request
-    _as.signIn(_loginId, _password).then(sc);
-  }
+  void _signUp() {}
 }

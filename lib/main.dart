@@ -4,12 +4,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:spectrome/page/home.dart';
 import 'package:spectrome/page/sign_in.dart';
+import 'package:spectrome/page/sign_up.dart';
 
 void main() => runApp(App());
 
 final routes = <String, WidgetBuilder>{
   HomePage.tag: (c) => new HomePage(),
   SignInPage.tag: (c) => new SignInPage(),
+  SignUpPage.tag: (c) => new SignUpPage(),
 };
 
 class App extends StatelessWidget {
