@@ -274,9 +274,7 @@ class _SignUpState extends State<SignUpPage> {
     return new CupertinoPageScaffold(
       backgroundColor: const Color(0xffffffff),
       child: new GestureDetector(
-        onTap: () {
-          FocusScope.of(context).requestFocus(FocusNode());
-        },
+        onTap: () => FocusScope.of(context).requestFocus(_focus),
         child: new Padding(
           padding: EdgeInsets.symmetric(horizontal: pv),
           child: w,
@@ -285,5 +283,51 @@ class _SignUpState extends State<SignUpPage> {
     );
   }
 
-  void _signUp() {}
+  /// Make sign up
+  ///
+  /// Account service must be initialized
+  void _signUp() {
+    dev.log('Sign up button clicked.');
+
+    // Say application to sign up in process
+    setState(() => _completed = false);
+
+    if (_loading) {
+      return;
+    }
+
+    dev.log('Sign up request sending.');
+
+    // Set loading true
+    setState(() => _loading = true);
+
+    // Handle HTTP response
+    final sc = (SignUpResponse r) {
+      dev.log('Sign up request sent.');
+
+      if (!r.status) {
+        if (r.isNetErr ?? false) {
+          // Create network error
+          setState(() => _error = ErrorMessage.network());
+        } else {
+          // Create custom error
+          setState(() => _error = ErrorMessage.custom(r.message));
+        }
+
+        // Set loading false
+        setState(() => _loading = false);
+
+        return;
+      }
+
+      // Set loading false
+      setState(() => _loading = false);
+
+      // Say application to sign up completed
+      setState(() => _completed = true);
+    };
+
+    // Send sign up request
+    _as.signUp(_email, _password, _name, _username).then(sc);
+  }
 }
