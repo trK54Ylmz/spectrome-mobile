@@ -18,7 +18,7 @@ class ErrorMessage {
   // Create custom error message
   ErrorMessage.custom(String e, {int code}) {
     // Use custom sad face as error icon
-    if (code != null) {
+    if (code == null) {
       code = 0xf57a;
     }
 

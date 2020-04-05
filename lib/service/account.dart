@@ -64,10 +64,36 @@ class AccountService extends Service {
 
     return Http.doPost(path, body: body).then(c).catchError(e);
   }
+
+  /// Check user session by using session code
+  Future<SessionResponse> checkSession(String session) {
+    final path = '/account/session';
+    final body = {
+      'session': session,
+    };
+
+    // Http response handle callback
+    final c = (Response r) {
+      if (r.code != 200) {
+        final m = 'An error occurred';
+        return SessionResponse.bind(status: false, message: m);
+      }
+
+      return SessionResponse.fromJson(r.body);
+    };
+
+    // Handle error case
+    final e = (e, StackTrace s) {
+      final r = SessionResponse.empty();
+      return Service.handleError<SessionResponse>(e, s, r);
+    };
+
+    return Http.doPost(path, body: body).then(c).catchError(e);
+  }
 }
 
 class SignInResponse extends BasicResponse {
-  String auth;
+  String session;
 
   /// Create empty object
   SignInResponse.empty() : super.empty();
@@ -82,7 +108,7 @@ class SignInResponse extends BasicResponse {
   SignInResponse.fromJson(String input) {
     final json = super.jsonToMap(input);
 
-    auth = json['auth'] ?? null;
+    session = json['session'] ?? null;
   }
 }
 
@@ -98,6 +124,22 @@ class SignUpResponse extends BasicResponse {
 
   /// Create response by using JSON input
   SignUpResponse.fromJson(String input) {
+    super.jsonToMap(input);
+  }
+}
+
+class SessionResponse extends BasicResponse {
+  /// Create empty object
+  SessionResponse.empty() : super.empty();
+
+  /// Create only status and message
+  SessionResponse.bind({
+    status,
+    message,
+  }) : super.bind(status: status, message: message);
+
+  /// Create response by using JSON input
+  SessionResponse.fromJson(String input) {
     super.jsonToMap(input);
   }
 }

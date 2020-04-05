@@ -1,6 +1,8 @@
 import 'dart:developer' as dev;
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:spectrome/item/form.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/service/account.dart';
@@ -18,7 +20,26 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUpPage> {
-  final FocusNode _focus = new FocusNode();
+  // Phone number input controller
+  final _phone = new TextEditingController();
+
+  // Username input controller
+  final _username = new TextEditingController();
+
+  // E-mail input controller
+  final _email = new TextEditingController();
+
+  // Password input controller
+  final _password = new TextEditingController();
+
+  // User real name input controller
+  final _name = new TextEditingController();
+
+  // Form validation key
+  final _formKey = GlobalKey<FormState>();
+
+  // Screen focus node
+  final _focus = new FocusNode();
 
   // Loading indicator
   bool _loading = false;
@@ -31,18 +52,6 @@ class _SignUpState extends State<SignUpPage> {
 
   // Error message
   ErrorMessage _error;
-
-  // E-mail address
-  String _email;
-
-  // Username
-  String _username;
-
-  // Account password
-  String _password;
-
-  // User's name and surname
-  String _name;
 
   @override
   void initState() {
@@ -67,12 +76,6 @@ class _SignUpState extends State<SignUpPage> {
       padding: EdgeInsets.only(top: ph),
     );
 
-    final ts = new TextStyle(
-      fontFamily: FontConst.primary,
-      fontSize: 14.0,
-      letterSpacing: 0.33,
-    );
-
     Widget w;
     if (_loading) {
       // Use loading animation
@@ -85,12 +88,19 @@ class _SignUpState extends State<SignUpPage> {
       );
     } else if (_completed) {
     } else if (_error != null) {
+      final ts = new TextStyle(
+        fontFamily: FontConst.primary,
+        fontSize: 14.0,
+        letterSpacing: 0.33,
+        color: ColorConst.grayColor,
+      );
+
       final icon = new Icon(
         new IconData(
           _error.icon,
           fontFamily: FontConst.fa,
         ),
-        color: const Color(0xffaaaaaa),
+        color: ColorConst.grayColor,
         size: 32.0,
       );
 
@@ -116,7 +126,7 @@ class _SignUpState extends State<SignUpPage> {
               letterSpacing: 0.33,
             ),
           ),
-          color: const Color(0xffaaaaaa),
+          color: ColorConst.grayColor,
         ),
       );
 
@@ -131,19 +141,48 @@ class _SignUpState extends State<SignUpPage> {
         ],
       );
     } else {
-      // Create e-mail address input
-      final email = new TextInput(
-        hint: 'Username or e-mail address',
-        onChange: (i) => _email = i,
+      final loading = new Image.asset(
+        'assets/images/loading.gif',
+        width: 40.0,
+        height: 40.0,
+      );
+
+      final empty = new SizedBox(
+        height: 40.0,
+      );
+
+      // Create phone number input
+      final phone = new TextInput(
+        hint: 'Phone number',
+        inputType: TextInputType.phone,
+        controller: _phone,
         style: new TextStyle(
           fontFamily: FontConst.primary,
           fontSize: 14.0,
-          letterSpacing: 0.33,
+          letterSpacing: 0,
         ),
         hintStyle: new TextStyle(
           fontFamily: FontConst.primary,
           fontSize: 14.0,
-          letterSpacing: 0.33,
+          letterSpacing: 0,
+          color: const Color(0xffcccccc),
+        ),
+      );
+
+      // Create e-mail address input
+      final email = new TextInput(
+        hint: 'E-mail address',
+        inputType: TextInputType.emailAddress,
+        controller: _email,
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          fontSize: 14.0,
+          letterSpacing: 0,
+        ),
+        hintStyle: new TextStyle(
+          fontFamily: FontConst.primary,
+          fontSize: 14.0,
+          letterSpacing: 0,
           color: const Color(0xffcccccc),
         ),
       );
@@ -152,16 +191,16 @@ class _SignUpState extends State<SignUpPage> {
       final password = new TextInput(
         hint: 'Password',
         obscure: true,
-        onChange: (i) => _password = i,
+        controller: _password,
         style: new TextStyle(
           fontFamily: FontConst.primary,
           fontSize: 14.0,
-          letterSpacing: 0.33,
+          letterSpacing: 0,
         ),
         hintStyle: new TextStyle(
           fontFamily: FontConst.primary,
           fontSize: 14.0,
-          letterSpacing: 0.33,
+          letterSpacing: 0,
           color: const Color(0xffcccccc),
         ),
       );
@@ -169,33 +208,42 @@ class _SignUpState extends State<SignUpPage> {
       // Create username input
       final username = new TextInput(
         hint: 'Username',
-        onChange: (i) => _username = i,
+        controller: _username,
         style: new TextStyle(
           fontFamily: FontConst.primary,
           fontSize: 14.0,
-          letterSpacing: 0.33,
+          letterSpacing: 0,
         ),
         hintStyle: new TextStyle(
           fontFamily: FontConst.primary,
           fontSize: 14.0,
-          letterSpacing: 0.33,
+          letterSpacing: 0,
           color: const Color(0xffcccccc),
         ),
+        validator: (i) {
+          print(i);
+
+          if (i.length < 6) {
+            return 'The username cannot be lower than 6 character';
+          }
+
+          return null;
+        },
       );
 
       // Create user name input
       final name = new TextInput(
         hint: 'Name',
-        onChange: (i) => _name = i,
+        controller: _name,
         style: new TextStyle(
           fontFamily: FontConst.primary,
           fontSize: 14.0,
-          letterSpacing: 0.33,
+          letterSpacing: 0,
         ),
         hintStyle: new TextStyle(
           fontFamily: FontConst.primary,
           fontSize: 14.0,
-          letterSpacing: 0.33,
+          letterSpacing: 0,
           color: const Color(0xffcccccc),
         ),
       );
@@ -214,7 +262,7 @@ class _SignUpState extends State<SignUpPage> {
             style: new TextStyle(
               color: const Color(0xffffffff),
               fontSize: 14.0,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w400,
               letterSpacing: -0.28,
             ),
           ),
@@ -234,7 +282,9 @@ class _SignUpState extends State<SignUpPage> {
 
       // Create sign-in page button
       final sib = new CupertinoButton(
-        onPressed: () => Navigator.of(context).pushReplacementNamed(SignInPage.tag),
+        onPressed: () {
+          Navigator.of(context).pushReplacementNamed(SignInPage.tag);
+        },
         color: ColorConst.transparent,
         pressedOpacity: 1,
         padding: EdgeInsets.all(8.0),
@@ -251,33 +301,42 @@ class _SignUpState extends State<SignUpPage> {
       );
 
       // Create main container
-      w = new Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          email,
-          pt,
-          password,
-          pt,
-          username,
-          pt,
-          name,
-          pt,
-          sub,
-          ptl,
-          sit,
-          sib,
-        ],
+      w = new FormValidation(
+        key: _formKey,
+        child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            _loading ? loading : empty,
+            pt,
+            phone,
+            pt,
+            email,
+            pt,
+            password,
+            pt,
+            username,
+            pt,
+            name,
+            pt,
+            sub,
+            ptl,
+            sit,
+            sib,
+          ],
+        ),
       );
     }
 
-    return new CupertinoPageScaffold(
+    return new Scaffold(
       backgroundColor: const Color(0xffffffff),
-      child: new GestureDetector(
+      body: new GestureDetector(
         onTap: () => FocusScope.of(context).requestFocus(_focus),
-        child: new Padding(
-          padding: EdgeInsets.symmetric(horizontal: pv),
-          child: w,
+        child: new Center(
+          child: new Padding(
+            padding: EdgeInsets.symmetric(horizontal: pv),
+            child: w,
+          ),
         ),
       ),
     );
@@ -293,6 +352,11 @@ class _SignUpState extends State<SignUpPage> {
     setState(() => _completed = false);
 
     if (_loading) {
+      return;
+    }
+
+    // Validate form key
+    if (!_formKey.currentState.validate()) {
       return;
     }
 
@@ -328,6 +392,6 @@ class _SignUpState extends State<SignUpPage> {
     };
 
     // Send sign up request
-    _as.signUp(_email, _password, _name, _username).then(sc);
+    _as.signUp(_email.text, _password.text, _name.text, _username.text).then(sc);
   }
 }

@@ -1,14 +1,30 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+typedef CallbackFunc<T> = T Function(T value);
 
 class TextInput extends StatefulWidget {
+  final TextEditingController controller;
+
+  final String initialValue;
+
+  final FocusNode focusNode;
+
+  final CallbackFunc<String> onSaved;
+
+  final CallbackFunc<String> validator;
+
+  final List<TextInputFormatter> inputFormatters;
+
+  final CallbackFunc<String> onChange;
+
   final String hint;
 
   final TextStyle style;
 
   final TextStyle hintStyle;
 
-  final Function onChange;
+  final TextInputType inputType;
 
   final EdgeInsetsGeometry padding;
 
@@ -19,24 +35,32 @@ class TextInput extends StatefulWidget {
   final bool obscure;
 
   TextInput({
+    Key key,
+    this.controller,
+    this.initialValue,
+    this.focusNode,
+    this.onSaved,
+    this.validator,
+    this.inputFormatters,
     this.hint,
     this.style,
     this.hintStyle,
+    this.inputType = TextInputType.text,
     this.onChange,
+    this.radius = 8.0,
     this.enabled = true,
     this.obscure = false,
-    this.radius = 8.0,
     this.padding = const EdgeInsets.symmetric(
       vertical: 8.0,
-      horizontal: 4.0,
+      horizontal: 6.0,
     ),
   });
 
   @override
-  _TextInputState createState() => new _TextInputState();
+  TextInputState createState() => new TextInputState();
 }
 
-class _TextInputState extends State<TextInput> {
+class TextInputState extends State<TextInput> {
   @override
   Widget build(BuildContext context) {
     return new DecoratedBox(
@@ -52,9 +76,15 @@ class _TextInputState extends State<TextInput> {
         onChanged: widget.onChange,
         obscureText: widget.obscure,
         style: widget.style,
+        padding: widget.padding,
         placeholder: widget.hint,
         placeholderStyle: widget.hintStyle,
+        keyboardType: widget.inputType,
       ),
     );
+  }
+
+  String validate() {
+    return null;
   }
 }
