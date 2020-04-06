@@ -1,6 +1,7 @@
 import 'dart:developer' as dev;
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/page/sign_up.dart';
 import 'package:spectrome/service/account.dart';
@@ -75,63 +76,78 @@ class _SignInState extends State<SignInPage> {
     );
 
     Widget w;
-    if (_loading) {
-      // Use loading animation
-      w = new Center(
-        child: new Image.asset(
-          'assets/images/loading.gif',
-          width: 60.0,
-          height: 60.0,
-        ),
-      );
-    } else if (_error != null) {
-      final icon = new Icon(
-        new IconData(
-          _error.icon,
-          fontFamily: FontConst.fa,
-        ),
-        color: const Color(0xffaaaaaa),
-        size: 32.0,
-      );
+    if (_preferences == null) {
+      if (_loading) {
+        // Use loading animation
+        w = new Center(
+          child: new Image.asset(
+            'assets/images/loading.gif',
+            width: 60.0,
+            height: 60.0,
+          ),
+        );
+      } else if (_error != null) {
+        final icon = new Icon(
+          new IconData(
+            _error.icon,
+            fontFamily: FontConst.fa,
+          ),
+          color: ColorConst.grayColor,
+          size: 32.0,
+        );
 
-      final message = new Padding(
-        padding: EdgeInsets.only(top: 8.0),
-        child: new Text(_error.error, style: ts),
-      );
+        final message = new Padding(
+          padding: EdgeInsets.only(top: 8.0),
+          child: new Text(_error.error, style: ts),
+        );
 
-      // Add re-try button
-      final button = new Padding(
-        padding: EdgeInsets.only(top: 16.0),
-        child: new CupertinoButton(
-          onPressed: () {
-            // Reload sign in screen
-            Navigator.of(context).pushReplacementNamed(SignInPage.tag);
-          },
-          child: new Text(
-            'Try again',
-            style: new TextStyle(
-              color: const Color(0xffffffff),
-              fontFamily: FontConst.primary,
-              fontSize: 14.0,
-              letterSpacing: 0.33,
+        // Add re-try button
+        final button = new Padding(
+          padding: EdgeInsets.only(top: 16.0),
+          child: new CupertinoButton(
+            color: ColorConst.grayColor,
+            onPressed: () {
+              // Reload sign in screen
+              Navigator.of(context).pushReplacementNamed(SignInPage.tag);
+            },
+            child: new Text(
+              'Try again',
+              style: new TextStyle(
+                color: const Color(0xffffffff),
+                fontFamily: FontConst.primary,
+                fontSize: 14.0,
+                letterSpacing: 0.33,
+              ),
             ),
           ),
-          color: const Color(0xffaaaaaa),
-        ),
+        );
+
+        // Handle error
+        w = new Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            icon,
+            message,
+            button,
+          ],
+        );
+      }
+    } else {
+      final logo = new Image.asset(
+        'assets/images/logo@2x.png',
+        width: 128.0,
       );
 
-      // Handle error
-      w = new Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          icon,
-          message,
-          button,
-        ],
+      final loading = new Image.asset(
+        'assets/images/loading.gif',
+        width: 40.0,
+        height: 40.0,
       );
-    } else {
-      final logo = new Image.asset('assets/images/logo.png');
+
+      final empty = new SizedBox(
+        height: 40.0,
+      );
 
       // Create e-mail address input
       final email = new TextInput(
@@ -182,7 +198,7 @@ class _SignInState extends State<SignInPage> {
             style: new TextStyle(
               color: const Color(0xffffffff),
               fontSize: 14.0,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w400,
               letterSpacing: -0.28,
             ),
           ),
@@ -223,7 +239,9 @@ class _SignInState extends State<SignInPage> {
 
       // Create sign-up page button
       final sub = new CupertinoButton(
-        onPressed: () => Navigator.of(context).pushReplacementNamed(SignUpPage.tag),
+        onPressed: () {
+          Navigator.of(context).pushReplacementNamed(SignUpPage.tag);
+        },
         color: ColorConst.transparent,
         pressedOpacity: 1,
         padding: EdgeInsets.all(8.0),
@@ -246,7 +264,7 @@ class _SignInState extends State<SignInPage> {
         children: <Widget>[
           pt,
           logo,
-          ptl,
+          _loading ? loading : empty,
           email,
           pt,
           password,
@@ -261,11 +279,13 @@ class _SignInState extends State<SignInPage> {
       );
     }
 
-    return new CupertinoPageScaffold(
+    return new Scaffold(
       backgroundColor: const Color(0xffffffff),
-      child: new Padding(
-        padding: EdgeInsets.symmetric(horizontal: pv),
-        child: w,
+      body: new Center(
+        child: new Padding(
+          padding: EdgeInsets.symmetric(horizontal: pv),
+          child: w,
+        ),
       ),
     );
   }
@@ -305,7 +325,7 @@ class _SignInState extends State<SignInPage> {
       }
 
       // Create new auth key
-      _preferences.setString('auth', r.auth);
+      _preferences.setString('_session', r.session);
 
       // Set loading false
       setState(() => _loading = false);

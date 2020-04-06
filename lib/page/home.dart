@@ -3,10 +3,14 @@ import 'dart:developer' as dev;
 import 'package:flutter/cupertino.dart';
 import 'package:spectrome/main.dart';
 import 'package:spectrome/page/sign_in.dart';
+import 'package:spectrome/page/timeline.dart';
+import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
+import 'package:spectrome/service/account.dart';
 import 'package:spectrome/util/http.dart';
 import 'package:spectrome/util/error.dart';
 import 'package:spectrome/util/route.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   static final tag = 'home';
@@ -28,10 +32,24 @@ class _HomeState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    // Check session etc.
-    final c = (_) {
-      final s = routes[SignInPage.tag](context);
-      final route = new DefaultRoute(s);
+    // Handle exceptions
+    final ec = (e, StackTrace s) {
+      dev.log(e.toString(), stackTrace: s);
+
+      final m = 'Something wrong happened';
+      setState(() => _error = ErrorMessage.custom(m));
+    };
+
+    final sc = (SessionResponse res) {
+      // Create route according to response
+      Widget r;
+      if (!res.status || res.expired ?? false) {
+        r = routes[SignInPage.tag](context);
+      } else {
+        r = routes[TimeLinePage.tag](context);
+      }
+
+      final route = new DefaultRoute(r);
 
       // Replace page with sign in screen
       Navigator.of(context).pushReplacement(route);
@@ -39,12 +57,27 @@ class _HomeState extends State<HomePage> {
       setState(() => _loading = false);
     };
 
-    // Handle exceptions
-    final ec = (e, StackTrace s) {
-      dev.log(e.toString(), stackTrace: s);
+    // Check session etc.
+    final c = (_) async {
+      final sp = await SharedPreferences.getInstance();
+      final session = sp.getString('_session');
 
-      final m = 'Something wrong happened';
-      setState(() => _error = ErrorMessage.custom(m));
+      // route page according to session information
+      if (session == null) {
+        final r = routes[SignInPage.tag](context);
+        final route = new DefaultRoute(r);
+
+        // Replace page with sign in screen
+        Navigator.of(context).pushReplacement(route);
+
+        setState(() => _loading = false);
+        return;
+      }
+
+      final _as = new AccountService();
+
+      // Check session and route according to response
+      _as.checkSession(session).then(sc).catchError(ec);  
     };
 
     // Show loading icon when screen initialized
@@ -58,7 +91,7 @@ class _HomeState extends State<HomePage> {
   Widget build(BuildContext context) {
     final ts = new TextStyle(
       fontFamily: FontConst.primary,
-      color: const Color(0xffaaaaaa),
+      color: ColorConst.grayColor,
       fontSize: 14.0,
     );
 
@@ -78,7 +111,7 @@ class _HomeState extends State<HomePage> {
           _error.icon,
           fontFamily: FontConst.fa,
         ),
-        color: const Color(0xffaaaaaa),
+        color: ColorConst.grayColor,
         size: 32.0,
       );
 
@@ -104,7 +137,7 @@ class _HomeState extends State<HomePage> {
               letterSpacing: 0.33,
             ),
           ),
-          color: const Color(0xffaaaaaa),
+          color: ColorConst.grayColor,
         ),
       );
 
