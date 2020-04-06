@@ -221,8 +221,6 @@ class _SignUpState extends State<SignUpPage> {
           color: const Color(0xffcccccc),
         ),
         validator: (i) {
-          print(i);
-
           if (i.length < 6) {
             return 'The username cannot be lower than 6 character';
           }
