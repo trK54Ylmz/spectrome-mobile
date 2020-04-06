@@ -16,10 +16,11 @@ class GuidePage extends StatefulWidget {
 }
 
 class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
-  AnimationController _controller;
+  // Animation controller
+  AnimationController _ac;
 
-  // Carousel left offset
-  double _offset = 0.0;
+  // Animation side, 1 is right, -1 is left
+  int _side = 1;
 
   // Active image ID
   int _active = 1;
@@ -30,6 +31,8 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
   // Carousel messages
   final _texts = <String>[
     'See what people shared.',
+    'Share your post.',
+    'Send to the friends.',
   ];
 
   @override
@@ -37,12 +40,28 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
     super.initState();
 
     // Initiate animation controller
-    _controller = new AnimationController(
+    _ac = new AnimationController(
       vsync: this,
       lowerBound: 0.0,
       upperBound: 100.0,
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 200),
     );
+
+    // Generate widget every tick
+    _ac.addListener(() => setState(() => null));
+
+    // Add animation listener to manage animation
+    _ac.addStatusListener((AnimationStatus status) {
+      if (status == AnimationStatus.completed) {
+        dev.log('Animation completed.');
+
+        // Reset animation
+        _ac.reset();
+
+        // Unlock lock
+        _blocked = false;
+      }
+    });
   }
 
   @override
@@ -50,7 +69,7 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
     super.dispose();
 
     // Dispose animation controller
-    _controller.dispose();
+    _ac.dispose();
   }
 
   @override
@@ -64,11 +83,25 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
     // Carousel image group
     final images = <Widget>[
       new Container(
-        width: 300.0,
-        height: 300.0,
+        width: width - (hp * 2),
+        height: height - ((vp * 2) + 110),
         color: const Color(0xffff3333),
       ),
+      new Container(
+        width: width - (hp * 2),
+        height: height - ((vp * 2) + 110),
+        color: const Color(0xff33ff33),
+      ),
+      new Container(
+        width: width - (hp * 2),
+        height: height - ((vp * 2) + 110),
+        color: const Color(0xff3333ff),
+      ),
     ];
+
+    // Carousel offset value
+    double offset = ((width - (hp * 2)) * (_active - 1));
+    double difference = (_side * (width - (hp * 2)) * (_ac.value / 100.0));
 
     // Animated carousel with images
     final carousel = new Expanded(
@@ -80,7 +113,7 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
             children: <Widget>[
               new Positioned(
                 bottom: 0.0,
-                left: _offset,
+                left: -(offset + difference),
                 child: new Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -94,13 +127,16 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
     );
 
     // Guide message
-    final msg = new Text(
-      _texts[_active - 1],
-      style: new TextStyle(
-        fontFamily: FontConst.primary,
-        fontSize: 14.0,
-        color: ColorConst.darkGrayColor,
-        letterSpacing: 0.0,
+    final msg = new Opacity(
+      opacity: _ac.value >= 50 ? (_ac.value - 50) / 50 : (50 - _ac.value) / 50,
+      child: new Text(
+        _texts[_active - 1],
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          fontSize: 14.0,
+          color: ColorConst.darkGrayColor,
+          letterSpacing: 0.0,
+        ),
       ),
     );
 
@@ -167,6 +203,7 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
+            tp,
             carousel,
             tp,
             msg,
@@ -187,8 +224,44 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
       return;
     }
 
+    _blocked = true;
+
     // Side of the slide action
     final dx = details.velocity.pixelsPerSecond.dx;
+
+    if (dx > 0) {
+      // App shows the first screen
+      if (_active <= 1) {
+        _blocked = false;
+        return;
+      }
+
+      // Move carousel to left
+      _side = -1;
+
+      final cb = (_) {
+        setState(() => _active -= 1);
+      };
+
+      // Start animation
+      _ac.forward().then(cb);
+    } else {
+      // App shows the last screen
+      if (_active >= 3) {
+        _blocked = false;
+        return;
+      }
+
+      // Move carousel to right
+      _side = 1;
+
+      final cb = (_) {
+        setState(() => _active += 1);
+      };
+
+      // Start animation
+      _ac.forward().then(cb);
+    }
   }
 
   /// Complete the guide statement
