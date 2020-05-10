@@ -206,53 +206,63 @@ class _SignInState extends State<SignInPage> {
       );
 
       // Forgot password page button
-      final fpb = new SizedBox(
+      final fpt = new Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          new Text(
+            'forgot password? ',
+            style: new TextStyle(
+              fontFamily: FontConst.primary,
+              fontSize: 12.0,
+              letterSpacing: 0.33,
+              color: ColorConst.grayColor,
+            ),
+          ),
+          new GestureDetector(
+            onTap: () {
+              Navigator.of(context).pushReplacementNamed(SignUpPage.tag);
+            },
+            child: new Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 8.0,
+                horizontal: 4.0,
+              ),
+              child: new Text(
+                'reset',
+                style: new TextStyle(
+                  fontFamily: FontConst.primary,
+                  fontSize: 12.0,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.33,
+                  color: ColorConst.grayColor,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+
+      // Create sign-up page button
+      final sub = new SizedBox(
         width: double.infinity,
         child: new CupertinoButton(
-          onPressed: _signIn,
+          onPressed: () {
+            Navigator.of(context).pushReplacementNamed(SignUpPage.tag);
+          },
           color: ColorConst.grayColor,
           borderRadius: BorderRadius.circular(8.0),
           pressedOpacity: 0.9,
           padding: EdgeInsets.zero,
           child: new Text(
-            'Forgot password',
+            'Sign Up',
             style: new TextStyle(
               color: const Color(0xffffffff),
               fontSize: 14.0,
               fontWeight: FontWeight.w400,
               letterSpacing: -0.28,
             ),
-          ),
-        ),
-      );
-
-      // Don't have an account text
-      final sut = new Text(
-        'You do not have an account yet?',
-        style: new TextStyle(
-          fontFamily: FontConst.primary,
-          fontSize: 12.0,
-          letterSpacing: 0.33,
-          color: ColorConst.grayColor,
-        ),
-      );
-
-      // Create sign-up page button
-      final sub = new CupertinoButton(
-        onPressed: () {
-          Navigator.of(context).pushReplacementNamed(SignUpPage.tag);
-        },
-        color: ColorConst.transparent,
-        pressedOpacity: 1,
-        padding: EdgeInsets.all(8.0),
-        minSize: 4.0,
-        child: new Text(
-          'Sign Up',
-          style: new TextStyle(
-            color: ColorConst.grayColor,
-            fontSize: 14.0,
-            fontWeight: FontWeight.w400,
-            letterSpacing: -0.28,
           ),
         ),
       );
@@ -271,10 +281,10 @@ class _SignInState extends State<SignInPage> {
           pt,
           sib,
           pt,
-          fpb,
+          fpt,
           ptl,
-          sut,
           sub,
+          pt,
         ],
       );
     }
