@@ -3,9 +3,7 @@ import 'dart:developer' as dev;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:spectrome/item/input.dart';
-
 import 'package:spectrome/item/button.dart';
-
 import 'package:spectrome/page/sign_up.dart';
 import 'package:spectrome/service/account.dart';
 import 'package:spectrome/theme/color.dart';
