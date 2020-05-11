@@ -3,6 +3,9 @@ import 'dart:developer' as dev;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:spectrome/item/input.dart';
+
+import 'package:spectrome/item/button.dart';
+
 import 'package:spectrome/page/sign_up.dart';
 import 'package:spectrome/service/account.dart';
 import 'package:spectrome/theme/color.dart';
@@ -185,24 +188,9 @@ class _SignInState extends State<SignInPage> {
       );
 
       // Create sign-in submit button
-      final sib = new SizedBox(
-        width: double.infinity,
-        child: new CupertinoButton(
-          onPressed: _signIn,
-          color: ColorConst.buttonColor,
-          borderRadius: BorderRadius.circular(8.0),
-          pressedOpacity: 0.9,
-          padding: EdgeInsets.zero,
-          child: new Text(
-            'Sign In',
-            style: new TextStyle(
-              color: const Color(0xffffffff),
-              fontSize: 14.0,
-              fontWeight: FontWeight.w400,
-              letterSpacing: -0.28,
-            ),
-          ),
-        ),
+      final sib = new Button(
+        text: 'Sign In',
+        onPressed: _signIn,
       );
 
       // Forgot password page button
@@ -245,26 +233,12 @@ class _SignInState extends State<SignInPage> {
       );
 
       // Create sign-up page button
-      final sub = new SizedBox(
-        width: double.infinity,
-        child: new CupertinoButton(
-          onPressed: () {
-            Navigator.of(context).pushReplacementNamed(SignUpPage.tag);
-          },
-          color: ColorConst.grayColor,
-          borderRadius: BorderRadius.circular(8.0),
-          pressedOpacity: 0.9,
-          padding: EdgeInsets.zero,
-          child: new Text(
-            'Sign Up',
-            style: new TextStyle(
-              color: const Color(0xffffffff),
-              fontSize: 14.0,
-              fontWeight: FontWeight.w400,
-              letterSpacing: -0.28,
-            ),
-          ),
-        ),
+      final sub = new Button(
+        text: 'Sign Up',
+        color: ColorConst.grayColor,
+        onPressed: () {
+          Navigator.of(context).pushReplacementNamed(SignUpPage.tag);
+        },
       );
 
       // Create main container
