@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:spectrome/item/input.dart';
+import 'package:spectrome/item/button.dart';
 import 'package:spectrome/page/sign_up.dart';
 import 'package:spectrome/service/account.dart';
 import 'package:spectrome/theme/color.dart';
@@ -185,76 +186,57 @@ class _SignInState extends State<SignInPage> {
       );
 
       // Create sign-in submit button
-      final sib = new SizedBox(
-        width: double.infinity,
-        child: new CupertinoButton(
-          onPressed: _signIn,
-          color: ColorConst.buttonColor,
-          borderRadius: BorderRadius.circular(8.0),
-          pressedOpacity: 0.9,
-          padding: EdgeInsets.zero,
-          child: new Text(
-            'Sign In',
-            style: new TextStyle(
-              color: const Color(0xffffffff),
-              fontSize: 14.0,
-              fontWeight: FontWeight.w400,
-              letterSpacing: -0.28,
-            ),
-          ),
-        ),
+      final sib = new Button(
+        text: 'Sign In',
+        onPressed: _signIn,
       );
 
       // Forgot password page button
-      final fpb = new SizedBox(
-        width: double.infinity,
-        child: new CupertinoButton(
-          onPressed: _signIn,
-          color: ColorConst.grayColor,
-          borderRadius: BorderRadius.circular(8.0),
-          pressedOpacity: 0.9,
-          padding: EdgeInsets.zero,
-          child: new Text(
-            'Forgot password',
+      final fpt = new Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          new Text(
+            'forgot password? ',
             style: new TextStyle(
-              color: const Color(0xffffffff),
-              fontSize: 14.0,
-              fontWeight: FontWeight.w400,
-              letterSpacing: -0.28,
+              fontFamily: FontConst.primary,
+              fontSize: 12.0,
+              letterSpacing: 0.33,
+              color: ColorConst.grayColor,
             ),
           ),
-        ),
-      );
-
-      // Don't have an account text
-      final sut = new Text(
-        'You do not have an account yet?',
-        style: new TextStyle(
-          fontFamily: FontConst.primary,
-          fontSize: 12.0,
-          letterSpacing: 0.33,
-          color: ColorConst.grayColor,
-        ),
+          new GestureDetector(
+            onTap: () {
+              Navigator.of(context).pushReplacementNamed(SignUpPage.tag);
+            },
+            child: new Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 8.0,
+                horizontal: 4.0,
+              ),
+              child: new Text(
+                'reset',
+                style: new TextStyle(
+                  fontFamily: FontConst.primary,
+                  fontSize: 12.0,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.33,
+                  color: ColorConst.grayColor,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+          ),
+        ],
       );
 
       // Create sign-up page button
-      final sub = new CupertinoButton(
+      final sub = new Button(
+        text: 'Sign Up',
+        color: ColorConst.grayColor,
         onPressed: () {
           Navigator.of(context).pushReplacementNamed(SignUpPage.tag);
         },
-        color: ColorConst.transparent,
-        pressedOpacity: 1,
-        padding: EdgeInsets.all(8.0),
-        minSize: 4.0,
-        child: new Text(
-          'Sign Up',
-          style: new TextStyle(
-            color: ColorConst.grayColor,
-            fontSize: 14.0,
-            fontWeight: FontWeight.w400,
-            letterSpacing: -0.28,
-          ),
-        ),
       );
 
       // Create main container
@@ -271,10 +253,10 @@ class _SignInState extends State<SignInPage> {
           pt,
           sib,
           pt,
-          fpb,
+          fpt,
           ptl,
-          sut,
           sub,
+          pt,
         ],
       );
     }
