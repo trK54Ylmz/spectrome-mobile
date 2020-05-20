@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:flutter/cupertino.dart';
 import 'package:spectrome/item/input.dart';
 
@@ -5,32 +7,67 @@ class FormValidation extends StatefulWidget {
   // Children widgets
   final Widget child;
 
-  // Form input group from children widgets
-  final List<TextInputState> fields;
-
-  // Error messages
-  final List<String> errors;
-
   const FormValidation({
     Key key,
     @required this.child,
-    this.errors = const <String>[],
-    this.fields = const <TextInputState>[],
-  });
+  })  : assert(child != null),
+        super(key: key);
 
   /// Get the closest [_FormValidationState]
-  /// 
+  ///
   /// Helps to update state of the input group
   static FormValidationState of(BuildContext context) {
     final scope = context.dependOnInheritedWidgetOfExactType<_FormValidationScope>();
-    if (scope == null) {
-      return null;
-    }
-
-    return scope.formState;
+    return scope == null ? null : scope.formState;
   }
 
   FormValidationState createState() => new FormValidationState();
+}
+
+class FormValidationState extends State<FormValidation> {
+  int _generation = 0;
+
+  // Form input group from children widgets
+  final List<TextInputState> _fields = <TextInputState>[];
+
+  // Error messages
+  final List<String> errors = <String>[];
+
+  /// Register field to form
+  void register(TextInputState field) {
+    _fields.add(field);
+
+    dev.log('Field "${field.widget.hint}" registered to form.');
+  }
+
+  /// Unregister field from form
+  void unregister(TextInputState field) {
+    _fields.remove(field);
+  }
+
+  /// Validate form according to given fields
+  bool validate() {
+    for (int i = 0; i < _fields.length; i++) {
+      // Validate input
+      final result = _fields[i].validate();
+
+      // Append error to errors list
+      if (result != null) {
+        errors.add(result);
+      }
+    }
+
+    return errors.isEmpty;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new _FormValidationScope(
+      formState: this,
+      gen: _generation,
+      child: widget.child,
+    );
+  }
 }
 
 class _FormValidationScope extends InheritedWidget {
@@ -49,11 +86,4 @@ class _FormValidationScope extends InheritedWidget {
 
   @override
   bool updateShouldNotify(_FormValidationScope old) => gen != old.gen;
-}
-
-class FormValidationState extends State<FormValidation> {
-  @override
-  Widget build(BuildContext context) {
-    throw UnimplementedError();
-  }
 }
