@@ -2,6 +2,7 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/form.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/page/sign_in.dart';
@@ -36,7 +37,7 @@ class _SignUpState extends State<SignUpPage> {
   final _name = new TextEditingController();
 
   // Form validation key
-  final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormValidationState>();
 
   // Screen focus node
   final _focus = new FocusNode();
@@ -112,21 +113,13 @@ class _SignUpState extends State<SignUpPage> {
       // Add re-try button
       final button = new Padding(
         padding: EdgeInsets.only(top: 16.0),
-        child: new CupertinoButton(
+        child: new Button(
+          text: 'Try again',
+          color: ColorConst.grayColor,
           onPressed: () {
             // Reload sign up screen
             Navigator.of(context).pushReplacementNamed(SignUpPage.tag);
           },
-          child: new Text(
-            'Try again',
-            style: new TextStyle(
-              color: const Color(0xffffffff),
-              fontFamily: FontConst.primary,
-              fontSize: 14.0,
-              letterSpacing: 0.33,
-            ),
-          ),
-          color: ColorConst.grayColor,
         ),
       );
 
@@ -141,6 +134,11 @@ class _SignUpState extends State<SignUpPage> {
         ],
       );
     } else {
+      final logo = new Image.asset(
+        'assets/images/logo@2x.png',
+        width: 128.0,
+      );
+
       final loading = new Image.asset(
         'assets/images/loading.gif',
         width: 40.0,
@@ -247,55 +245,58 @@ class _SignUpState extends State<SignUpPage> {
       );
 
       // Create sign-up submit button
-      final sub = new SizedBox(
-        width: double.infinity,
-        child: new CupertinoButton(
-          onPressed: _signUp,
-          color: ColorConst.buttonColor,
-          borderRadius: BorderRadius.circular(8.0),
-          pressedOpacity: 0.9,
-          padding: EdgeInsets.zero,
-          child: new Text(
-            'Sign Up',
-            style: new TextStyle(
-              color: const Color(0xffffffff),
-              fontSize: 14.0,
-              fontWeight: FontWeight.w400,
-              letterSpacing: -0.28,
-            ),
-          ),
-        ),
+      final sub = new Button(
+        onPressed: _signUp,
+        color: ColorConst.buttonColor,
+        text: 'Sign Up',
       );
 
       // Already have an account text
-      final sit = new Text(
-        'You already have an account?',
-        style: new TextStyle(
-          fontFamily: FontConst.primary,
-          fontSize: 12.0,
-          letterSpacing: 0.33,
-          color: ColorConst.grayColor,
-        ),
+      final sit = new Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          new Text(
+            'already have an account? ',
+            style: new TextStyle(
+              fontFamily: FontConst.primary,
+              fontSize: 12.0,
+              letterSpacing: 0.33,
+              color: ColorConst.grayColor,
+            ),
+          ),
+          new GestureDetector(
+            onTap: () {
+              Navigator.of(context).pushReplacementNamed(SignInPage.tag);
+            },
+            child: new Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 8.0,
+                horizontal: 4.0,
+              ),
+              child: new Text(
+                'sign in',
+                style: new TextStyle(
+                  fontFamily: FontConst.primary,
+                  fontSize: 12.0,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.33,
+                  color: ColorConst.grayColor,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+          ),
+        ],
       );
 
       // Create sign-in page button
-      final sib = new CupertinoButton(
+      final sib = new Button(
+        color: ColorConst.transparent,
+        text: 'Sign In',
         onPressed: () {
           Navigator.of(context).pushReplacementNamed(SignInPage.tag);
         },
-        color: ColorConst.transparent,
-        pressedOpacity: 1,
-        padding: EdgeInsets.all(8.0),
-        minSize: 4.0,
-        child: new Text(
-          'Sign In',
-          style: new TextStyle(
-            color: ColorConst.grayColor,
-            fontSize: 14.0,
-            fontWeight: FontWeight.w400,
-            letterSpacing: -0.28,
-          ),
-        ),
       );
 
       // Create main container
@@ -305,17 +306,19 @@ class _SignUpState extends State<SignUpPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            pt,
+            logo,
             _loading ? loading : empty,
             pt,
             phone,
             pt,
-            email,
-            pt,
-            password,
-            pt,
             username,
             pt,
             name,
+            pt,
+            email,
+            pt,
+            password,
             pt,
             sub,
             ptl,
@@ -355,6 +358,9 @@ class _SignUpState extends State<SignUpPage> {
 
     // Validate form key
     if (!_formKey.currentState.validate()) {
+      // Create custom error
+      setState(() => _error = ErrorMessage.custom(_formKey.currentState.errors.first));
+
       return;
     }
 

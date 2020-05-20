@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:spectrome/item/form.dart';
 
 typedef CallbackFunc<T> = T Function(T value);
 
@@ -61,6 +62,24 @@ class TextInput extends StatefulWidget {
 }
 
 class TextInputState extends State<TextInput> {
+  final TextEditingController _c = new TextEditingController();
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Register form input
+    FormValidation.of(context)?.unregister(this);
+    FormValidation.of(context)?.register(this);
+  }
+
+  @override
+  void deactivate() {
+    super.deactivate();
+
+    FormValidation.of(context)?.unregister(this);
+  }
+
   @override
   Widget build(BuildContext context) {
     return new DecoratedBox(
@@ -72,6 +91,7 @@ class TextInputState extends State<TextInput> {
         ),
       ),
       child: new CupertinoTextField(
+        controller: widget.controller ?? _c,
         enabled: widget.enabled,
         onChanged: widget.onChange,
         obscureText: widget.obscure,
@@ -84,7 +104,12 @@ class TextInputState extends State<TextInput> {
     );
   }
 
+  /// Validate input by using validator and text
   String validate() {
-    return null;
+    if (widget.validator == null) {
+      return null;
+    }
+
+    return widget.validator.call((widget.controller ?? _c).text);
   }
 }
