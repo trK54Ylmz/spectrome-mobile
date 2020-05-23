@@ -54,6 +54,9 @@ class _SignUpState extends State<SignUpPage> {
   // Error message
   ErrorMessage _error;
 
+  // API response, validation error messages
+  String _message;
+
   @override
   void initState() {
     super.initState();
@@ -139,15 +142,33 @@ class _SignUpState extends State<SignUpPage> {
         width: 128.0,
       );
 
-      final loading = new Image.asset(
-        'assets/images/loading.gif',
-        width: 40.0,
-        height: 40.0,
-      );
-
-      final empty = new SizedBox(
-        height: 40.0,
-      );
+      Widget dp;
+      if (_loading) {
+        dp = new Image.asset(
+          'assets/images/loading.gif',
+          width: 40.0,
+          height: 40.0,
+        );
+      } else if (_message != null) {
+        dp = new Padding(
+          padding: EdgeInsets.only(
+            top: 20.0,
+            bottom: 6.0,
+          ),
+          child: new Text(
+            _message,
+            style: new TextStyle(
+              fontFamily: FontConst.primary,
+              fontSize: 12.0,
+              color: ColorConst.darkRed,
+            ),
+          ),
+        );
+      } else {
+        dp = new SizedBox(
+          height: 40.0,
+        );
+      }
 
       // Create phone number input
       final phone = new TextInput(
@@ -308,7 +329,7 @@ class _SignUpState extends State<SignUpPage> {
           children: <Widget>[
             pt,
             logo,
-            _loading ? loading : empty,
+            dp,
             pt,
             phone,
             pt,
@@ -352,6 +373,9 @@ class _SignUpState extends State<SignUpPage> {
     // Say application to sign up in process
     setState(() => _completed = false);
 
+    // Clear message
+    setState(() => _message = null);
+
     if (_loading) {
       return;
     }
@@ -359,7 +383,7 @@ class _SignUpState extends State<SignUpPage> {
     // Validate form key
     if (!_formKey.currentState.validate()) {
       // Create custom error
-      setState(() => _error = ErrorMessage.custom(_formKey.currentState.errors.first));
+      setState(() => _message = _formKey.currentState.errors.first);
 
       return;
     }
@@ -379,7 +403,7 @@ class _SignUpState extends State<SignUpPage> {
           setState(() => _error = ErrorMessage.network());
         } else {
           // Create custom error
-          setState(() => _error = ErrorMessage.custom(r.message));
+          setState(() => _message = r.message);
         }
 
         // Set loading false

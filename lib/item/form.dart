@@ -47,6 +47,9 @@ class FormValidationState extends State<FormValidation> {
 
   /// Validate form according to given fields
   bool validate() {
+    // Clear errors list
+    errors.clear();
+
     for (int i = 0; i < _fields.length; i++) {
       // Validate input
       final result = _fields[i].validate();
