@@ -9,5 +9,7 @@ class ColorConst {
 
   static const darkGrayColor = const Color(0xff999999);
 
+  static const darkRed = const Color(0xff8b0000);
+
   static const grayColor = const Color(0xffcccccc);
 }
