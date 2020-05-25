@@ -10,6 +10,8 @@ The mobile application of Spectrome.
 
 #### Pages
 
+Screens for the application,
+
 <p align="center">
     <img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/signin.jpg" width="224">
     <img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/signup.jpg" width="224">
