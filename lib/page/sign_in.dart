@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/button.dart';
+import 'package:spectrome/item/form.dart';
 import 'package:spectrome/page/sign_up.dart';
 import 'package:spectrome/service/account.dart';
 import 'package:spectrome/theme/color.dart';
@@ -21,6 +22,15 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInState extends State<SignInPage> {
+  // Form validation key
+  final _formKey = GlobalKey<FormValidationState>();
+
+  // Username or e-mail input controller
+  final _loginId = new TextEditingController();
+
+  // Password input controller
+  final _password = new TextEditingController();
+
   // Loading indicator
   bool _loading = true;
 
@@ -32,11 +42,8 @@ class _SignInState extends State<SignInPage> {
   // Error message
   ErrorMessage _error;
 
-  // Login id means username or e-mail address
-  String _loginId;
-
-  // Account password
-  String _password;
+  // API response, validation error messages
+  String _message;
 
   @override
   void initState() {
@@ -140,20 +147,38 @@ class _SignInState extends State<SignInPage> {
         width: 128.0,
       );
 
-      final loading = new Image.asset(
-        'assets/images/loading.gif',
-        width: 40.0,
-        height: 40.0,
-      );
-
-      final empty = new SizedBox(
-        height: 40.0,
-      );
+      Widget s;
+      if (_loading) {
+        s = new Image.asset(
+          'assets/images/loading.gif',
+          width: 40.0,
+          height: 40.0,
+        );
+      } else if (_message != null) {
+        s = new Padding(
+          padding: EdgeInsets.only(
+            top: 20.0,
+            bottom: 6.0,
+          ),
+          child: new Text(
+            _message,
+            style: new TextStyle(
+              fontFamily: FontConst.primary,
+              fontSize: 12.0,
+              color: ColorConst.darkRed,
+            ),
+          ),
+        );
+      } else {
+        s = new SizedBox(
+          height: 40.0,
+        );
+      }
 
       // Create e-mail address input
       final email = new TextInput(
         hint: 'Username or e-mail address',
-        onChange: (i) => _loginId = i,
+        controller: _loginId,
         style: new TextStyle(
           fontFamily: FontConst.primary,
           fontSize: 14.0,
@@ -165,13 +190,16 @@ class _SignInState extends State<SignInPage> {
           letterSpacing: 0.33,
           color: const Color(0xffcccccc),
         ),
+        validator: (i) {
+          return null;
+        },
       );
 
       // Create password input
       final password = new TextInput(
         hint: 'Password',
+        controller: _password,
         obscure: true,
-        onChange: (i) => _password = i,
         style: new TextStyle(
           fontFamily: FontConst.primary,
           fontSize: 14.0,
@@ -183,6 +211,21 @@ class _SignInState extends State<SignInPage> {
           letterSpacing: 0.33,
           color: const Color(0xffcccccc),
         ),
+        validator: (i) {
+          if (i.length == 0) {
+            return 'The password is required.';
+          }
+
+          if (i.length < 8) {
+            return 'The password cannot be lower than 8 character.';
+          }
+
+          if (i.length > 50) {
+            return 'The password cannot be higher than 50 character.';
+          }
+
+          return null;
+        },
       );
 
       // Create sign-in submit button
@@ -240,24 +283,27 @@ class _SignInState extends State<SignInPage> {
       );
 
       // Create main container
-      w = new Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          pt,
-          logo,
-          _loading ? loading : empty,
-          email,
-          pt,
-          password,
-          pt,
-          sib,
-          pt,
-          fpt,
-          ptl,
-          sub,
-          pt,
-        ],
+      w = new FormValidation(
+        key: _formKey,
+        child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            pt,
+            logo,
+            s,
+            email,
+            pt,
+            password,
+            pt,
+            sib,
+            pt,
+            fpt,
+            ptl,
+            sub,
+            pt,
+          ],
+        ),
       );
     }
 
@@ -279,6 +325,14 @@ class _SignInState extends State<SignInPage> {
     dev.log('Sign in button clicked.');
 
     if (_loading) {
+      return;
+    }
+
+    // Validate form key
+    if (!_formKey.currentState.validate()) {
+      // Create custom error
+      setState(() => _message = _formKey.currentState.errors.first);
+
       return;
     }
 
@@ -314,6 +368,6 @@ class _SignInState extends State<SignInPage> {
     };
 
     // Send sign in request
-    _as.signIn(_loginId, _password).then(sc);
+    _as.signIn(_loginId.text, _password.text).then(sc);
   }
 }

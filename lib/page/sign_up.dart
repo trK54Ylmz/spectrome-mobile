@@ -21,6 +21,9 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUpPage> {
+    // Form validation key
+  final _formKey = GlobalKey<FormValidationState>();
+
   // Phone number input controller
   final _phone = new TextEditingController();
 
@@ -35,9 +38,6 @@ class _SignUpState extends State<SignUpPage> {
 
   // User real name input controller
   final _name = new TextEditingController();
-
-  // Form validation key
-  final _formKey = GlobalKey<FormValidationState>();
 
   // Screen focus node
   final _focus = new FocusNode();
@@ -142,15 +142,15 @@ class _SignUpState extends State<SignUpPage> {
         width: 128.0,
       );
 
-      Widget dp;
+      Widget s;
       if (_loading) {
-        dp = new Image.asset(
+        s = new Image.asset(
           'assets/images/loading.gif',
           width: 40.0,
           height: 40.0,
         );
       } else if (_message != null) {
-        dp = new Padding(
+        s = new Padding(
           padding: EdgeInsets.only(
             top: 20.0,
             bottom: 6.0,
@@ -165,7 +165,7 @@ class _SignUpState extends State<SignUpPage> {
           ),
         );
       } else {
-        dp = new SizedBox(
+        s = new SizedBox(
           height: 40.0,
         );
       }
@@ -186,6 +186,24 @@ class _SignUpState extends State<SignUpPage> {
           letterSpacing: 0,
           color: const Color(0xffcccccc),
         ),
+        validator: (i) {
+          if (i.length == 0) {
+            return 'The phone number is required.';
+          }
+
+          // Example format is +905431234567
+          if (i.length < 9 || i.length > 16) {
+            return 'Invalid phone number.';
+          }
+
+          // Check according E.164 format
+          final r = new RegExp(r'\+[1-9]\d{7,14}$');
+          if (r.allMatches(i).isEmpty) {
+            return 'Invalid phone number.';
+          }
+
+          return null;
+        },
       );
 
       // Create e-mail address input
@@ -204,6 +222,19 @@ class _SignUpState extends State<SignUpPage> {
           letterSpacing: 0,
           color: const Color(0xffcccccc),
         ),
+        validator: (i) {
+          if (i.length == 0) {
+            return 'The e-mail address is required.';
+          }
+
+          // Most basic e-mail address validation
+          final r = new RegExp(r'^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$');
+          if (r.allMatches(i).isEmpty) {
+            return 'The e-mail address is invalid.';
+          }
+
+          return null;
+        },
       );
 
       // Create password input
@@ -222,6 +253,21 @@ class _SignUpState extends State<SignUpPage> {
           letterSpacing: 0,
           color: const Color(0xffcccccc),
         ),
+        validator: (i) {
+          if (i.length == 0) {
+            return 'The password is required.';
+          }
+
+          if (i.length < 8) {
+            return 'The password cannot be lower than 8 character.';
+          }
+
+          if (i.length > 50) {
+            return 'The password cannot be higher than 50 character.';
+          }
+
+          return null;
+        },
       );
 
       // Create username input
@@ -240,8 +286,16 @@ class _SignUpState extends State<SignUpPage> {
           color: const Color(0xffcccccc),
         ),
         validator: (i) {
-          if (i.length < 6) {
-            return 'The username cannot be lower than 6 character';
+          if (i.length == 0) {
+            return 'The username is required.';
+          }
+
+          if (i.length < 2) {
+            return 'The username cannot be lower than 2 character.';
+          }
+
+          if (i.length > 24) {
+            return 'The username cannot be higher than 24 character.';
           }
 
           return null;
@@ -263,6 +317,21 @@ class _SignUpState extends State<SignUpPage> {
           letterSpacing: 0,
           color: const Color(0xffcccccc),
         ),
+        validator: (i) {
+          if (i.length == 0) {
+            return 'The name is required.';
+          }
+
+          if (i.length < 4) {
+            return 'The name cannot be lower than 4 character.';
+          }
+
+          if (i.length > 50) {
+            return 'The name cannot be higher than 50 character.';
+          }
+
+          return null;
+        },
       );
 
       // Create sign-up submit button
@@ -329,7 +398,7 @@ class _SignUpState extends State<SignUpPage> {
           children: <Widget>[
             pt,
             logo,
-            dp,
+            s,
             pt,
             phone,
             pt,
