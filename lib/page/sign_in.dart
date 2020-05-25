@@ -191,6 +191,14 @@ class _SignInState extends State<SignInPage> {
           color: const Color(0xffcccccc),
         ),
         validator: (i) {
+          if (i.length == 0) {
+            return 'The username or e-mail address is required.';
+          }
+
+          if (i.length < 2) {
+            return 'The username or e-mail address is too short.';
+          }
+
           return null;
         },
       );
