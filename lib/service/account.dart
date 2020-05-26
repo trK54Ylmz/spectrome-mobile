@@ -95,6 +95,8 @@ class AccountService extends Service {
 class SignInResponse extends BasicResponse {
   String session;
 
+  bool activation;
+
   /// Create empty object
   SignInResponse.empty() : super.empty();
 
@@ -109,6 +111,7 @@ class SignInResponse extends BasicResponse {
     final json = super.jsonToMap(input);
 
     session = json['session'] ?? null;
+    activation = json['activation'] ?? true;
   }
 }
 

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/form.dart';
+import 'package:spectrome/page/activation.dart';
 import 'package:spectrome/page/sign_up.dart';
 import 'package:spectrome/service/account.dart';
 import 'package:spectrome/theme/color.dart';
@@ -34,6 +35,7 @@ class _SignInState extends State<SignInPage> {
   // Loading indicator
   bool _loading = true;
 
+  // Shared preferences instance
   SharedPreferences _preferences;
 
   // Account service
@@ -188,7 +190,7 @@ class _SignInState extends State<SignInPage> {
           fontFamily: FontConst.primary,
           fontSize: 14.0,
           letterSpacing: 0.33,
-          color: const Color(0xffcccccc),
+          color: ColorConst.grayColor,
         ),
         validator: (i) {
           if (i.length == 0) {
@@ -217,7 +219,7 @@ class _SignInState extends State<SignInPage> {
           fontFamily: FontConst.primary,
           fontSize: 14.0,
           letterSpacing: 0.33,
-          color: const Color(0xffcccccc),
+          color: ColorConst.grayColor,
         ),
         validator: (i) {
           if (i.length == 0) {
@@ -316,7 +318,7 @@ class _SignInState extends State<SignInPage> {
     }
 
     return new Scaffold(
-      backgroundColor: const Color(0xffffffff),
+      backgroundColor: ColorConst.white,
       body: new Center(
         child: new Padding(
           padding: EdgeInsets.symmetric(horizontal: pv),
@@ -364,6 +366,11 @@ class _SignInState extends State<SignInPage> {
 
         // Set loading false
         setState(() => _loading = false);
+
+        // Route to activation page, if activation is wating
+        if (!r.activation) {
+          Navigator.of(context).pushReplacementNamed(ActivationPage.tag);
+        }
 
         return;
       }

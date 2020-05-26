@@ -1,40 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:spectrome/util/device.dart';
 
 class Http {
-  static final _client = new HttpClient();
-
   static const TOKEN_HEADER = 'x-authorization';
 
   static const CONTENT_HEADER = 'accept-encoding';
 
   static const FORM = 'application/x-www-form-urlencoded';
 
-  static String _domain;
+  static final client = new HttpClient();
 
-  /// Initialize domain name according to device type
-  ///
-  /// Local environment ignores ssl verification
-  static Future<Null> init() {
-    if (_domain != null) {
-      new Future.value(null);
-    }
-
-    final c = (bool isDevice) {
-      _domain = isDevice ? 'api.spectrome.app' : 'localhost';
-
-      /// Bypass ssl verification at test
-      if (!isDevice) {
-        _client.badCertificateCallback = (c, h, p) => true;
-      }
-
-      return null;
-    };
-
-    return Device.isDevice().then(c);
-  }
+  static String domain;
 
   /// Make a POST request to the remote server
   static Future<Response> doPost(
@@ -44,7 +21,7 @@ class Http {
     Map<String, String> body,
     String type,
   }) {
-    final Uri url = new Uri.https(_domain, path, params);
+    final Uri url = new Uri.https(domain, path, params);
 
     // Http request and response callback
     final c = (HttpClientRequest r) {
@@ -68,7 +45,7 @@ class Http {
       return r.close();
     };
 
-    return _client.getUrl(url).then(c).then((r) => _toResponse(r));
+    return client.getUrl(url).then(c).then((r) => _toResponse(r));
   }
 
   /// Convert [HttpClientResponse] to Spectrome [HttpResponse] object

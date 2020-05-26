@@ -1,13 +1,7 @@
 import 'dart:io';
-import 'package:spectrome/util/http.dart';
 import 'package:spectrome/service/response.dart';
 
 abstract class Service {
-  /// Http client initializer
-  Service() {
-    Http.init();
-  }
-
   /// Handle HTTP IO errors
   static T handleError<T extends BasicResponse>(e, StackTrace s, T t) {
     t.status = false;

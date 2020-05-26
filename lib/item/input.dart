@@ -29,6 +29,8 @@ class TextInput extends StatefulWidget {
 
   final EdgeInsetsGeometry padding;
 
+  final Color borderColor;
+
   final double radius;
 
   final bool enabled;
@@ -51,6 +53,7 @@ class TextInput extends StatefulWidget {
     this.radius = 8.0,
     this.enabled = true,
     this.obscure = false,
+    this.borderColor = const Color(0xffcccccc),
     this.padding = const EdgeInsets.symmetric(
       vertical: 8.0,
       horizontal: 6.0,
@@ -82,24 +85,23 @@ class TextInputState extends State<TextInput> {
 
   @override
   Widget build(BuildContext context) {
-    return new DecoratedBox(
+    return new CupertinoTextField(
+      controller: widget.controller ?? _c,
+      enabled: widget.enabled,
+      onChanged: widget.onChange,
+      obscureText: widget.obscure,
+      style: widget.style,
+      padding: widget.padding,
+      placeholder: widget.hint,
+      placeholderStyle: widget.hintStyle,
+      keyboardType: widget.inputType,
       decoration: new BoxDecoration(
         borderRadius: new BorderRadius.circular(widget.radius),
         color: const Color(0xffffffff),
         border: new Border.all(
           width: 1.0,
+          color: widget.borderColor.withOpacity(0.67),
         ),
-      ),
-      child: new CupertinoTextField(
-        controller: widget.controller ?? _c,
-        enabled: widget.enabled,
-        onChanged: widget.onChange,
-        obscureText: widget.obscure,
-        style: widget.style,
-        padding: widget.padding,
-        placeholder: widget.hint,
-        placeholderStyle: widget.hintStyle,
-        keyboardType: widget.inputType,
       ),
     );
   }

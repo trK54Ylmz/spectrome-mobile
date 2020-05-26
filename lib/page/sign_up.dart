@@ -184,7 +184,7 @@ class _SignUpState extends State<SignUpPage> {
           fontFamily: FontConst.primary,
           fontSize: 14.0,
           letterSpacing: 0,
-          color: const Color(0xffcccccc),
+          color: ColorConst.grayColor,
         ),
         validator: (i) {
           if (i.length == 0) {
@@ -220,7 +220,7 @@ class _SignUpState extends State<SignUpPage> {
           fontFamily: FontConst.primary,
           fontSize: 14.0,
           letterSpacing: 0,
-          color: const Color(0xffcccccc),
+          color: ColorConst.grayColor,
         ),
         validator: (i) {
           if (i.length == 0) {
@@ -251,7 +251,7 @@ class _SignUpState extends State<SignUpPage> {
           fontFamily: FontConst.primary,
           fontSize: 14.0,
           letterSpacing: 0,
-          color: const Color(0xffcccccc),
+          color: ColorConst.grayColor,
         ),
         validator: (i) {
           if (i.length == 0) {
@@ -283,7 +283,7 @@ class _SignUpState extends State<SignUpPage> {
           fontFamily: FontConst.primary,
           fontSize: 14.0,
           letterSpacing: 0,
-          color: const Color(0xffcccccc),
+          color: ColorConst.grayColor,
         ),
         validator: (i) {
           if (i.length == 0) {
@@ -315,7 +315,7 @@ class _SignUpState extends State<SignUpPage> {
           fontFamily: FontConst.primary,
           fontSize: 14.0,
           letterSpacing: 0,
-          color: const Color(0xffcccccc),
+          color: ColorConst.grayColor,
         ),
         validator: (i) {
           if (i.length == 0) {
@@ -420,7 +420,7 @@ class _SignUpState extends State<SignUpPage> {
     }
 
     return new Scaffold(
-      backgroundColor: const Color(0xffffffff),
+      backgroundColor: ColorConst.white,
       body: new GestureDetector(
         onTap: () => FocusScope.of(context).requestFocus(_focus),
         child: new Center(

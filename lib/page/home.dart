@@ -58,8 +58,7 @@ class _HomeState extends State<HomePage> {
     };
 
     // Check session etc.
-    final c = (_) async {
-      final sp = await SharedPreferences.getInstance();
+    final c = (SharedPreferences sp) async {
       final session = sp.getString('_session');
 
       // route page according to session information
@@ -83,8 +82,7 @@ class _HomeState extends State<HomePage> {
     // Show loading icon when screen initialized
     setState(() => _loading = true);
 
-    // Initialize http client and check session
-    Http.init().then(c).catchError(ec);
+    SharedPreferences.getInstance().then(c);
   }
 
   @override
