@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:spectrome/service/base.dart';
 import 'package:spectrome/service/response.dart';
 import 'package:spectrome/util/http.dart';
@@ -9,7 +11,10 @@ class AccountService extends Service {
   /// Login id is e-mail address or username
   Future<SignInResponse> signIn(String loginId, String password) {
     final path = '/account/login';
-    final body = {'login_id': loginId, 'password': password};
+    final body = {
+      'login_id': loginId,
+      'password': password,
+    };
 
     // Http response handle callback
     final c = (Response r) {
@@ -17,6 +22,8 @@ class AccountService extends Service {
         final m = 'An error occurred';
         return SignInResponse.bind(status: false, message: m);
       }
+
+      dev.log(r.body);
 
       return SignInResponse.fromJson(r.body);
     };
@@ -27,7 +34,7 @@ class AccountService extends Service {
       return Service.handleError<SignInResponse>(e, s, r);
     };
 
-    return Http.doPost(path, body: body).then(c).catchError(e);
+    return Http.doPost(path, body: body, type: Http.FORM).then(c).catchError(e);
   }
 
   /// Create new user account
@@ -95,7 +102,7 @@ class AccountService extends Service {
 class SignInResponse extends BasicResponse {
   String session;
 
-  bool activation;
+  bool activation = true;
 
   /// Create empty object
   SignInResponse.empty() : super.empty();
@@ -108,7 +115,7 @@ class SignInResponse extends BasicResponse {
 
   /// Create response by using JSON input
   SignInResponse.fromJson(String input) {
-    final json = super.jsonToMap(input);
+    final json = super.fromJson(input);
 
     session = json['session'] ?? null;
     activation = json['activation'] ?? true;
@@ -127,7 +134,7 @@ class SignUpResponse extends BasicResponse {
 
   /// Create response by using JSON input
   SignUpResponse.fromJson(String input) {
-    super.jsonToMap(input);
+    super.fromJson(input);
   }
 }
 
@@ -143,6 +150,6 @@ class SessionResponse extends BasicResponse {
 
   /// Create response by using JSON input
   SessionResponse.fromJson(String input) {
-    super.jsonToMap(input);
+    super.fromJson(input);
   }
 }

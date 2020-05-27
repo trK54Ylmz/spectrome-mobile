@@ -142,6 +142,7 @@ class _MainState extends State<MainPage> {
 
         final ip = i.TextInput(
           hint: '192.168.X.Y',
+          inputType: TextInputType.number,
           controller: new TextEditingController(),
           style: new TextStyle(
             fontFamily: FontConst.primary,

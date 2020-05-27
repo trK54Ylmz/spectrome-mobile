@@ -7,7 +7,7 @@ class Http {
 
   static const CONTENT_HEADER = 'accept-encoding';
 
-  static const FORM = 'application/x-www-form-urlencoded';
+  static const FORM = 'application/x-www-form-urlencoded; charset=utf-8';
 
   static final client = new HttpClient();
 
@@ -41,11 +41,24 @@ class Http {
         }
       }
 
+      // Add form data if body selected
+      if (body != null) {
+        final form = <String>[];
+        for (var key in body.keys) {
+          final k = Uri.encodeQueryComponent(key);
+          final v = Uri.encodeQueryComponent(body[key]);
+
+          form.add('$k=$v');
+        }
+
+        r.write(form.join('&'));
+      }
+
       // Send request and close remote connection
       return r.close();
     };
 
-    return client.getUrl(url).then(c).then((r) => _toResponse(r));
+    return client.postUrl(url).then(c).then((r) => _toResponse(r));
   }
 
   /// Convert [HttpClientResponse] to Spectrome [HttpResponse] object
