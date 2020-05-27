@@ -46,7 +46,7 @@ class _ActivationState extends State<ActivationPage> {
   _ActivationState() {
     // Create text controllers
     for (int i = 0; i < 6; i++) {
-      _inputs[i] = new TextEditingController();
+      _inputs.add(new TextEditingController());
     }
   }
 

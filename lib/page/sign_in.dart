@@ -7,6 +7,7 @@ import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/form.dart';
 import 'package:spectrome/page/activation.dart';
 import 'package:spectrome/page/sign_up.dart';
+import 'package:spectrome/page/timeline.dart';
 import 'package:spectrome/service/account.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
@@ -361,28 +362,50 @@ class _SignInState extends State<SignInPage> {
           setState(() => _error = ErrorMessage.network());
         } else {
           // Create custom error
-          setState(() => _error = ErrorMessage.custom(r.message));
+          setState(() => _message = r.message);
         }
 
         // Set loading false
         setState(() => _loading = false);
 
         // Route to activation page, if activation is wating
-        if (!r.activation) {
+        if (r.activation == false) {
           Navigator.of(context).pushReplacementNamed(ActivationPage.tag);
         }
 
         return;
       }
 
+      // Clear API response message
+      setState(() => _message = null);
+
       // Create new auth key
       _preferences.setString('_session', r.session);
 
       // Set loading false
       setState(() => _loading = false);
+
+      // Route to timeline
+      Navigator.of(context).pushReplacementNamed(TimeLinePage.tag);
+    };
+
+    // Error callback
+    final e = (e, s) {
+      // Create unknown error message
+      final st = () {
+        _loading = false;
+
+        final msg = 'Unknown error. Please try again later.';
+        _error = ErrorMessage.custom(msg);
+      };
+
+      setState(st);
+
+      print(e);
+      print(s);
     };
 
     // Send sign in request
-    _as.signIn(_loginId.text, _password.text).then(sc);
+    _as.signIn(_loginId.text, _password.text).then(sc).catchError(e);
   }
 }
