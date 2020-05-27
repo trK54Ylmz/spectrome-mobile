@@ -21,7 +21,7 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUpPage> {
-    // Form validation key
+  // Form validation key
   final _formKey = GlobalKey<FormValidationState>();
 
   // Phone number input controller
@@ -81,17 +81,7 @@ class _SignUpState extends State<SignUpPage> {
     );
 
     Widget w;
-    if (_loading) {
-      // Use loading animation
-      w = new Center(
-        child: new Image.asset(
-          'assets/images/loading.gif',
-          width: 60.0,
-          height: 60.0,
-        ),
-      );
-    } else if (_completed) {
-    } else if (_error != null) {
+    if (_error != null) {
       final ts = new TextStyle(
         fontFamily: FontConst.primary,
         fontSize: 14.0,
@@ -228,7 +218,7 @@ class _SignUpState extends State<SignUpPage> {
           }
 
           // Most basic e-mail address validation
-          final r = new RegExp(r'^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$');
+          final r = new RegExp(r'^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$');
           if (r.allMatches(i).isEmpty) {
             return 'The e-mail address is invalid.';
           }
@@ -421,12 +411,15 @@ class _SignUpState extends State<SignUpPage> {
 
     return new Scaffold(
       backgroundColor: ColorConst.white,
-      body: new GestureDetector(
-        onTap: () => FocusScope.of(context).requestFocus(_focus),
-        child: new Center(
-          child: new Padding(
-            padding: EdgeInsets.symmetric(horizontal: pv),
-            child: w,
+      body: new SingleChildScrollView(
+        child: new GestureDetector(
+          onTap: () => FocusScope.of(context).requestFocus(_focus),
+          child: new Container(
+            height: height,
+            child: new Padding(
+              padding: EdgeInsets.symmetric(horizontal: pv),
+              child: w,
+            ),
           ),
         ),
       ),
@@ -488,7 +481,12 @@ class _SignUpState extends State<SignUpPage> {
       setState(() => _completed = true);
     };
 
+    final email = _email.text;
+    final password = _password.text;
+    final username = _username.text;
+    final name = _name.text;
+
     // Send sign up request
-    _as.signUp(_email.text, _password.text, _name.text, _username.text).then(sc);
+    _as.signUp(email, password, username, name).then(sc);
   }
 }

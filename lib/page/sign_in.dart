@@ -320,10 +320,13 @@ class _SignInState extends State<SignInPage> {
 
     return new Scaffold(
       backgroundColor: ColorConst.white,
-      body: new Center(
-        child: new Padding(
-          padding: EdgeInsets.symmetric(horizontal: pv),
-          child: w,
+      body: new SingleChildScrollView(
+        child: new Container(
+          height: height,
+          child: new Padding(
+            padding: EdgeInsets.symmetric(horizontal: pv),
+            child: w,
+          ),
         ),
       ),
     );

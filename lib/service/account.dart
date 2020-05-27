@@ -69,7 +69,7 @@ class AccountService extends Service {
       return Service.handleError<SignUpResponse>(e, s, r);
     };
 
-    return Http.doPost(path, body: body).then(c).catchError(e);
+    return Http.doPost(path, body: body, type: Http.FORM).then(c).catchError(e);
   }
 
   /// Check user session by using session code

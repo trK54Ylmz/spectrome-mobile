@@ -245,11 +245,14 @@ class _ActivationState extends State<ActivationPage> {
     }
 
     return new Scaffold(
-      backgroundColor: const Color(0xffffffff),
-      body: new Center(
-        child: new Padding(
-          padding: EdgeInsets.symmetric(horizontal: pv),
-          child: w,
+      backgroundColor: ColorConst.white,
+      body: new SingleChildScrollView(
+        child: new Container(
+          height: height,
+          child: new Padding(
+            padding: EdgeInsets.symmetric(horizontal: pv),
+            child: w,
+          ),
         ),
       ),
     );
