@@ -360,6 +360,12 @@ class _SignInState extends State<SignInPage> {
       dev.log('Sign in request sent.');
 
       if (!r.status) {
+        // Route to activation page, if activation is wating
+        if (r.activation == false) {
+          Navigator.of(context).pushReplacementNamed(ActivationPage.tag);
+          return;
+        }
+
         if (r.isNetErr ?? false) {
           // Create network error
           setState(() => _error = ErrorMessage.network());
@@ -370,11 +376,6 @@ class _SignInState extends State<SignInPage> {
 
         // Set loading false
         setState(() => _loading = false);
-
-        // Route to activation page, if activation is wating
-        if (r.activation == false) {
-          Navigator.of(context).pushReplacementNamed(ActivationPage.tag);
-        }
 
         return;
       }

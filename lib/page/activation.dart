@@ -9,6 +9,7 @@ import 'package:spectrome/service/account.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/storage.dart';
+import 'package:spectrome/page/timeline.dart';
 import 'package:spectrome/util/error.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -25,8 +26,11 @@ class _ActivationState extends State<ActivationPage> {
   // Form validation key
   final _formKey = GlobalKey<FormValidationState>();
 
-  // Username or e-mail input controller
+  // Code input controller group
   final _inputs = <TextEditingController>[];
+
+  // Code input focus node group
+  final _focuses = <FocusNode>[];
 
   // Loading indicator
   bool _loading = true;
@@ -43,13 +47,6 @@ class _ActivationState extends State<ActivationPage> {
   // API response, validation error messages
   String _message;
 
-  _ActivationState() {
-    // Create text controllers
-    for (int i = 0; i < 6; i++) {
-      _inputs.add(new TextEditingController());
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -61,10 +58,34 @@ class _ActivationState extends State<ActivationPage> {
       setState(() => _loading = false);
     };
 
-    SharedPreferences.getInstance().then(spc);
+    Storage.load().then(spc);
 
     // Initialize account service
     _as = new AccountService();
+
+    // Create text controllers
+    for (int i = 0; i < 6; i++) {
+      _inputs.add(new TextEditingController());
+      _focuses.add(new FocusNode());
+    }
+
+    final dcb = (_) {
+      _focuses[0].requestFocus();
+    };
+
+    // Focus to first input
+    WidgetsBinding.instance.addPostFrameCallback(dcb);
+  }
+
+  @override
+  void dispose() {
+    // Dispose all controllers and focus nodes
+    for (int i = 0; i < 6; i++) {
+      _inputs[i].dispose();
+      _focuses[i].dispose();
+    }
+
+    super.dispose();
   }
 
   @override
@@ -89,15 +110,17 @@ class _ActivationState extends State<ActivationPage> {
     );
 
     Widget w;
-    if (_loading) {
-      // Use loading animation
-      w = new Center(
-        child: new Image.asset(
-          'assets/images/loading.gif',
-          width: 60.0,
-          height: 60.0,
-        ),
-      );
+    if (_preferences == null) {
+      if (_loading) {
+        // Use loading animation
+        w = new Center(
+          child: new Image.asset(
+            'assets/images/loading.gif',
+            width: 60.0,
+            height: 60.0,
+          ),
+        );
+      }
     } else {
       final logo = new Image.asset(
         'assets/images/logo@2x.png',
@@ -151,20 +174,49 @@ class _ActivationState extends State<ActivationPage> {
       final items = <Widget>[];
       for (int i = 0; i < 6; i++) {
         // Activation input
-        final item = new TextInput(
-          controller: _inputs[i],
-          style: new TextStyle(
-            fontFamily: FontConst.primary,
-            fontSize: 14.0,
-            letterSpacing: 0.33,
-          ),
-          validator: (i) {
-            if (i.length == 0) {
-              return 'All fields are required.';
-            }
+        final item = new Padding(
+          padding: EdgeInsets.only(right: i < 5 ? 8.0 : 0.0),
+          child: new Container(
+            width: 30.0,
+            child: new TextInput(
+              controller: _inputs[i],
+              focusNode: _focuses[i],
+              inputType: TextInputType.number,
+              size: 1,
+              cursorWidth: 1.0,
+              style: new TextStyle(
+                fontFamily: FontConst.primary,
+                fontSize: 24.0,
+                letterSpacing: 0.0,
+              ),
+              onChange: (i) {
+                int index = 0;
+                for (int i = 0; i < 6; i++) {
+                  if (_focuses[i].hasFocus) {
+                    index = i;
+                    break;
+                  }
+                }
 
-            return null;
-          },
+                if (i.length > 0 && index < 5) {
+                  _focuses[index + 1].requestFocus();
+                }
+
+                if (i.length == 0 && index > 0) {
+                  _focuses[index - 1].requestFocus();
+                }
+
+                return null;
+              },
+              validator: (i) {
+                if (i.length == 0) {
+                  return 'All fields are required.';
+                }
+
+                return null;
+              },
+            ),
+          ),
         );
 
         items.add(item);
@@ -258,5 +310,86 @@ class _ActivationState extends State<ActivationPage> {
     );
   }
 
-  void _activation() {}
+  void _activation() {
+    dev.log('Activation button clicked.');
+
+    // Say application to activation in process
+    setState(() => null);
+
+    // Clear message
+    setState(() => _message = null);
+
+    if (_loading) {
+      return;
+    }
+
+    // Validate form key
+    if (!_formKey.currentState.validate()) {
+      // Create custom error
+      setState(() => _message = _formKey.currentState.errors.first);
+
+      return;
+    }
+
+    dev.log('Activation request sending.');
+
+    // Set loading true
+    setState(() => _loading = true);
+
+    final sc = (ActivationResponse r) {
+      dev.log('Activation request sent.');
+
+      if (!r.status) {
+        if (r.isNetErr ?? false) {
+          // Create network error
+          setState(() => _error = ErrorMessage.network());
+        } else {
+          // Create custom error
+          setState(() => _message = r.message);
+        }
+
+        // Set loading false
+        setState(() => _loading = false);
+
+        return;
+      }
+
+      // Clear API response message
+      setState(() => _message = null);
+
+      // Create new auth key
+      // _preferences.setString('_session', r.session);
+
+      // Set loading false
+      setState(() => _loading = false);
+
+      // Route to timeline
+      Navigator.of(context).pushReplacementNamed(TimeLinePage.tag);
+    };
+
+    // Error callback
+    final e = (e, s) {
+      // Create unknown error message
+      final st = () {
+        _loading = false;
+
+        final msg = 'Unknown error. Please try again later.';
+        _error = ErrorMessage.custom(msg);
+      };
+
+      setState(st);
+
+      print(e);
+      print(s);
+    };
+
+    // Create activation code as integer
+    final buffer = <String>[];
+    for (int i = 0; i < 6; i++) {
+      buffer.add(_inputs[i].text);
+    }
+
+    // Send activation request
+    _as.activate(int.parse(buffer.join())).then(sc).catchError(e);
+  }
 }

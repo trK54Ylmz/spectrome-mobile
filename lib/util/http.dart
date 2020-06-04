@@ -9,16 +9,52 @@ class Http {
 
   static const FORM = 'application/x-www-form-urlencoded; charset=utf-8';
 
+  static const JSON = 'application/json; charset=utf-8';
+
   static final client = new HttpClient();
 
   static String domain;
+
+  /// Make a GET request to the remote server
+  static Future<Response> doGet(
+    String path, {
+    Map<String, String> params,
+    Map<String, String> headers,
+    String type,
+  }) {
+    final Uri url = new Uri.https(domain, path, params);
+
+    // Http request and response callback
+    final c = (HttpClientRequest r) {
+      // Update request headers if headers parameter is present
+      if (headers != null && headers.isNotEmpty) {
+        for (String k in headers.keys) {
+          r.headers.add(k, headers[k]);
+        }
+      }
+
+      // Add http request content type header
+      if (type != null) {
+        switch (type) {
+          case JSON:
+            r.headers.add(HttpHeaders.contentTypeHeader, JSON);
+            break;
+        }
+      }
+
+      // Send request and close remote connection
+      return r.close();
+    };
+
+    return client.getUrl(url).then(c).then((r) => _toResponse(r));
+  }
 
   /// Make a POST request to the remote server
   static Future<Response> doPost(
     String path, {
     Map<String, String> params,
     Map<String, String> headers,
-    Map<String, String> body,
+    Map<String, dynamic> body,
     String type,
   }) {
     final Uri url = new Uri.https(domain, path, params);

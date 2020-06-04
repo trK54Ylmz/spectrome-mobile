@@ -37,6 +37,32 @@ class AccountService extends Service {
     return Http.doPost(path, body: body, type: Http.FORM).then(c).catchError(e);
   }
 
+  /// Activate account by using activation code
+  Future<ActivationResponse> activate(int code) {
+    final path = '/account/activate';
+    final params = {'code': code.toString()};
+
+    // Http response handle callback
+    final c = (Response r) {
+      if (r.code != 200) {
+        final m = 'An error occurred';
+        return ActivationResponse.bind(status: false, message: m);
+      }
+
+      dev.log(r.body);
+
+      return ActivationResponse.fromJson(r.body);
+    };
+
+    // Handle error case
+    final e = (e, StackTrace s) {
+      final r = ActivationResponse.empty();
+      return Service.handleError<ActivationResponse>(e, s, r);
+    };
+
+    return Http.doGet(path, params: params).then(c).catchError(e);
+  }
+
   /// Create new user account
   /// by using e-mail address, password, name and username
   Future<SignUpResponse> signUp(
@@ -119,6 +145,26 @@ class SignInResponse extends BasicResponse {
 
     session = json['session'] ?? null;
     activation = json['activation'] ?? true;
+  }
+}
+
+class ActivationResponse extends BasicResponse {
+  bool expired = false;
+
+  /// Create empty object
+  ActivationResponse.empty() : super.empty();
+
+  /// Create only status and message
+  ActivationResponse.bind({
+    status,
+    message,
+  }) : super.bind(status: status, message: message);
+
+  /// Create response by using JSON input
+  ActivationResponse.fromJson(String input) {
+    final json = super.fromJson(input);
+
+    expired = json['expired'] ?? false;
   }
 }
 
