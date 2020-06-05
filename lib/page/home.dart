@@ -7,7 +7,6 @@ import 'package:spectrome/page/timeline.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/service/account.dart';
-import 'package:spectrome/util/http.dart';
 import 'package:spectrome/util/error.dart';
 import 'package:spectrome/util/route.dart';
 import 'package:shared_preferences/shared_preferences.dart';

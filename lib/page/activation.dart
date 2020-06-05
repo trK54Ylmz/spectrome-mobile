@@ -9,6 +9,7 @@ import 'package:spectrome/service/account.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/storage.dart';
+import 'package:spectrome/page/timeline.dart';
 import 'package:spectrome/util/error.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -25,14 +26,23 @@ class _ActivationState extends State<ActivationPage> {
   // Form validation key
   final _formKey = GlobalKey<FormValidationState>();
 
-  // Username or e-mail input controller
+  // Code input controller group
   final _inputs = <TextEditingController>[];
+
+  // Code input focus node group
+  final _focuses = <FocusNode>[];
 
   // Loading indicator
   bool _loading = true;
 
+  // Resend request loading indicator;
+  bool _sending = false;
+
   // Shared preferences instance
   SharedPreferences _preferences;
+
+  // Token code from sign in response
+  String _token;
 
   // Account service
   AccountService _as;
@@ -43,13 +53,6 @@ class _ActivationState extends State<ActivationPage> {
   // API response, validation error messages
   String _message;
 
-  _ActivationState() {
-    // Create text controllers
-    for (int i = 0; i < 6; i++) {
-      _inputs.add(new TextEditingController());
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -58,13 +61,43 @@ class _ActivationState extends State<ActivationPage> {
     final spc = (SharedPreferences s) {
       _preferences = s;
 
+      // Set token code
+      _token = s.getString('_st');
+
+      // Remove code from shared preferences store
+      s.remove('_st');
+
       setState(() => _loading = false);
     };
 
-    SharedPreferences.getInstance().then(spc);
+    Storage.load().then(spc);
 
     // Initialize account service
     _as = new AccountService();
+
+    // Create text controllers
+    for (int i = 0; i < 6; i++) {
+      _inputs.add(new TextEditingController());
+      _focuses.add(new FocusNode());
+    }
+
+    final dcb = (_) {
+      _focuses[0].requestFocus();
+    };
+
+    // Focus to first input
+    WidgetsBinding.instance.addPostFrameCallback(dcb);
+  }
+
+  @override
+  void dispose() {
+    // Dispose all controllers and focus nodes
+    for (int i = 0; i < 6; i++) {
+      _inputs[i].dispose();
+      _focuses[i].dispose();
+    }
+
+    super.dispose();
   }
 
   @override
@@ -72,14 +105,9 @@ class _ActivationState extends State<ActivationPage> {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     final pv = width > 400 ? 100.0 : 60.0;
-    final ph = height > 800 ? 64.0 : 32.0;
 
     final pt = const Padding(
       padding: EdgeInsets.only(top: 8.0),
-    );
-
-    final ptl = new Padding(
-      padding: EdgeInsets.only(top: ph),
     );
 
     final ts = new TextStyle(
@@ -89,15 +117,63 @@ class _ActivationState extends State<ActivationPage> {
     );
 
     Widget w;
-    if (_loading) {
-      // Use loading animation
-      w = new Center(
-        child: new Image.asset(
-          'assets/images/loading.gif',
-          width: 60.0,
-          height: 60.0,
-        ),
-      );
+    if (_preferences == null) {
+      if (_loading) {
+        // Use loading animation
+        w = new Center(
+          child: new Image.asset(
+            'assets/images/loading.gif',
+            width: 60.0,
+            height: 60.0,
+          ),
+        );
+      } else if (_error != null) {
+        final icon = new Icon(
+          new IconData(
+            _error.icon,
+            fontFamily: FontConst.fa,
+          ),
+          color: ColorConst.grayColor,
+          size: 32.0,
+        );
+
+        final message = new Padding(
+          padding: EdgeInsets.only(top: 8.0),
+          child: new Text(_error.error, style: ts),
+        );
+
+        // Add re-try button
+        final button = new Padding(
+          padding: EdgeInsets.only(top: 16.0),
+          child: new CupertinoButton(
+            color: ColorConst.grayColor,
+            onPressed: () {
+              // Reload sign in screen
+              Navigator.of(context).pushReplacementNamed(ActivationPage.tag);
+            },
+            child: new Text(
+              'Try again',
+              style: new TextStyle(
+                color: const Color(0xffffffff),
+                fontFamily: FontConst.primary,
+                fontSize: 14.0,
+                letterSpacing: 0.33,
+              ),
+            ),
+          ),
+        );
+
+        // Handle error
+        w = new Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            icon,
+            message,
+            button,
+          ],
+        );
+      }
     } else {
       final logo = new Image.asset(
         'assets/images/logo@2x.png',
@@ -151,20 +227,49 @@ class _ActivationState extends State<ActivationPage> {
       final items = <Widget>[];
       for (int i = 0; i < 6; i++) {
         // Activation input
-        final item = new TextInput(
-          controller: _inputs[i],
-          style: new TextStyle(
-            fontFamily: FontConst.primary,
-            fontSize: 14.0,
-            letterSpacing: 0.33,
-          ),
-          validator: (i) {
-            if (i.length == 0) {
-              return 'All fields are required.';
-            }
+        final item = new Padding(
+          padding: EdgeInsets.only(right: i < 5 ? 8.0 : 0.0),
+          child: new Container(
+            width: 30.0,
+            child: new TextInput(
+              controller: _inputs[i],
+              focusNode: _focuses[i],
+              inputType: TextInputType.number,
+              size: 1,
+              cursorWidth: 1.0,
+              style: new TextStyle(
+                fontFamily: FontConst.primary,
+                fontSize: 24.0,
+                letterSpacing: 0.0,
+              ),
+              onChange: (i) {
+                int index = 0;
+                for (int i = 0; i < 6; i++) {
+                  if (_focuses[i].hasFocus) {
+                    index = i;
+                    break;
+                  }
+                }
 
-            return null;
-          },
+                if (i.length > 0 && index < 5) {
+                  _focuses[index + 1].requestFocus();
+                }
+
+                if (i.length == 0 && index > 0) {
+                  _focuses[index - 1].requestFocus();
+                }
+
+                return null;
+              },
+              validator: (i) {
+                if (i.length == 0) {
+                  return 'All fields are required.';
+                }
+
+                return null;
+              },
+            ),
+          ),
         );
 
         items.add(item);
@@ -180,10 +285,11 @@ class _ActivationState extends State<ActivationPage> {
       // Create activation submit button
       final aib = new Button(
         text: 'Activation',
-        onPressed: _activation,
+        onPressed: _activate,
       );
 
       // Send activation code button
+      final cl = _sending ? ColorConst.grayColor.withAlpha(100) : ColorConst.grayColor;
       final art = new Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -194,7 +300,7 @@ class _ActivationState extends State<ActivationPage> {
               fontFamily: FontConst.primary,
               fontSize: 12.0,
               letterSpacing: 0.33,
-              color: ColorConst.grayColor,
+              color: cl,
             ),
           ),
           new GestureDetector(
@@ -211,7 +317,7 @@ class _ActivationState extends State<ActivationPage> {
                   fontSize: 12.0,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.33,
-                  color: ColorConst.grayColor,
+                  color: cl,
                   decoration: TextDecoration.underline,
                 ),
               ),
@@ -258,5 +364,149 @@ class _ActivationState extends State<ActivationPage> {
     );
   }
 
-  void _activation() {}
+  /// Create and send activation code request
+  void _activate() {
+    dev.log('Activation button clicked.');
+
+    // Clear message
+    setState(() => _message = null);
+
+    if (_loading) {
+      return;
+    }
+
+    // Validate form key
+    if (!_formKey.currentState.validate()) {
+      // Create custom error
+      setState(() => _message = _formKey.currentState.errors.first);
+
+      return;
+    }
+
+    dev.log('Activation request sending.');
+
+    // Set loading true
+    setState(() => _loading = true);
+
+    final sc = (ActivateResponse r) {
+      dev.log('Activation request sent.');
+
+      if (!r.status) {
+        if (r.isNetErr ?? false) {
+          // Create network error
+          setState(() => _error = ErrorMessage.network());
+        } else {
+          // Create custom error
+          setState(() => _message = r.message);
+        }
+
+        // Set loading false
+        setState(() => _loading = false);
+
+        return;
+      }
+
+      // Clear API response message
+      setState(() => _message = null);
+
+      // Create new auth key
+      _preferences.setString('_session', r.session);
+
+      // Set loading false
+      setState(() => _loading = false);
+
+      // Route to timeline
+      Navigator.of(context).pushReplacementNamed(TimeLinePage.tag);
+    };
+
+    // Error callback
+    final e = (e, s) {
+      // Create unknown error message
+      final st = () {
+        _loading = false;
+
+        final msg = 'Unknown error. Please try again later.';
+        _error = ErrorMessage.custom(msg);
+      };
+
+      setState(st);
+
+      print(e);
+      print(s);
+    };
+
+    // Create activation code as integer
+    final buffer = <String>[];
+    for (int i = 0; i < 6; i++) {
+      buffer.add(_inputs[i].text);
+    }
+
+    // Send activation request
+    final code = buffer.join();
+    _as.activate(_token, code).then(sc).catchError(e);
+  }
+
+  void _activation() {
+    dev.log('Resend activation button clicked.');
+
+    // Clear message
+    setState(() => _message = null);
+
+    if (_sending) {
+      return;
+    }
+
+    print(1);
+    if (_token == null) {
+      setState(() => _message = 'The token is required.');
+      return;
+    }
+
+    setState(() => _sending = true);
+
+    dev.log('Resend request sending.');
+
+    final sc = (ActivationResponse r) {
+      dev.log('Resend request sent.');
+
+      if (!r.status) {
+        if (r.isNetErr ?? false) {
+          // Create network error
+          setState(() => _error = ErrorMessage.network());
+        } else {
+          // Create custom error
+          setState(() => _message = r.message);
+        }
+
+        return;
+      }
+
+      // Clear API response message
+      setState(() => _message = null);
+
+      // Update sign in token
+      _token = r.token;
+    };
+
+    // Error callback
+    final e = (e, s) {
+      // Create unknown error message
+      final st = () {
+        final msg = 'Unknown error. Please try again later.';
+        _error = ErrorMessage.custom(msg);
+      };
+
+      setState(st);
+
+      print(e);
+      print(s);
+    };
+
+    final c = () {
+      setState(() => _sending = false);
+    };
+
+    // Send activation code again by using request
+    _as.activation(_token).then(sc).catchError(e).whenComplete(c);
+  }
 }

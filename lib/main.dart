@@ -140,10 +140,20 @@ class _MainState extends State<MainPage> {
           },
         );
 
+        final controller = new TextEditingController();
+        final cb = (i) {
+          if (i == null || i.length == 0) {
+            controller.text = '192.168.1.';
+          }
+        };
+
+        // Fill IP controller after 3 seconds if empty
+        Future.delayed(Duration(seconds: 2)).then(cb);
+
         final ip = i.TextInput(
           hint: '192.168.X.Y',
           inputType: TextInputType.number,
-          controller: new TextEditingController(),
+          controller: controller,
           style: new TextStyle(
             fontFamily: FontConst.primary,
             fontSize: 14.0,
@@ -164,7 +174,7 @@ class _MainState extends State<MainPage> {
           width: 160.0,
           onPressed: () {
             if (ip.controller.text.length == 0) {
-              setState(() => _error = true); 
+              setState(() => _error = true);
               return;
             }
 

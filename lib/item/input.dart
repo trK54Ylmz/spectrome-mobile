@@ -31,11 +31,15 @@ class TextInput extends StatefulWidget {
 
   final Color borderColor;
 
+  final double cursorWidth;
+
   final double radius;
 
   final bool enabled;
 
   final bool obscure;
+
+  final int size;
 
   TextInput({
     Key key,
@@ -50,7 +54,9 @@ class TextInput extends StatefulWidget {
     this.hintStyle,
     this.inputType = TextInputType.text,
     this.onChange,
+    this.size = 1000,
     this.radius = 8.0,
+    this.cursorWidth = 1.0,
     this.enabled = true,
     this.obscure = false,
     this.borderColor = const Color(0xffcccccc),
@@ -87,14 +93,18 @@ class TextInputState extends State<TextInput> {
   Widget build(BuildContext context) {
     return new CupertinoTextField(
       controller: widget.controller ?? _c,
+      focusNode: widget.focusNode,
       enabled: widget.enabled,
       onChanged: widget.onChange,
+      onSubmitted: widget.onSaved,
       obscureText: widget.obscure,
       style: widget.style,
       padding: widget.padding,
       placeholder: widget.hint,
       placeholderStyle: widget.hintStyle,
       keyboardType: widget.inputType,
+      maxLength: widget.size,
+      cursorWidth: widget.cursorWidth,
       decoration: new BoxDecoration(
         borderRadius: new BorderRadius.circular(widget.radius),
         color: const Color(0xffffffff),
