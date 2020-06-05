@@ -35,8 +35,14 @@ class _ActivationState extends State<ActivationPage> {
   // Loading indicator
   bool _loading = true;
 
+  // Resend request loading indicator;
+  bool _sending = false;
+
   // Shared preferences instance
   SharedPreferences _preferences;
+
+  // Token code from sign in response
+  String _token;
 
   // Account service
   AccountService _as;
@@ -54,6 +60,12 @@ class _ActivationState extends State<ActivationPage> {
     // Shared preferences callback
     final spc = (SharedPreferences s) {
       _preferences = s;
+
+      // Set token code
+      _token = s.getString('_st');
+
+      // Remove code from shared preferences store
+      s.remove('_st');
 
       setState(() => _loading = false);
     };
@@ -93,14 +105,9 @@ class _ActivationState extends State<ActivationPage> {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     final pv = width > 400 ? 100.0 : 60.0;
-    final ph = height > 800 ? 64.0 : 32.0;
 
     final pt = const Padding(
       padding: EdgeInsets.only(top: 8.0),
-    );
-
-    final ptl = new Padding(
-      padding: EdgeInsets.only(top: ph),
     );
 
     final ts = new TextStyle(
@@ -119,6 +126,52 @@ class _ActivationState extends State<ActivationPage> {
             width: 60.0,
             height: 60.0,
           ),
+        );
+      } else if (_error != null) {
+        final icon = new Icon(
+          new IconData(
+            _error.icon,
+            fontFamily: FontConst.fa,
+          ),
+          color: ColorConst.grayColor,
+          size: 32.0,
+        );
+
+        final message = new Padding(
+          padding: EdgeInsets.only(top: 8.0),
+          child: new Text(_error.error, style: ts),
+        );
+
+        // Add re-try button
+        final button = new Padding(
+          padding: EdgeInsets.only(top: 16.0),
+          child: new CupertinoButton(
+            color: ColorConst.grayColor,
+            onPressed: () {
+              // Reload sign in screen
+              Navigator.of(context).pushReplacementNamed(ActivationPage.tag);
+            },
+            child: new Text(
+              'Try again',
+              style: new TextStyle(
+                color: const Color(0xffffffff),
+                fontFamily: FontConst.primary,
+                fontSize: 14.0,
+                letterSpacing: 0.33,
+              ),
+            ),
+          ),
+        );
+
+        // Handle error
+        w = new Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            icon,
+            message,
+            button,
+          ],
         );
       }
     } else {
@@ -232,10 +285,11 @@ class _ActivationState extends State<ActivationPage> {
       // Create activation submit button
       final aib = new Button(
         text: 'Activation',
-        onPressed: _activation,
+        onPressed: _activate,
       );
 
       // Send activation code button
+      final cl = _sending ? ColorConst.grayColor.withAlpha(100) : ColorConst.grayColor;
       final art = new Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -246,7 +300,7 @@ class _ActivationState extends State<ActivationPage> {
               fontFamily: FontConst.primary,
               fontSize: 12.0,
               letterSpacing: 0.33,
-              color: ColorConst.grayColor,
+              color: cl,
             ),
           ),
           new GestureDetector(
@@ -263,7 +317,7 @@ class _ActivationState extends State<ActivationPage> {
                   fontSize: 12.0,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.33,
-                  color: ColorConst.grayColor,
+                  color: cl,
                   decoration: TextDecoration.underline,
                 ),
               ),
@@ -310,11 +364,9 @@ class _ActivationState extends State<ActivationPage> {
     );
   }
 
-  void _activation() {
+  /// Create and send activation code request
+  void _activate() {
     dev.log('Activation button clicked.');
-
-    // Say application to activation in process
-    setState(() => null);
 
     // Clear message
     setState(() => _message = null);
@@ -336,7 +388,7 @@ class _ActivationState extends State<ActivationPage> {
     // Set loading true
     setState(() => _loading = true);
 
-    final sc = (ActivationResponse r) {
+    final sc = (ActivateResponse r) {
       dev.log('Activation request sent.');
 
       if (!r.status) {
@@ -358,7 +410,7 @@ class _ActivationState extends State<ActivationPage> {
       setState(() => _message = null);
 
       // Create new auth key
-      // _preferences.setString('_session', r.session);
+      _preferences.setString('_session', r.session);
 
       // Set loading false
       setState(() => _loading = false);
@@ -390,6 +442,71 @@ class _ActivationState extends State<ActivationPage> {
     }
 
     // Send activation request
-    _as.activate(int.parse(buffer.join())).then(sc).catchError(e);
+    final code = buffer.join();
+    _as.activate(_token, code).then(sc).catchError(e);
+  }
+
+  void _activation() {
+    dev.log('Resend activation button clicked.');
+
+    // Clear message
+    setState(() => _message = null);
+
+    if (_sending) {
+      return;
+    }
+
+    print(1);
+    if (_token == null) {
+      setState(() => _message = 'The token is required.');
+      return;
+    }
+
+    setState(() => _sending = true);
+
+    dev.log('Resend request sending.');
+
+    final sc = (ActivationResponse r) {
+      dev.log('Resend request sent.');
+
+      if (!r.status) {
+        if (r.isNetErr ?? false) {
+          // Create network error
+          setState(() => _error = ErrorMessage.network());
+        } else {
+          // Create custom error
+          setState(() => _message = r.message);
+        }
+
+        return;
+      }
+
+      // Clear API response message
+      setState(() => _message = null);
+
+      // Update sign in token
+      _token = r.token;
+    };
+
+    // Error callback
+    final e = (e, s) {
+      // Create unknown error message
+      final st = () {
+        final msg = 'Unknown error. Please try again later.';
+        _error = ErrorMessage.custom(msg);
+      };
+
+      setState(st);
+
+      print(e);
+      print(s);
+    };
+
+    final c = () {
+      setState(() => _sending = false);
+    };
+
+    // Send activation code again by using request
+    _as.activation(_token).then(sc).catchError(e).whenComplete(c);
   }
 }

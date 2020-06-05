@@ -37,10 +37,41 @@ class AccountService extends Service {
     return Http.doPost(path, body: body, type: Http.FORM).then(c).catchError(e);
   }
 
-  /// Activate account by using activation code
-  Future<ActivationResponse> activate(int code) {
+  /// Activate account by using activation code and session token
+  Future<ActivateResponse> activate(String token, String code) {
     final path = '/account/activate';
-    final params = {'code': code.toString()};
+    final body = {
+      'code': code.toString(),
+      'token': token,
+    };
+
+    // Http response handle callback
+    final c = (Response r) {
+      if (r.code != 200) {
+        final m = 'An error occurred';
+        return ActivateResponse.bind(status: false, message: m);
+      }
+
+      dev.log(r.body);
+
+      return ActivateResponse.fromJson(r.body);
+    };
+
+    // Handle error case
+    final e = (e, StackTrace s) {
+      final r = ActivateResponse.empty();
+      return Service.handleError<ActivateResponse>(e, s, r);
+    };
+
+    return Http.doPost(path, body: body, type: Http.FORM).then(c).catchError(e);
+  }
+
+  /// Send activation code by using activation code and session token
+  Future<ActivationResponse> activation(String token) {
+    final path = '/account/activation';
+    final body = {
+      'token': token,
+    };
 
     // Http response handle callback
     final c = (Response r) {
@@ -60,7 +91,7 @@ class AccountService extends Service {
       return Service.handleError<ActivationResponse>(e, s, r);
     };
 
-    return Http.doGet(path, params: params).then(c).catchError(e);
+    return Http.doPost(path, body: body, type: Http.FORM).then(c).catchError(e);
   }
 
   /// Create new user account
@@ -126,9 +157,11 @@ class AccountService extends Service {
 }
 
 class SignInResponse extends BasicResponse {
+  bool activation = true;
+
   String session;
 
-  bool activation = true;
+  String token;
 
   /// Create empty object
   SignInResponse.empty() : super.empty();
@@ -143,13 +176,37 @@ class SignInResponse extends BasicResponse {
   SignInResponse.fromJson(String input) {
     final json = super.fromJson(input);
 
+    token = json['token'] ?? null;
     session = json['session'] ?? null;
     activation = json['activation'] ?? true;
   }
 }
 
-class ActivationResponse extends BasicResponse {
+class ActivateResponse extends BasicResponse {
   bool expired = false;
+
+  String session;
+
+  /// Create empty object
+  ActivateResponse.empty() : super.empty();
+
+  /// Create only status and message
+  ActivateResponse.bind({
+    status,
+    message,
+  }) : super.bind(status: status, message: message);
+
+  /// Create response by using JSON input
+  ActivateResponse.fromJson(String input) {
+    final json = super.fromJson(input);
+
+    session = json['session'] ?? null;
+    expired = json['expired'] ?? false;
+  }
+}
+
+class ActivationResponse extends BasicResponse {
+  String token;
 
   /// Create empty object
   ActivationResponse.empty() : super.empty();
@@ -164,7 +221,7 @@ class ActivationResponse extends BasicResponse {
   ActivationResponse.fromJson(String input) {
     final json = super.fromJson(input);
 
-    expired = json['expired'] ?? false;
+    token = json['token'] ?? null;
   }
 }
 

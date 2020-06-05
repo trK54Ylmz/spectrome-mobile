@@ -362,6 +362,9 @@ class _SignInState extends State<SignInPage> {
       if (!r.status) {
         // Route to activation page, if activation is wating
         if (r.activation == false) {
+          // Set session token
+          _preferences.setString('_st', r.token);
+
           Navigator.of(context).pushReplacementNamed(ActivationPage.tag);
           return;
         }
