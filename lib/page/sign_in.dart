@@ -407,9 +407,6 @@ class _SignInState extends State<SignInPage> {
       };
 
       setState(st);
-
-      print(e);
-      print(s);
     };
 
     // Send sign in request

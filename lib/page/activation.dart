@@ -2,6 +2,7 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:spectrome/page/timeline.dart';
 import 'package:spectrome/item/form.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/button.dart';
@@ -9,7 +10,6 @@ import 'package:spectrome/service/account.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/storage.dart';
-import 'package:spectrome/page/timeline.dart';
 import 'package:spectrome/util/error.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -430,9 +430,6 @@ class _ActivationState extends State<ActivationPage> {
       };
 
       setState(st);
-
-      print(e);
-      print(s);
     };
 
     // Create activation code as integer
@@ -456,7 +453,6 @@ class _ActivationState extends State<ActivationPage> {
       return;
     }
 
-    print(1);
     if (_token == null) {
       setState(() => _message = 'The token is required.');
       return;
@@ -497,9 +493,6 @@ class _ActivationState extends State<ActivationPage> {
       };
 
       setState(st);
-
-      print(e);
-      print(s);
     };
 
     final c = () {
