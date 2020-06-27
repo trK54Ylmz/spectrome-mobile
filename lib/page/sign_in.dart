@@ -8,7 +8,7 @@ import 'package:spectrome/item/form.dart';
 import 'package:spectrome/page/activation.dart';
 import 'package:spectrome/page/sign_up.dart';
 import 'package:spectrome/page/timeline.dart';
-import 'package:spectrome/service/account.dart';
+import 'package:spectrome/service/account/sign_in.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -39,9 +39,6 @@ class _SignInState extends State<SignInPage> {
   // Shared preferences instance
   SharedPreferences _preferences;
 
-  // Account service
-  AccountService _as;
-
   // Error message
   ErrorMessage _error;
 
@@ -60,9 +57,6 @@ class _SignInState extends State<SignInPage> {
     };
 
     SharedPreferences.getInstance().then(spc);
-
-    // Initialize account service
-    _as = new AccountService();
   }
 
   @override
@@ -410,6 +404,6 @@ class _SignInState extends State<SignInPage> {
     };
 
     // Send sign in request
-    _as.signIn(_loginId.text, _password.text).then(sc).catchError(e);
+    SignInService.call(_loginId.text, _password.text).then(sc).catchError(e);
   }
 }

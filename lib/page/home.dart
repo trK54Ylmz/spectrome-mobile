@@ -6,7 +6,7 @@ import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/page/timeline.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
-import 'package:spectrome/service/account.dart';
+import 'package:spectrome/service/account/session.dart';
 import 'package:spectrome/util/error.dart';
 import 'package:spectrome/util/route.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -72,10 +72,8 @@ class _HomeState extends State<HomePage> {
         return;
       }
 
-      final _as = new AccountService();
-
       // Check session and route according to response
-      _as.checkSession(session).then(sc).catchError(ec);  
+      SessionService.call(session).then(sc).catchError(ec);
     };
 
     // Show loading icon when screen initialized
