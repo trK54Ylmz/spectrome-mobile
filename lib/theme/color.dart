@@ -12,4 +12,6 @@ class ColorConst {
   static const darkRed = const Color(0xff8b0000);
 
   static const grayColor = const Color(0xffcccccc);
+
+  static const successColor = const Color(0xff2c974b);
 }

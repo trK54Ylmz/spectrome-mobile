@@ -6,7 +6,8 @@ import 'package:spectrome/page/timeline.dart';
 import 'package:spectrome/item/form.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/button.dart';
-import 'package:spectrome/service/account.dart';
+import 'package:spectrome/service/account/activate.dart';
+import 'package:spectrome/service/account/activation.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/storage.dart';
@@ -44,9 +45,6 @@ class _ActivationState extends State<ActivationPage> {
   // Token code from sign in response
   String _token;
 
-  // Account service
-  AccountService _as;
-
   // Error message
   ErrorMessage _error;
 
@@ -71,9 +69,6 @@ class _ActivationState extends State<ActivationPage> {
     };
 
     Storage.load().then(spc);
-
-    // Initialize account service
-    _as = new AccountService();
 
     // Create text controllers
     for (int i = 0; i < 6; i++) {
@@ -440,7 +435,7 @@ class _ActivationState extends State<ActivationPage> {
 
     // Send activation request
     final code = buffer.join();
-    _as.activate(_token, code).then(sc).catchError(e);
+    ActivateService.call(_token, code).then(sc).catchError(e);
   }
 
   void _activation() {
@@ -500,6 +495,6 @@ class _ActivationState extends State<ActivationPage> {
     };
 
     // Send activation code again by using request
-    _as.activation(_token).then(sc).catchError(e).whenComplete(c);
+    ActivationService.call(_token).then(sc).catchError(e).whenComplete(c);
   }
 }

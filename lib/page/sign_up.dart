@@ -6,7 +6,7 @@ import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/form.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/page/sign_in.dart';
-import 'package:spectrome/service/account.dart';
+import 'package:spectrome/service/account/sign_up.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/error.dart';
@@ -46,10 +46,7 @@ class _SignUpState extends State<SignUpPage> {
   bool _loading = false;
 
   // Is sign up operation completed
-  bool _completed = false;
-
-  // Account service
-  AccountService _as;
+  bool _completed = true;
 
   // Error message
   ErrorMessage _error;
@@ -58,18 +55,58 @@ class _SignUpState extends State<SignUpPage> {
   String _message;
 
   @override
-  void initState() {
-    super.initState();
-
-    // Initialize account service
-    _as = new AccountService();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
+
     final pv = width > 400 ? 100.0 : 60.0;
+
+    Widget w;
+    if (_completed) {
+      w = new Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          new Icon(
+            new IconData(
+              0xf058,
+              fontFamily: FontConst.fa,
+            ),
+            color: ColorConst.successColor,
+            size: 60.0,
+          ),
+          new Text(
+            'Sign up completed.',
+            style: new TextStyle(
+              fontFamily: FontConst.primary,
+            ),
+          )
+        ],
+      );
+    } else {
+      w = getForm();
+    }
+
+    return new Scaffold(
+      backgroundColor: ColorConst.white,
+      body: new SingleChildScrollView(
+        child: new GestureDetector(
+          onTap: () => FocusScope.of(context).requestFocus(_focus),
+          child: new Container(
+            height: height,
+            child: new Padding(
+              padding: EdgeInsets.symmetric(horizontal: pv),
+              child: w,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Get sign up form
+  Widget getForm() {
+    final height = MediaQuery.of(context).size.height;
     final ph = height > 800 ? 64.0 : 32.0;
 
     final pt = const Padding(
@@ -80,7 +117,6 @@ class _SignUpState extends State<SignUpPage> {
       padding: EdgeInsets.only(top: ph),
     );
 
-    Widget w;
     if (_error != null) {
       final ts = new TextStyle(
         fontFamily: FontConst.primary,
@@ -117,7 +153,7 @@ class _SignUpState extends State<SignUpPage> {
       );
 
       // Handle error
-      w = new Column(
+      return new Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
@@ -380,7 +416,7 @@ class _SignUpState extends State<SignUpPage> {
       );
 
       // Create main container
-      w = new FormValidation(
+      return new FormValidation(
         key: _formKey,
         child: new Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -408,22 +444,6 @@ class _SignUpState extends State<SignUpPage> {
         ),
       );
     }
-
-    return new Scaffold(
-      backgroundColor: ColorConst.white,
-      body: new SingleChildScrollView(
-        child: new GestureDetector(
-          onTap: () => FocusScope.of(context).requestFocus(_focus),
-          child: new Container(
-            height: height,
-            child: new Padding(
-              padding: EdgeInsets.symmetric(horizontal: pv),
-              child: w,
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   /// Make sign up
@@ -487,6 +507,6 @@ class _SignUpState extends State<SignUpPage> {
     final name = _name.text;
 
     // Send sign up request
-    _as.signUp(email, password, username, name).then(sc);
+    SignUpService.call(email, password, username, name).then(sc);
   }
 }
