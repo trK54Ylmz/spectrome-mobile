@@ -37,3 +37,6 @@ flutter:
     - family: Font Awesome
       fonts:
       - asset: assets/fonts/fa-solid.ttf
+    - family: Font Awesome Brand
+      fonts:
+      - asset: assets/fonts/fa-brand.ttf

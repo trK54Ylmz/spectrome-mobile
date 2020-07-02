@@ -32,7 +32,7 @@ class _HomeState extends State<HomePage> {
     super.initState();
 
     // Handle exceptions
-    final ec = (e, StackTrace s) {
+    final e = (e, StackTrace s) {
       dev.log(e.toString(), stackTrace: s);
 
       final m = 'Something wrong happened';
@@ -73,7 +73,7 @@ class _HomeState extends State<HomePage> {
       }
 
       // Check session and route according to response
-      SessionService.call(session).then(sc).catchError(ec);
+      SessionService.call(session).then(sc).catchError(e);
     };
 
     // Show loading icon when screen initialized

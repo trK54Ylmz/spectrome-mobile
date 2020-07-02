@@ -34,7 +34,7 @@ class VersionService extends Service {
 
 
 class VersionResponse extends BasicResponse {
-  String version;
+  double version;
 
   /// Create empty object
   VersionResponse.empty() : super.empty();

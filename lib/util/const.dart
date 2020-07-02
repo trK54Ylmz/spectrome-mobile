@@ -1,3 +1,3 @@
-class Const {
-  static const VERSION = '0.1';
+class AppConst {
+  static const version = 0.1;
 }
