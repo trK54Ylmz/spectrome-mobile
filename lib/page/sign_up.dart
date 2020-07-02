@@ -58,15 +58,7 @@ class _SignUpState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
-
     final pv = width > 400 ? 100.0 : 60.0;
-
-    Widget w;
-    if (_completed) {
-      w = getCompleted();
-    } else {
-      w = getForm();
-    }
 
     return new Scaffold(
       backgroundColor: ColorConst.white,
@@ -77,7 +69,7 @@ class _SignUpState extends State<SignUpPage> {
             height: height,
             child: new Padding(
               padding: EdgeInsets.symmetric(horizontal: pv),
-              child: w,
+              child: _completed ? getCompleted() : getForm(),
             ),
           ),
         ),
