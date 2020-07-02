@@ -107,14 +107,11 @@ class _SignInState extends State<SignInPage> {
         padding: EdgeInsets.only(top: 16.0),
         child: new CupertinoButton(
           color: ColorConst.grayColor,
-          onPressed: () {
-            // Reload sign in screen
-            Navigator.of(context).pushReplacementNamed(SignInPage.tag);
-          },
+          onPressed: () => Navigator.of(context).pushReplacementNamed(SignInPage.tag),
           child: new Text(
             'Try again',
             style: new TextStyle(
-              color: const Color(0xffffffff),
+              color: ColorConst.white,
               fontFamily: FontConst.primary,
               fontSize: 14.0,
               letterSpacing: 0.33,
@@ -268,9 +265,7 @@ class _SignInState extends State<SignInPage> {
           ),
         ),
         new GestureDetector(
-          onTap: () {
-            Navigator.of(context).pushReplacementNamed(SignUpPage.tag);
-          },
+          onTap: () => Navigator.of(context).pushReplacementNamed(SignUpPage.tag),
           child: new Padding(
             padding: const EdgeInsets.symmetric(
               vertical: 8.0,
@@ -296,9 +291,7 @@ class _SignInState extends State<SignInPage> {
     final sub = new Button(
       text: 'Sign Up',
       color: ColorConst.grayColor,
-      onPressed: () {
-        Navigator.of(context).pushReplacementNamed(SignUpPage.tag);
-      },
+      onPressed: () => Navigator.of(context).pushReplacementNamed(SignUpPage.tag),
     );
 
     // Create main container
