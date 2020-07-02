@@ -12,6 +12,7 @@ import 'package:spectrome/page/home.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/page/sign_up.dart';
 import 'package:spectrome/page/timeline.dart';
+import 'package:spectrome/page/version.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/http.dart';
@@ -27,6 +28,7 @@ final routes = <String, WidgetBuilder>{
   SignUpPage.tag: (c) => new SignUpPage(),
   ActivationPage.tag: (c) => new ActivationPage(),
   TimeLinePage.tag: (c) => new TimeLinePage(),
+  VersionPage.tag: (c) => new VersionPage(),
 };
 
 class MainPage extends StatefulWidget {
@@ -52,7 +54,7 @@ class _MainState extends State<MainPage> {
     // Shared preferences callback
     final cb = (SharedPreferences sp) {
       // Figure out the selected page
-      final t = sp.containsKey('guided') ? HomePage.tag : GuidePage.tag;
+      final t = sp.containsKey('guided') ? VersionPage.tag : GuidePage.tag;
 
       dev.log('Selected page is $t');
 
@@ -102,126 +104,133 @@ class _MainState extends State<MainPage> {
         routes: routes,
       );
     } else {
-      final pt = const Padding(
-        padding: EdgeInsets.only(top: 8.0),
-      );
-
-      // Figure out the widget
-      Widget w;
-      if (_tag == null) {
-        w = new Container(
-          color: const Color(0xffffffff),
-          child: new Center(
-            child: new Image.asset(
-              'assets/images/loading.gif',
-              width: 60.0,
-              height: 60.0,
-            ),
-          ),
-        );
-      } else if (!_domain) {
-        final t = new Text(
-          'Please select API domain',
-          style: new TextStyle(
-            fontFamily: FontConst.primary,
-            color: ColorConst.darkGrayColor,
-            fontSize: 14.0,
-            letterSpacing: 0.33,
-          ),
-        );
-
-        // Default API domain button
-        final b = new Button(
-          text: 'Default',
-          onPressed: () {
-            Http.domain = 'api.spectrome.app';
-
-            setState(() => _domain = true);
-          },
-        );
-
-        final controller = new TextEditingController();
-        final cb = (i) {
-          if (i == null || i.length == 0) {
-            controller.text = '192.168.1.';
-          }
-        };
-
-        // Fill IP controller after 3 seconds if empty
-        Future.delayed(Duration(seconds: 2)).then(cb);
-
-        final ip = i.TextInput(
-          hint: '192.168.X.Y',
-          inputType: TextInputType.number,
-          controller: controller,
-          style: new TextStyle(
-            fontFamily: FontConst.primary,
-            fontSize: 14.0,
-            letterSpacing: 0.33,
-          ),
-          hintStyle: new TextStyle(
-            fontFamily: FontConst.primary,
-            fontSize: 14.0,
-            letterSpacing: 0.33,
-            color: ColorConst.grayColor,
-          ),
-          borderColor: _error ? ColorConst.darkRed : ColorConst.grayColor,
-        );
-
-        // Default API domain button
-        final ib = new Button(
-          text: 'Custom',
-          width: 160.0,
-          onPressed: () {
-            if (ip.controller.text.length == 0) {
-              setState(() => _error = true);
-              return;
-            }
-
-            setState(() => _error = false);
-
-            // Set custom http client parameters
-            Http.domain = ip.controller.text;
-            Http.client.badCertificateCallback = (c, h, p) => true;
-
-            setState(() => _domain = true);
-          },
-        );
-
-        w = new Container(
-          color: ColorConst.white,
-          child: new Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 100.0,
-              vertical: 16.0,
-            ),
-            child: new Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                t,
-                pt,
-                b,
-                pt,
-                pt,
-                ip,
-                pt,
-                ib,
-              ],
-            ),
-          ),
-        );
-      } else {
-        w = routes[_tag](context);
-      }
-
       // Select API endpoint domain, if app not in release mode
       return new CupertinoApp(
         title: 'Spectrome',
         debugShowCheckedModeBanner: false,
-        home: w,
+        home: getDevelop(),
         routes: routes,
       );
     }
+  }
+
+  /// Get develop widgets for main page
+  Widget getDevelop() {
+    // Show loading indicator if any tag have not selected yet
+    if (_tag == null) {
+      return new Container(
+        color: const Color(0xffffffff),
+        child: new Center(
+          child: new Image.asset(
+            'assets/images/loading.gif',
+            width: 60.0,
+            height: 60.0,
+          ),
+        ),
+      );
+    }
+
+    // Show domain name selector widgets
+    // This will be used only for development purposes
+    if (!_domain) {
+      final pt = const Padding(
+        padding: EdgeInsets.only(top: 8.0),
+      );
+
+      final t = new Text(
+        'Please select API domain',
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          color: ColorConst.darkGrayColor,
+          fontSize: 14.0,
+          letterSpacing: 0.33,
+        ),
+      );
+
+      // Default API domain button
+      final b = new Button(
+        text: 'Default',
+        onPressed: () {
+          Http.domain = 'api.spectrome.app';
+
+          setState(() => _domain = true);
+        },
+      );
+
+      final controller = new TextEditingController();
+      final cb = (i) {
+        if (i == null || i.length == 0) {
+          controller.text = '192.168.1.';
+        }
+      };
+
+      // Fill IP controller after 3 seconds if empty
+      Future.delayed(Duration(seconds: 2)).then(cb);
+
+      final ip = i.TextInput(
+        hint: '192.168.X.Y',
+        inputType: TextInputType.number,
+        controller: controller,
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          fontSize: 14.0,
+          letterSpacing: 0.33,
+        ),
+        hintStyle: new TextStyle(
+          fontFamily: FontConst.primary,
+          fontSize: 14.0,
+          letterSpacing: 0.33,
+          color: ColorConst.grayColor,
+        ),
+        borderColor: _error ? ColorConst.darkRed : ColorConst.grayColor,
+      );
+
+      // Default API domain button
+      final ib = new Button(
+        text: 'Custom',
+        width: 160.0,
+        onPressed: () {
+          if (ip.controller.text.length == 0) {
+            setState(() => _error = true);
+            return;
+          }
+
+          setState(() => _error = false);
+
+          // Set custom http client parameters
+          Http.domain = ip.controller.text;
+          Http.client.badCertificateCallback = (c, h, p) => true;
+
+          setState(() => _domain = true);
+        },
+      );
+
+      return new Container(
+        color: ColorConst.white,
+        child: new Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: 100.0,
+            vertical: 16.0,
+          ),
+          child: new Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              t,
+              pt,
+              b,
+              pt,
+              pt,
+              ip,
+              pt,
+              ib,
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Select route and redirect
+    return routes[_tag](context);
   }
 }

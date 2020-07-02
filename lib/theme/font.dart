@@ -5,5 +5,7 @@ class FontConst {
 
   static const fa = 'Font Awesome';
 
+  static const fab = 'Font Awesome Brand';
+
   static const pw = 14.0;
 }
