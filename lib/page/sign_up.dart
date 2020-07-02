@@ -63,26 +63,7 @@ class _SignUpState extends State<SignUpPage> {
 
     Widget w;
     if (_completed) {
-      w = new Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          new Icon(
-            new IconData(
-              0xf058,
-              fontFamily: FontConst.fa,
-            ),
-            color: ColorConst.successColor,
-            size: 60.0,
-          ),
-          new Text(
-            'Sign up completed.',
-            style: new TextStyle(
-              fontFamily: FontConst.primary,
-            ),
-          )
-        ],
-      );
+      w = getCompleted();
     } else {
       w = getForm();
     }
@@ -117,14 +98,20 @@ class _SignUpState extends State<SignUpPage> {
       padding: EdgeInsets.only(top: ph),
     );
 
-    if (_error != null) {
-      final ts = new TextStyle(
-        fontFamily: FontConst.primary,
-        fontSize: 14.0,
-        letterSpacing: 0.33,
-        color: ColorConst.grayColor,
-      );
+    final ts = new TextStyle(
+      fontFamily: FontConst.primary,
+      fontSize: 14.0,
+      letterSpacing: 0.33,
+    );
 
+    final hs = new TextStyle(
+      fontFamily: FontConst.primary,
+      fontSize: 14.0,
+      letterSpacing: 0.33,
+      color: ColorConst.grayColor,
+    );
+
+    if (_error != null) {
       final icon = new Icon(
         new IconData(
           _error.icon,
@@ -136,7 +123,10 @@ class _SignUpState extends State<SignUpPage> {
 
       final message = new Padding(
         padding: EdgeInsets.only(top: 8.0),
-        child: new Text(_error.error, style: ts),
+        child: new Text(
+          _error.error,
+          style: hs,
+        ),
       );
 
       // Add re-try button
@@ -145,10 +135,7 @@ class _SignUpState extends State<SignUpPage> {
         child: new Button(
           text: 'Try again',
           color: ColorConst.grayColor,
-          onPressed: () {
-            // Reload sign up screen
-            Navigator.of(context).pushReplacementNamed(SignUpPage.tag);
-          },
+          onPressed: () => Navigator.of(context).pushReplacementNamed(SignUpPage.tag),
         ),
       );
 
@@ -201,17 +188,8 @@ class _SignUpState extends State<SignUpPage> {
         hint: 'Phone number',
         inputType: TextInputType.phone,
         controller: _phone,
-        style: new TextStyle(
-          fontFamily: FontConst.primary,
-          fontSize: 14.0,
-          letterSpacing: 0,
-        ),
-        hintStyle: new TextStyle(
-          fontFamily: FontConst.primary,
-          fontSize: 14.0,
-          letterSpacing: 0,
-          color: ColorConst.grayColor,
-        ),
+        style: ts,
+        hintStyle: hs,
         validator: (i) {
           if (i.length == 0) {
             return 'The phone number is required.';
@@ -237,17 +215,8 @@ class _SignUpState extends State<SignUpPage> {
         hint: 'E-mail address',
         inputType: TextInputType.emailAddress,
         controller: _email,
-        style: new TextStyle(
-          fontFamily: FontConst.primary,
-          fontSize: 14.0,
-          letterSpacing: 0,
-        ),
-        hintStyle: new TextStyle(
-          fontFamily: FontConst.primary,
-          fontSize: 14.0,
-          letterSpacing: 0,
-          color: ColorConst.grayColor,
-        ),
+        style: ts,
+        hintStyle: hs,
         validator: (i) {
           if (i.length == 0) {
             return 'The e-mail address is required.';
@@ -268,17 +237,8 @@ class _SignUpState extends State<SignUpPage> {
         hint: 'Password',
         obscure: true,
         controller: _password,
-        style: new TextStyle(
-          fontFamily: FontConst.primary,
-          fontSize: 14.0,
-          letterSpacing: 0,
-        ),
-        hintStyle: new TextStyle(
-          fontFamily: FontConst.primary,
-          fontSize: 14.0,
-          letterSpacing: 0,
-          color: ColorConst.grayColor,
-        ),
+        style: ts,
+        hintStyle: hs,
         validator: (i) {
           if (i.length == 0) {
             return 'The password is required.';
@@ -300,17 +260,8 @@ class _SignUpState extends State<SignUpPage> {
       final username = new TextInput(
         hint: 'Username',
         controller: _username,
-        style: new TextStyle(
-          fontFamily: FontConst.primary,
-          fontSize: 14.0,
-          letterSpacing: 0,
-        ),
-        hintStyle: new TextStyle(
-          fontFamily: FontConst.primary,
-          fontSize: 14.0,
-          letterSpacing: 0,
-          color: ColorConst.grayColor,
-        ),
+        style: ts,
+        hintStyle: hs,
         validator: (i) {
           if (i.length == 0) {
             return 'The username is required.';
@@ -332,17 +283,8 @@ class _SignUpState extends State<SignUpPage> {
       final name = new TextInput(
         hint: 'Name',
         controller: _name,
-        style: new TextStyle(
-          fontFamily: FontConst.primary,
-          fontSize: 14.0,
-          letterSpacing: 0,
-        ),
-        hintStyle: new TextStyle(
-          fontFamily: FontConst.primary,
-          fontSize: 14.0,
-          letterSpacing: 0,
-          color: ColorConst.grayColor,
-        ),
+        style: ts,
+        hintStyle: hs,
         validator: (i) {
           if (i.length == 0) {
             return 'The name is required.';
@@ -410,9 +352,7 @@ class _SignUpState extends State<SignUpPage> {
       final sib = new Button(
         color: ColorConst.transparent,
         text: 'Sign In',
-        onPressed: () {
-          Navigator.of(context).pushReplacementNamed(SignInPage.tag);
-        },
+        onPressed: () => Navigator.of(context).pushReplacementNamed(SignInPage.tag),
       );
 
       // Create main container
@@ -444,6 +384,30 @@ class _SignUpState extends State<SignUpPage> {
         ),
       );
     }
+  }
+
+  /// Get sign up completed screen
+  Widget getCompleted() {
+    return new Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        new Icon(
+          new IconData(
+            0xf058,
+            fontFamily: FontConst.fa,
+          ),
+          color: ColorConst.successColor,
+          size: 60.0,
+        ),
+        new Text(
+          'Sign up completed.',
+          style: new TextStyle(
+            fontFamily: FontConst.primary,
+          ),
+        )
+      ],
+    );
   }
 
   /// Make sign up
