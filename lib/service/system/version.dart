@@ -32,7 +32,6 @@ class VersionService extends Service {
   }
 }
 
-
 class VersionResponse extends BasicResponse {
   double version;
 
