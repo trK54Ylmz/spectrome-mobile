@@ -7,9 +7,9 @@ import 'package:spectrome/util/http.dart';
 class LocationService extends Service {
   /// Check user session by using session code
   static Future<LocationResponse> call(String session, String country, String language) {
-    final path = '/account/location';
+    final path = '/profile/location';
     final headers = {Http.TOKEN_HEADER: session};
-    final body = {'country': country, 'language': language};
+    final body = {'session': session, 'country': country, 'language': language};
 
     // Http response handle callback
     final c = (Response r) {
@@ -30,7 +30,9 @@ class LocationService extends Service {
       return Service.handleError<LocationResponse>(e, s, r);
     };
 
-    return Http.doPost(path, body: body, headers: headers).then(c).catchError(e);
+    final post = Http.doPost(path, body: body, headers: headers, type: Http.FORM);
+
+    return post.then(c).catchError(e);
   }
 }
 
