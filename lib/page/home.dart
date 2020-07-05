@@ -42,6 +42,8 @@ class _HomeState extends State<HomePage> {
     };
 
     final sc = (SessionResponse res) {
+      dev.log('Session check request sent.');
+
       // Create route according to response
       Widget r;
       if (!res.status || res.expired ?? false) {
