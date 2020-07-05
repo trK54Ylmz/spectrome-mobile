@@ -78,13 +78,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.4"
-  equatable:
-    dependency: transitive
-    description:
-      name: equatable
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.2.0"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -100,20 +93,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  geolocator:
-    dependency: "direct main"
-    description:
-      name: geolocator
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "5.3.2+2"
-  google_api_availability:
-    dependency: transitive
-    description:
-      name: google_api_availability
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.4"
   image:
     dependency: transitive
     description:
@@ -121,13 +100,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.12"
-  location_permissions:
-    dependency: transitive
-    description:
-      name: location_permissions
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.0.0+1"
   matcher:
     dependency: transitive
     description:
@@ -261,4 +233,4 @@ packages:
     version: "3.6.1"
 sdks:
   dart: ">=2.6.0 <3.0.0"
-  flutter: ">=1.12.13+hotfix.6 <2.0.0"
+  flutter: ">=1.12.13+hotfix.4 <2.0.0"
