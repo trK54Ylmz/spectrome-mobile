@@ -29,7 +29,7 @@ class SessionService extends Service {
       return Service.handleError<SessionResponse>(e, s, r);
     };
 
-    return Http.doPost(path, body: body).then(c).catchError(e);
+    return Http.doPost(path, body: body, type: Http.FORM).then(c).catchError(e);
   }
 }
 

@@ -37,7 +37,7 @@ class _SignInState extends State<SignInPage> {
   bool _loading = true;
 
   // Shared preferences instance
-  SharedPreferences _preferences;
+  SharedPreferences _sp;
 
   // Error message
   ErrorMessage _error;
@@ -51,7 +51,7 @@ class _SignInState extends State<SignInPage> {
 
     // Shared preferences callback
     final spc = (SharedPreferences s) {
-      _preferences = s;
+      _sp = s;
 
       setState(() => _loading = false);
     };
@@ -72,7 +72,7 @@ class _SignInState extends State<SignInPage> {
           height: height,
           child: new Padding(
             padding: EdgeInsets.symmetric(horizontal: pv),
-            child: _preferences == null ? getLoading() : getForm(),
+            child: _sp == null ? getLoading() : getForm(),
           ),
         ),
       ),
@@ -350,7 +350,7 @@ class _SignInState extends State<SignInPage> {
         // Route to activation page, if activation is wating
         if (r.activation == false) {
           // Set session token
-          _preferences.setString('_st', r.token);
+          _sp.setString('_st', r.token);
 
           Navigator.of(context).pushReplacementNamed(ActivationPage.tag);
           return;
@@ -374,7 +374,7 @@ class _SignInState extends State<SignInPage> {
       setState(() => _message = null);
 
       // Create new auth key
-      _preferences.setString('_session', r.session);
+      _sp.setString('_session', r.session);
 
       // Set loading false
       setState(() => _loading = false);
