@@ -1,4 +1,5 @@
 import 'dart:developer' as dev;
+import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart';
 import 'package:spectrome/main.dart';
@@ -6,6 +7,7 @@ import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/page/timeline.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
+import 'package:spectrome/service/account/location.dart';
 import 'package:spectrome/service/account/session.dart';
 import 'package:spectrome/util/error.dart';
 import 'package:spectrome/util/route.dart';
@@ -46,6 +48,15 @@ class _HomeState extends State<HomePage> {
         r = routes[SignInPage.tag](context);
       } else {
         r = routes[TimeLinePage.tag](context);
+
+        // Detect location and send by using session code
+        final language = ui.window.locale.languageCode;
+        final country = ui.window.locale.countryCode.toLowerCase();
+
+        dev.log('Location request sent.');
+
+        // Update location by using session
+        LocationService.call(res.session, country, language);
       }
 
       final route = new DefaultRoute(r);
@@ -126,7 +137,7 @@ class _HomeState extends State<HomePage> {
           child: new Text(
             'Try again',
             style: new TextStyle(
-              color: const Color(0xffffffff),
+              color: ColorConst.white,
               fontFamily: FontConst.primary,
               fontSize: 14.0,
               letterSpacing: 0.33,
@@ -148,12 +159,14 @@ class _HomeState extends State<HomePage> {
       );
     } else {
       // Create empty container if everything is okay
-      w = new Container(color: const Color(0xffffffff));
+      w = new Container(
+        color: ColorConst.white,
+      );
     }
 
     // Show loading icon
     return new Container(
-      color: const Color(0xffffffff),
+      color: ColorConst.white,
       child: w,
     );
   }

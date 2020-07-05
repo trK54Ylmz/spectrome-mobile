@@ -46,7 +46,7 @@ class _SignUpState extends State<SignUpPage> {
   bool _loading = false;
 
   // Is sign up operation completed
-  bool _completed = true;
+  bool _completed = false;
 
   // Error message
   ErrorMessage _error;
@@ -380,25 +380,27 @@ class _SignUpState extends State<SignUpPage> {
 
   /// Get sign up completed screen
   Widget getCompleted() {
-    return new Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        new Icon(
-          new IconData(
-            0xf058,
-            fontFamily: FontConst.fa,
+    return new Center(
+      child: new Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          new Icon(
+            new IconData(
+              0xf058,
+              fontFamily: FontConst.fa,
+            ),
+            color: ColorConst.successColor,
+            size: 60.0,
           ),
-          color: ColorConst.successColor,
-          size: 60.0,
-        ),
-        new Text(
-          'Sign up completed.',
-          style: new TextStyle(
-            fontFamily: FontConst.primary,
-          ),
-        )
-      ],
+          new Text(
+            'Sign up completed.',
+            style: new TextStyle(
+              fontFamily: FontConst.primary,
+            ),
+          )
+        ],
+      ),
     );
   }
 
