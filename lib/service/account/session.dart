@@ -7,10 +7,8 @@ import 'package:spectrome/util/http.dart';
 class SessionService extends Service {
   /// Check user session by using session code
   static Future<SessionResponse> call(String session) {
-    final path = '/account/session';
-    final body = {
-      'session': session,
-    };
+    final path = '/session/check';
+    final body = {'session': session};
 
     // Http response handle callback
     final c = (Response r) {
@@ -36,6 +34,8 @@ class SessionService extends Service {
 }
 
 class SessionResponse extends BasicResponse {
+  String session;
+
   /// Create empty object
   SessionResponse.empty() : super.empty();
 
@@ -47,6 +47,8 @@ class SessionResponse extends BasicResponse {
 
   /// Create response by using JSON input
   SessionResponse.fromJson(String input) {
-    super.fromJson(input);
+    final json = super.fromJson(input);
+
+    session = json['session'] ?? null;
   }
 }

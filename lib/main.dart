@@ -84,6 +84,19 @@ class _MainState extends State<MainPage> {
       );
     }
 
+    // Define theme
+    final theme = CupertinoThemeData(
+      scaffoldBackgroundColor: ColorConst.white,
+      textTheme: CupertinoTextThemeData(
+        textStyle: TextStyle(
+          fontFamily: FontConst.primary,
+          fontSize: 14.0,
+          letterSpacing: 0.33,
+          color: ColorConst.dark,
+        ),
+      ),
+    );
+
     if (kReleaseMode) {
       final loading = new Container(
         color: const Color(0xffffffff),
@@ -102,6 +115,7 @@ class _MainState extends State<MainPage> {
         debugShowCheckedModeBanner: false,
         home: _tag == null ? loading : routes[_tag](context),
         routes: routes,
+        theme: theme,
       );
     } else {
       // Select API endpoint domain, if app not in release mode
@@ -110,6 +124,7 @@ class _MainState extends State<MainPage> {
         debugShowCheckedModeBanner: false,
         home: getDevelop(),
         routes: routes,
+        theme: theme,
       );
     }
   }
