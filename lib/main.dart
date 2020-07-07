@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:spectrome/item/button.dart';
-import 'package:spectrome/item/input.dart' as i;
+import 'package:spectrome/item/input.dart';
 import 'package:spectrome/page/activation.dart';
 import 'package:spectrome/page/guide.dart';
 import 'package:spectrome/page/home.dart';
@@ -99,7 +99,7 @@ class _MainState extends State<MainPage> {
 
     if (kReleaseMode) {
       final loading = new Container(
-        color: const Color(0xffffffff),
+        color: ColorConst.white,
         child: new Center(
           child: new Image.asset(
             'assets/images/loading.gif',
@@ -182,7 +182,7 @@ class _MainState extends State<MainPage> {
       // Fill IP controller after 3 seconds if empty
       Future.delayed(Duration(seconds: 2)).then(cb);
 
-      final ip = i.TextInput(
+      final ip = FormText(
         hint: '192.168.X.Y',
         inputType: TextInputType.number,
         controller: controller,

@@ -4,7 +4,7 @@ import 'package:spectrome/item/form.dart';
 
 typedef CallbackFunc<T> = T Function(T value);
 
-class TextInput extends StatefulWidget {
+class FormText extends StatefulWidget {
   final TextEditingController controller;
 
   final String initialValue;
@@ -41,7 +41,7 @@ class TextInput extends StatefulWidget {
 
   final int size;
 
-  TextInput({
+  FormText({
     Key key,
     this.controller,
     this.initialValue,
@@ -70,7 +70,7 @@ class TextInput extends StatefulWidget {
   TextInputState createState() => new TextInputState();
 }
 
-class TextInputState extends State<TextInput> {
+class TextInputState extends State<FormText> {
   final TextEditingController _c = new TextEditingController();
 
   @override

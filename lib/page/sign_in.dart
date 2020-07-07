@@ -202,7 +202,7 @@ class _SignInState extends State<SignInPage> {
     }
 
     // Create e-mail address input
-    final email = new TextInput(
+    final email = new FormText(
       hint: 'Username or e-mail address',
       controller: _loginId,
       style: ts,
@@ -212,7 +212,7 @@ class _SignInState extends State<SignInPage> {
           return 'The username or e-mail address is required.';
         }
 
-        if (i.length < 2) {
+        if (i.runes.length < 2) {
           return 'The username or e-mail address is too short.';
         }
 
@@ -221,7 +221,7 @@ class _SignInState extends State<SignInPage> {
     );
 
     // Create password input
-    final password = new TextInput(
+    final password = new FormText(
       hint: 'Password',
       controller: _password,
       obscure: true,
@@ -232,11 +232,11 @@ class _SignInState extends State<SignInPage> {
           return 'The password is required.';
         }
 
-        if (i.length < 8) {
+        if (i.runes.length < 8) {
           return 'The password cannot be lower than 8 character.';
         }
 
-        if (i.length > 50) {
+        if (i.runes.length > 50) {
           return 'The password cannot be higher than 50 character.';
         }
 
