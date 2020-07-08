@@ -226,7 +226,7 @@ class _ActivationState extends State<ActivationPage> {
           padding: EdgeInsets.only(right: i < 5 ? 8.0 : 0.0),
           child: new Container(
             width: 30.0,
-            child: new TextInput(
+            child: new FormText(
               controller: _inputs[i],
               focusNode: _focuses[i],
               inputType: TextInputType.number,

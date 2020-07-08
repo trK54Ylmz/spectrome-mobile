@@ -176,7 +176,7 @@ class _SignUpState extends State<SignUpPage> {
       }
 
       // Create phone number input
-      final phone = new TextInput(
+      final phone = new FormText(
         hint: 'Phone number',
         inputType: TextInputType.phone,
         controller: _phone,
@@ -188,7 +188,7 @@ class _SignUpState extends State<SignUpPage> {
           }
 
           // Example format is +905431234567
-          if (i.length < 9 || i.length > 16) {
+          if (i.runes.length < 9 || i.runes.length > 16) {
             return 'Invalid phone number.';
           }
 
@@ -203,7 +203,7 @@ class _SignUpState extends State<SignUpPage> {
       );
 
       // Create e-mail address input
-      final email = new TextInput(
+      final email = new FormText(
         hint: 'E-mail address',
         inputType: TextInputType.emailAddress,
         controller: _email,
@@ -225,7 +225,7 @@ class _SignUpState extends State<SignUpPage> {
       );
 
       // Create password input
-      final password = new TextInput(
+      final password = new FormText(
         hint: 'Password',
         obscure: true,
         controller: _password,
@@ -236,11 +236,11 @@ class _SignUpState extends State<SignUpPage> {
             return 'The password is required.';
           }
 
-          if (i.length < 8) {
+          if (i.runes.length < 8) {
             return 'The password cannot be lower than 8 character.';
           }
 
-          if (i.length > 50) {
+          if (i.runes.length > 50) {
             return 'The password cannot be higher than 50 character.';
           }
 
@@ -249,7 +249,7 @@ class _SignUpState extends State<SignUpPage> {
       );
 
       // Create username input
-      final username = new TextInput(
+      final username = new FormText(
         hint: 'Username',
         controller: _username,
         style: ts,
@@ -259,11 +259,11 @@ class _SignUpState extends State<SignUpPage> {
             return 'The username is required.';
           }
 
-          if (i.length < 2) {
+          if (i.runes.length < 2) {
             return 'The username cannot be lower than 2 character.';
           }
 
-          if (i.length > 24) {
+          if (i.runes.length > 24) {
             return 'The username cannot be higher than 24 character.';
           }
 
@@ -272,7 +272,7 @@ class _SignUpState extends State<SignUpPage> {
       );
 
       // Create user name input
-      final name = new TextInput(
+      final name = new FormText(
         hint: 'Name',
         controller: _name,
         style: ts,
@@ -282,11 +282,11 @@ class _SignUpState extends State<SignUpPage> {
             return 'The name is required.';
           }
 
-          if (i.length < 4) {
+          if (i.runes.length < 4) {
             return 'The name cannot be lower than 4 character.';
           }
 
-          if (i.length > 50) {
+          if (i.runes.length > 50) {
             return 'The name cannot be higher than 50 character.';
           }
 
