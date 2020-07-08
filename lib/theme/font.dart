@@ -1,8 +1,6 @@
 class FontConst {
   static const primary = 'Primary Regular';
 
-  static const secondary = 'Secondary Regular';
-
   static const bold = 'Primary Bold';
   
   static const fa = 'Font Awesome';

@@ -225,6 +225,7 @@ class _SignInState extends State<SignInPage> {
       hint: 'Password',
       controller: _password,
       obscure: true,
+      showObscure: true,
       style: ts,
       hintStyle: hs,
       validator: (i) {

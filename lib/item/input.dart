@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:spectrome/item/form.dart';
+import 'package:spectrome/theme/color.dart';
+import 'package:spectrome/theme/font.dart';
 
 typedef CallbackFunc<T> = T Function(T value);
 
@@ -39,6 +41,8 @@ class FormText extends StatefulWidget {
 
   final bool obscure;
 
+  final bool showObscure;
+
   final int size;
 
   FormText({
@@ -59,10 +63,13 @@ class FormText extends StatefulWidget {
     this.cursorWidth = 1.0,
     this.enabled = true,
     this.obscure = false,
+    this.showObscure = false,
     this.borderColor = const Color(0xffcccccc),
-    this.padding = const EdgeInsets.symmetric(
-      vertical: 8.0,
-      horizontal: 6.0,
+    this.padding = const EdgeInsets.only(
+      top: 10.0,
+      bottom: 8.0,
+      left: 8.0,
+      right: 8.0,
     ),
   });
 
@@ -72,6 +79,15 @@ class FormText extends StatefulWidget {
 
 class TextInputState extends State<FormText> {
   final TextEditingController _c = new TextEditingController();
+
+  bool obscure = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    obscure = widget.obscure;
+  }
 
   @override
   void didChangeDependencies() {
@@ -91,13 +107,31 @@ class TextInputState extends State<FormText> {
 
   @override
   Widget build(BuildContext context) {
+    Widget suffix = new Container(width: 0.0, height: 0.0);
+
+    // Create password to text field conversion
+    if (widget.showObscure) {
+      final icon = obscure ? 0xf070 : 0xf06e;
+
+      suffix = new GestureDetector(
+        onTap: () => setState(() => obscure = obscure != true),
+        child: new Padding(
+          padding: widget.padding,
+          child: new Icon(
+            IconData(icon, fontFamily: FontConst.fa),
+            color: ColorConst.grayColor,
+            size: widget.style.fontSize,
+          ),
+        ),
+      );
+    }
+
     return new CupertinoTextField(
       controller: widget.controller ?? _c,
       focusNode: widget.focusNode,
       enabled: widget.enabled,
       onChanged: widget.onChange,
       onSubmitted: widget.onSaved,
-      obscureText: widget.obscure,
       style: widget.style,
       padding: widget.padding,
       placeholder: widget.hint,
@@ -105,9 +139,11 @@ class TextInputState extends State<FormText> {
       keyboardType: widget.inputType,
       maxLength: widget.size,
       cursorWidth: widget.cursorWidth,
+      obscureText: obscure,
+      suffix: suffix,
       decoration: new BoxDecoration(
         borderRadius: new BorderRadius.circular(widget.radius),
-        color: const Color(0xffffffff),
+        color: ColorConst.white,
         border: new Border.all(
           width: 1.0,
           color: widget.borderColor.withOpacity(0.67),
