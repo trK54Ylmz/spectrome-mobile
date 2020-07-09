@@ -2,7 +2,7 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:spectrome/page/timeline.dart';
+import 'package:spectrome/page/waterfall.dart';
 import 'package:spectrome/item/form.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/button.dart';
@@ -411,7 +411,7 @@ class _ActivationState extends State<ActivationPage> {
       setState(() => _loading = false);
 
       // Route to timeline
-      Navigator.of(context).pushReplacementNamed(TimeLinePage.tag);
+      Navigator.of(context).pushReplacementNamed(WaterFallPage.tag);
     };
 
     // Error callback

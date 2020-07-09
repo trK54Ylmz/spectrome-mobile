@@ -7,7 +7,7 @@ import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/form.dart';
 import 'package:spectrome/page/activation.dart';
 import 'package:spectrome/page/sign_up.dart';
-import 'package:spectrome/page/timeline.dart';
+import 'package:spectrome/page/waterfall.dart';
 import 'package:spectrome/service/account/sign_in.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
@@ -381,7 +381,7 @@ class _SignInState extends State<SignInPage> {
       setState(() => _loading = false);
 
       // Route to timeline
-      Navigator.of(context).pushReplacementNamed(TimeLinePage.tag);
+      Navigator.of(context).pushReplacementNamed(WaterFallPage.tag);
     };
 
     // Error callback

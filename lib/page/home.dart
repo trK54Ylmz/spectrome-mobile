@@ -4,7 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
 import 'package:spectrome/main.dart';
 import 'package:spectrome/page/sign_in.dart';
-import 'package:spectrome/page/timeline.dart';
+import 'package:spectrome/page/waterfall.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/service/profile/location.dart';
@@ -41,15 +41,18 @@ class _HomeState extends State<HomePage> {
       setState(() => _error = ErrorMessage.custom(m));
     };
 
-    final sc = (SessionResponse res) {
+    final sc = (SharedPreferences sp, SessionResponse res) {
       dev.log('Session check request sent.');
+
+      // Update new session
+      sp.setString('_session', res.session);
 
       // Create route according to response
       Widget r;
       if (!res.status || res.expired ?? false) {
         r = routes[SignInPage.tag](context);
       } else {
-        r = routes[TimeLinePage.tag](context);
+        r = routes[WaterFallPage.tag](context);
 
         // Detect location and send by using session code
         final language = ui.window.locale.languageCode;
@@ -86,7 +89,7 @@ class _HomeState extends State<HomePage> {
       }
 
       // Check session and route according to response
-      SessionService.call(session).then(sc).catchError(e);
+      SessionService.call(session).then((r) => sc(sp, r)).catchError(e);
     };
 
     // Show loading icon when screen initialized
