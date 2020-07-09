@@ -11,7 +11,7 @@ import 'package:spectrome/page/guide.dart';
 import 'package:spectrome/page/home.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/page/sign_up.dart';
-import 'package:spectrome/page/timeline.dart';
+import 'package:spectrome/page/waterfall.dart';
 import 'package:spectrome/page/version.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
@@ -27,7 +27,7 @@ final routes = <String, WidgetBuilder>{
   SignInPage.tag: (c) => new SignInPage(),
   SignUpPage.tag: (c) => new SignUpPage(),
   ActivationPage.tag: (c) => new ActivationPage(),
-  TimeLinePage.tag: (c) => new TimeLinePage(),
+  WaterFallPage.tag: (c) => new WaterFallPage(),
   VersionPage.tag: (c) => new VersionPage(),
 };
 
