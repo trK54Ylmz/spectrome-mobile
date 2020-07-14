@@ -104,273 +104,6 @@ class _ActivationState extends State<ActivationPage> {
     final height = MediaQuery.of(context).size.height;
     final pv = width > 400 ? 100.0 : 60.0;
 
-    final pt = const Padding(
-      padding: EdgeInsets.only(top: 8.0),
-    );
-
-    final ts = new TextStyle(
-      fontFamily: FontConst.primary,
-      fontSize: 14.0,
-      letterSpacing: 0.33,
-    );
-
-    Widget w;
-    if (_sp == null) {
-      if (_loading) {
-        // Use loading animation
-        w = new Center(
-          child: new Image.asset(
-            'assets/images/loading.gif',
-            width: 60.0,
-            height: 60.0,
-          ),
-        );
-      } else if (_error != null) {
-        final icon = new Icon(
-          new IconData(
-            _error.icon,
-            fontFamily: FontConst.fa,
-          ),
-          color: ColorConst.grayColor,
-          size: 32.0,
-        );
-
-        final message = new Padding(
-          padding: EdgeInsets.only(top: 8.0),
-          child: new Text(_error.error, style: ts),
-        );
-
-        // Add re-try button
-        final button = new Padding(
-          padding: EdgeInsets.only(top: 16.0),
-          child: new CupertinoButton(
-            color: ColorConst.grayColor,
-            onPressed: () {
-              // Reload sign in screen
-              Navigator.of(context).pushReplacementNamed(ActivationPage.tag);
-            },
-            child: new Text(
-              'Try again',
-              style: new TextStyle(
-                color: const Color(0xffffffff),
-                fontFamily: FontConst.primary,
-                fontSize: 14.0,
-                letterSpacing: 0.33,
-              ),
-            ),
-          ),
-        );
-
-        // Handle error
-        w = new Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            icon,
-            message,
-            button,
-          ],
-        );
-      }
-    } else {
-      final logo = new Image.asset(
-        'assets/images/logo@2x.png',
-        width: 128.0,
-      );
-
-      // Loading indicator for API requests
-      Widget s;
-      if (_loading) {
-        s = new Image.asset(
-          'assets/images/loading.gif',
-          width: 40.0,
-          height: 40.0,
-        );
-      } else if (_message != null) {
-        s = new Padding(
-          padding: EdgeInsets.only(
-            top: 20.0,
-            bottom: 6.0,
-          ),
-          child: new Text(
-            _message,
-            style: new TextStyle(
-              fontFamily: FontConst.primary,
-              fontSize: 12.0,
-              color: ColorConst.darkRed,
-            ),
-          ),
-        );
-      } else {
-        s = new SizedBox(
-          height: 40.0,
-        );
-      }
-
-      final at = '''
-      Please enter activation code as one-by-one 
-      which sent to your e-mail address
-      ''';
-
-      final t = new Text(
-        at.replaceAll(new RegExp(r'[\s]{2,}'), ' ').trim(),
-        style: new TextStyle(
-          fontFamily: FontConst.primary,
-          fontSize: 12.0,
-          letterSpacing: 0.33,
-          color: ColorConst.grayColor,
-        ),
-      );
-
-      final items = <Widget>[];
-      for (int i = 0; i < 6; i++) {
-        // Activation input
-        final item = new Padding(
-          padding: EdgeInsets.only(right: i < 5 ? 4.0 : 0.0),
-          child: new Container(
-            width: 34.0,
-            child: new FormText(
-              controller: _inputs[i],
-              focusNode: _focuses[i],
-              inputType: TextInputType.number,
-              textAlign: TextAlign.center,
-              size: 1,
-              cursorWidth: 1.0,
-              style: new TextStyle(
-                fontFamily: FontConst.primary,
-                fontSize: 24.0,
-                letterSpacing: 0.0,
-              ),
-              onChange: (i) {
-                int index = 0;
-                for (int i = 0; i < 6; i++) {
-                  if (_focuses[i].hasFocus) {
-                    index = i;
-                    break;
-                  }
-                }
-
-                if (i.length > 0 && index < 5) {
-                  _focuses[index + 1].requestFocus();
-                }
-
-                if (i.length == 0 && index > 0) {
-                  _focuses[index - 1].requestFocus();
-                }
-
-                return null;
-              },
-              validator: (i) {
-                if (i.length == 0) {
-                  return 'All fields are required.';
-                }
-
-                return null;
-              },
-            ),
-          ),
-        );
-
-        items.add(item);
-      }
-
-      // Activation input items
-      final c = new Row(
-        children: items,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-      );
-
-      // Create activation submit button
-      final aib = new Button(
-        text: 'Activation',
-        disabled: _loading,
-        onPressed: _activate,
-      );
-
-      // Send activation code button
-      final cl = _sending ? ColorConst.grayColor.withAlpha(100) : ColorConst.grayColor;
-      final art = new Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          new Text(
-            'you didn’t receive? ',
-            style: new TextStyle(
-              fontFamily: FontConst.primary,
-              fontSize: 12.0,
-              letterSpacing: 0.33,
-              color: cl,
-            ),
-          ),
-          new GestureDetector(
-            onTap: () {
-              setState(() => _loading = true);
-
-              final now = DateTime.now();
-
-              // Check that if we already sent activation code
-              if (_lastSent != null && now.difference(_lastSent).inSeconds < 10) {
-                setState(() => _message = 'Activation code has been sent recently.');
-
-                // Clear message 5 seconds later
-                final c = (_) => setState(() => _message = null);
-                Future.delayed(Duration(seconds: 5)).then(c);
-
-                setState(() => _loading = false);
-
-                return;
-              }
-
-              _lastSent = now;
-
-              _activation();
-            },
-            child: new Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 8.0,
-                horizontal: 4.0,
-              ),
-              child: new Text(
-                'send again',
-                style: new TextStyle(
-                  fontFamily: FontConst.primary,
-                  fontSize: 12.0,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.33,
-                  color: cl,
-                  decoration: TextDecoration.underline,
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
-
-      // Create main container
-      w = new FormValidation(
-        key: _formKey,
-        child: new Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            pt,
-            logo,
-            pt,
-            t,
-            pt,
-            s,
-            c,
-            pt,
-            aib,
-            pt,
-            art,
-            pt,
-          ],
-        ),
-      );
-    }
-
     return new Scaffold(
       backgroundColor: ColorConst.white,
       body: new SingleChildScrollView(
@@ -379,9 +112,286 @@ class _ActivationState extends State<ActivationPage> {
           height: height,
           child: new Padding(
             padding: EdgeInsets.symmetric(horizontal: pv),
-            child: w,
+            child: _sp == null ? _getLoading() : _getForm(),
           ),
         ),
+      ),
+    );
+  }
+
+  /// Get loading form
+  Widget _getLoading() {
+    final ts = new TextStyle(
+      fontFamily: FontConst.primary,
+      fontSize: 14.0,
+      letterSpacing: 0.33,
+    );
+
+    if (_error != null) {
+      final icon = new Icon(
+        new IconData(
+          _error.icon,
+          fontFamily: FontConst.fa,
+        ),
+        color: ColorConst.grayColor,
+        size: 32.0,
+      );
+
+      final message = new Padding(
+        padding: EdgeInsets.only(top: 8.0),
+        child: new Text(_error.error, style: ts),
+      );
+
+      // Add re-try button
+      final button = new Padding(
+        padding: EdgeInsets.only(top: 16.0),
+        child: new CupertinoButton(
+          color: ColorConst.grayColor,
+          onPressed: () {
+            // Reload sign in screen
+            Navigator.of(context).pushReplacementNamed(ActivationPage.tag);
+          },
+          child: new Text(
+            'Try again',
+            style: new TextStyle(
+              color: const Color(0xffffffff),
+              fontFamily: FontConst.primary,
+              fontSize: 14.0,
+              letterSpacing: 0.33,
+            ),
+          ),
+        ),
+      );
+
+      // Handle error
+      return new Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          icon,
+          message,
+          button,
+        ],
+      );
+    }
+
+    // Use loading animation
+    return new Center(
+      child: new Image.asset(
+        'assets/images/loading.gif',
+        width: 60.0,
+        height: 60.0,
+      ),
+    );
+  }
+
+  /// Get activation form
+  Widget _getForm() {
+    final height = MediaQuery.of(context).size.height;
+    final ph = height > 800 ? 64.0 : 32.0;
+
+    final pt = const Padding(
+      padding: EdgeInsets.only(top: 8.0),
+    );
+
+    final ptl = new Padding(
+      padding: EdgeInsets.only(top: ph),
+    );
+
+    final logo = new Image.asset(
+      'assets/images/logo@2x.png',
+      width: 128.0,
+    );
+
+    // Loading indicator for API requests
+    Widget s;
+    if (_loading) {
+      s = new Image.asset(
+        'assets/images/loading.gif',
+        width: 40.0,
+        height: 40.0,
+      );
+    } else if (_message != null) {
+      s = new Padding(
+        padding: EdgeInsets.only(
+          top: 20.0,
+          bottom: 6.0,
+        ),
+        child: new Text(
+          _message,
+          style: new TextStyle(
+            fontFamily: FontConst.primary,
+            fontSize: 12.0,
+            color: ColorConst.darkRed,
+          ),
+        ),
+      );
+    } else {
+      s = new SizedBox(
+        height: 40.0,
+      );
+    }
+
+    final at = '''
+      Please enter activation code as one-by-one 
+      which sent to your e-mail address
+      ''';
+
+    final t = new Text(
+      at.replaceAll(new RegExp(r'[\s]{2,}'), ' ').trim(),
+      style: new TextStyle(
+        fontFamily: FontConst.primary,
+        fontSize: 12.0,
+        letterSpacing: 0.33,
+        color: ColorConst.grayColor,
+      ),
+    );
+
+    final items = <Widget>[];
+    for (int i = 0; i < 6; i++) {
+      // Activation input
+      final item = new Padding(
+        padding: EdgeInsets.only(right: i < 5 ? 4.0 : 0.0),
+        child: new Container(
+          width: 34.0,
+          child: new FormText(
+            controller: _inputs[i],
+            focusNode: _focuses[i],
+            inputType: TextInputType.number,
+            textAlign: TextAlign.center,
+            size: 1,
+            cursorWidth: 1.0,
+            style: new TextStyle(
+              fontFamily: FontConst.primary,
+              fontSize: 24.0,
+              letterSpacing: 0.0,
+            ),
+            onChange: (i) {
+              int index = 0;
+              for (int i = 0; i < 6; i++) {
+                if (_focuses[i].hasFocus) {
+                  index = i;
+                  break;
+                }
+              }
+
+              if (i.length > 0 && index < 5) {
+                _focuses[index + 1].requestFocus();
+              }
+
+              if (i.length == 0 && index > 0) {
+                _focuses[index - 1].requestFocus();
+              }
+
+              return null;
+            },
+            validator: (i) {
+              if (i.length == 0) {
+                return 'All fields are required.';
+              }
+
+              return null;
+            },
+          ),
+        ),
+      );
+
+      items.add(item);
+    }
+
+    // Activation input items
+    final c = new Row(
+      children: items,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+    );
+
+    // Create activation submit button
+    final aib = new Button(
+      text: 'Activation',
+      disabled: _loading,
+      onPressed: _activate,
+    );
+
+    // Send activation code button
+    final cl = _sending ? ColorConst.grayColor.withAlpha(100) : ColorConst.grayColor;
+    final art = new Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        new Text(
+          'you didn’t receive? ',
+          style: new TextStyle(
+            fontFamily: FontConst.primary,
+            fontSize: 12.0,
+            letterSpacing: 0.33,
+            color: cl,
+          ),
+        ),
+        new GestureDetector(
+          onTap: () {
+            setState(() => _loading = true);
+
+            final now = DateTime.now();
+
+            // Check that if we already sent activation code
+            if (_lastSent != null && now.difference(_lastSent).inSeconds < 10) {
+              setState(() => _message = 'Activation code has been sent recently.');
+
+              // Clear message 5 seconds later
+              final c = (_) => setState(() => _message = null);
+              Future.delayed(Duration(seconds: 5)).then(c);
+
+              setState(() => _loading = false);
+
+              return;
+            }
+
+            _lastSent = now;
+
+            _activation();
+          },
+          child: new Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 8.0,
+              horizontal: 4.0,
+            ),
+            child: new Text(
+              'send again',
+              style: new TextStyle(
+                fontFamily: FontConst.primary,
+                fontSize: 12.0,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.33,
+                color: cl,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+
+    // Create main container
+    return new FormValidation(
+      key: _formKey,
+      child: new Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          pt,
+          logo,
+          ptl,
+          t,
+          pt,
+          s,
+          c,
+          pt,
+          aib,
+          pt,
+          art,
+          pt,
+        ],
       ),
     );
   }
