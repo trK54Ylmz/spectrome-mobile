@@ -9,7 +9,7 @@ class InviteService extends Service {
   static Future<InviteResponse> call(String session, List<String> emails) {
     final path = '/users/invite';
     final headers = {Http.TOKEN_HEADER: session};
-    final body = {'session': session, 'emails': emails};
+    final body = {'session': session, 'email': emails};
 
     // Http response handle callback
     final c = (Response r) {

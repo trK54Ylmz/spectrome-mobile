@@ -6,7 +6,7 @@ import 'package:spectrome/util/http.dart';
 
 class ActivateService extends Service {
   /// Activate account by using activation code and session token
-  static Future<ActivateResponse> call(String token, String code) {
+  static Future<ActivateResponse> call(String code, String token) {
     final path = '/account/activate';
     final body = {
       'code': code.toString(),

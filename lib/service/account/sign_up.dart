@@ -45,6 +45,9 @@ class SignUpService extends Service {
 }
 
 class SignUpResponse extends BasicResponse {
+  // Session token
+  String token;
+
   /// Create empty object
   SignUpResponse.empty() : super.empty();
 
@@ -56,6 +59,8 @@ class SignUpResponse extends BasicResponse {
 
   /// Create response by using JSON input
   SignUpResponse.fromJson(String input) {
-    super.fromJson(input);
+    final json = super.fromJson(input);
+
+    token = json['token'];
   }
 }

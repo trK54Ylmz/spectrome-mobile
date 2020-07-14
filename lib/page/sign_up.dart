@@ -2,6 +2,8 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:email_validator/email_validator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/form.dart';
 import 'package:spectrome/item/input.dart';
@@ -46,11 +48,28 @@ class _SignUpState extends State<SignUpPage> {
   // Loading indicator
   bool _loading = false;
 
+  // Shared preferences instance
+  SharedPreferences _sp;
+
   // Error message
   ErrorMessage _error;
 
   // API response, validation error messages
   String _message;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Shared preferences callback
+    final spc = (SharedPreferences s) {
+      _sp = s;
+
+      setState(() => _loading = false);
+    };
+
+    SharedPreferences.getInstance().then(spc);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,10 +83,11 @@ class _SignUpState extends State<SignUpPage> {
         child: new GestureDetector(
           onTap: () => FocusScope.of(context).requestFocus(_focus),
           child: new Container(
+            width: width,
             height: height,
             child: new Padding(
               padding: EdgeInsets.symmetric(horizontal: pv),
-              child: getForm(),
+              child: _getForm(),
             ),
           ),
         ),
@@ -76,7 +96,7 @@ class _SignUpState extends State<SignUpPage> {
   }
 
   /// Get sign up form
-  Widget getForm() {
+  Widget _getForm() {
     final height = MediaQuery.of(context).size.height;
     final ph = height > 800 ? 64.0 : 32.0;
 
@@ -212,9 +232,7 @@ class _SignUpState extends State<SignUpPage> {
             return 'The e-mail address is required.';
           }
 
-          // Most basic e-mail address validation
-          final r = new RegExp(r'^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$');
-          if (r.allMatches(i).isEmpty) {
+          if (!EmailValidator.validate(i)) {
             return 'The e-mail address is invalid.';
           }
 
@@ -295,9 +313,10 @@ class _SignUpState extends State<SignUpPage> {
 
       // Create sign-up submit button
       final sub = new Button(
-        onPressed: _signUp,
         color: ColorConst.buttonColor,
         text: 'Sign Up',
+        disabled: _loading,
+        onPressed: _signUp,
       );
 
       // Already have an account text
@@ -339,13 +358,6 @@ class _SignUpState extends State<SignUpPage> {
         ],
       );
 
-      // Create sign-in page button
-      final sib = new Button(
-        color: ColorConst.transparent,
-        text: 'Sign In',
-        onPressed: () => Navigator.of(context).pushReplacementNamed(SignInPage.tag),
-      );
-
       // Create main container
       return new FormValidation(
         key: _formKey,
@@ -370,7 +382,7 @@ class _SignUpState extends State<SignUpPage> {
             sub,
             ptl,
             sit,
-            sib,
+            pt,
           ],
         ),
       );
@@ -421,6 +433,9 @@ class _SignUpState extends State<SignUpPage> {
 
         return;
       }
+
+      // Set session token
+      _sp.setString('_st', r.token);
 
       // Set loading false
       setState(() => _loading = false);

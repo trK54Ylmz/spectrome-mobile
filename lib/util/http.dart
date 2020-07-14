@@ -82,9 +82,19 @@ class Http {
         final form = <String>[];
         for (var key in body.keys) {
           final k = Uri.encodeQueryComponent(key);
-          final v = Uri.encodeQueryComponent(body[key]);
 
-          form.add('$k=$v');
+          if (body[key] is List) {
+            int i = 0;
+
+            // Iterate over list params
+            for (var v in body[key] as List) {
+              form.add('$k-$i=$v');
+              i++;
+            }
+          } else {
+            final v = Uri.encodeQueryComponent(body[key]);
+            form.add('$k=$v');
+          }
         }
 
         r.write(form.join('&'));
