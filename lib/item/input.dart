@@ -31,6 +31,8 @@ class FormText extends StatefulWidget {
 
   final EdgeInsetsGeometry padding;
 
+  final TextAlign textAlign;
+
   final Color borderColor;
 
   final double cursorWidth;
@@ -64,6 +66,7 @@ class FormText extends StatefulWidget {
     this.enabled = true,
     this.obscure = false,
     this.showObscure = false,
+    this.textAlign = TextAlign.start,
     this.borderColor = const Color(0xffcccccc),
     this.padding = const EdgeInsets.only(
       top: 10.0,
@@ -139,6 +142,7 @@ class TextInputState extends State<FormText> {
       keyboardType: widget.inputType,
       maxLength: widget.size,
       cursorWidth: widget.cursorWidth,
+      textAlign: widget.textAlign,
       obscureText: obscure,
       suffix: suffix,
       decoration: new BoxDecoration(

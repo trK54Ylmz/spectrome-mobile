@@ -6,6 +6,7 @@ import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/form.dart';
 import 'package:spectrome/page/activation.dart';
+import 'package:spectrome/page/invite.dart';
 import 'package:spectrome/page/sign_up.dart';
 import 'package:spectrome/page/waterfall.dart';
 import 'package:spectrome/service/account/sign_in.dart';
@@ -380,8 +381,16 @@ class _SignInState extends State<SignInPage> {
       // Set loading false
       setState(() => _loading = false);
 
-      // Route to timeline
-      Navigator.of(context).pushReplacementNamed(WaterFallPage.tag);
+      // Show invitation control
+      final ac = _sp.getBool('_ac');
+
+      if (ac == true) {
+        // Route to user invitation
+        Navigator.of(context).pushReplacementNamed(InvitePage.tag);
+      } else {
+        // Route to timeline
+        Navigator.of(context).pushReplacementNamed(WaterFallPage.tag);
+      }
     };
 
     // Error callback
