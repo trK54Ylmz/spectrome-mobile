@@ -47,14 +47,14 @@ class _SignUpDoneState extends State<SignUpDonePage> {
         child: Container(
           width: width,
           height: height,
-          child: getPage(),
+          child: _getPage(),
         ),
       ),
     );
   }
 
   // Get page widget
-  Widget getPage() {
+  Widget _getPage() {
     if (_loading) {
       return new Center(
         child: new Image.asset(

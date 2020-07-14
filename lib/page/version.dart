@@ -87,7 +87,7 @@ class _VersionState extends State<VersionPage> {
           child: new Padding(
             padding: EdgeInsets.symmetric(horizontal: pv),
             child: new Center(
-              child: getPage(),
+              child: _getPage(),
             ),
           ),
         ),
@@ -96,7 +96,7 @@ class _VersionState extends State<VersionPage> {
   }
 
   /// Get content of the version page
-  Widget getPage() {
+  Widget _getPage() {
     final ts = new TextStyle(
       fontFamily: FontConst.primary,
       fontSize: 14.0,
