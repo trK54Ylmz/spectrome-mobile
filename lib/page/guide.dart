@@ -194,6 +194,8 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
     // Show loading icon
     return new Container(
       color: ColorConst.white,
+      width: width,
+      height: height,
       child: new Padding(
         padding: EdgeInsets.symmetric(
           horizontal: hp,

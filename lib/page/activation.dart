@@ -2,7 +2,7 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:spectrome/page/waterfall.dart';
+import 'package:spectrome/page/sign_up_done.dart';
 import 'package:spectrome/item/form.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/button.dart';
@@ -40,7 +40,7 @@ class _ActivationState extends State<ActivationPage> {
   bool _sending = false;
 
   // Shared preferences instance
-  SharedPreferences _preferences;
+  SharedPreferences _sp;
 
   // Token code from sign in response
   String _token;
@@ -51,13 +51,16 @@ class _ActivationState extends State<ActivationPage> {
   // API response, validation error messages
   String _message;
 
+  // The last time activation code has been sent
+  DateTime _lastSent;
+
   @override
   void initState() {
     super.initState();
 
     // Shared preferences callback
     final spc = (SharedPreferences s) {
-      _preferences = s;
+      _sp = s;
 
       // Set token code
       _token = s.getString('_st');
@@ -112,7 +115,7 @@ class _ActivationState extends State<ActivationPage> {
     );
 
     Widget w;
-    if (_preferences == null) {
+    if (_sp == null) {
       if (_loading) {
         // Use loading animation
         w = new Center(
@@ -281,6 +284,7 @@ class _ActivationState extends State<ActivationPage> {
       // Create activation submit button
       final aib = new Button(
         text: 'Activation',
+        disabled: _loading,
         onPressed: _activate,
       );
 
@@ -300,7 +304,28 @@ class _ActivationState extends State<ActivationPage> {
             ),
           ),
           new GestureDetector(
-            onTap: _activation,
+            onTap: () {
+              setState(() => _loading = true);
+
+              final now = DateTime.now();
+
+              // Check that if we already sent activation code
+              if (_lastSent != null && now.difference(_lastSent).inSeconds < 10) {
+                setState(() => _message = 'Activation code has been sent recently.');
+
+                // Clear message 5 seconds later
+                final c = (_) => setState(() => _message = null);
+                Future.delayed(Duration(seconds: 5)).then(c);
+
+                setState(() => _loading = false);
+
+                return;
+              }
+
+              _lastSent = now;
+
+              _activation();
+            },
             child: new Padding(
               padding: const EdgeInsets.symmetric(
                 vertical: 8.0,
@@ -350,6 +375,7 @@ class _ActivationState extends State<ActivationPage> {
       backgroundColor: ColorConst.white,
       body: new SingleChildScrollView(
         child: new Container(
+          width: width,
           height: height,
           child: new Padding(
             padding: EdgeInsets.symmetric(horizontal: pv),
@@ -406,13 +432,13 @@ class _ActivationState extends State<ActivationPage> {
       setState(() => _message = null);
 
       // Create new auth key
-      _preferences.setString('_session', r.session);
+      _sp.setString('_session', r.session);
 
       // Set loading false
       setState(() => _loading = false);
 
-      // Route to timeline
-      Navigator.of(context).pushReplacementNamed(WaterFallPage.tag);
+      // Route to sign up complete page
+      Navigator.of(context).pushReplacementNamed(SignUpDonePage.tag);
     };
 
     // Error callback
@@ -436,21 +462,21 @@ class _ActivationState extends State<ActivationPage> {
 
     // Send activation request
     final code = buffer.join();
-    ActivateService.call(_token, code).then(sc).catchError(e);
+    ActivateService.call(code, _token).then(sc).catchError(e);
   }
 
   void _activation() {
     dev.log('Resend activation button clicked.');
 
     // Clear message
-    setState(() => _message = null);
-
+    _message = null;
     if (_sending) {
       return;
     }
 
     if (_token == null) {
-      setState(() => _message = 'The token is required.');
+      _message = 'The token is required.';
+      setState(() => _loading = false);
       return;
     }
 

@@ -15,10 +15,13 @@ class Button extends StatefulWidget {
   // The callback that is called when the button is tapped or otherwise activated
   final VoidCallback onPressed;
 
+  final bool disabled;
+
   const Button({
     Key key,
     this.text,
     this.onPressed,
+    this.disabled = false,
     this.width = double.infinity,
     this.color = const Color(0xff007aff),
   })  : assert(text != null),
@@ -34,6 +37,8 @@ class _ButtonState extends State<Button> {
 
   @override
   Widget build(BuildContext context) {
+    final c = _active || widget.disabled;
+
     return new GestureDetector(
       onTapDown: (_) {
         setState(() => _active = true);
@@ -41,7 +46,12 @@ class _ButtonState extends State<Button> {
       onTapUp: (_) {
         setState(() => _active = false);
       },
-      onTap: widget.onPressed,
+      onTap: () {
+        // Disable button should be un-clickable
+        if (widget.disabled) return;
+
+        widget.onPressed.call();
+      },
       child: new Semantics(
         button: true,
         child: new ConstrainedBox(
@@ -52,7 +62,7 @@ class _ButtonState extends State<Button> {
           child: new Container(
             padding: new EdgeInsets.all(12.0),
             decoration: BoxDecoration(
-              color: _active ? widget.color.withOpacity(0.9) : widget.color,
+              color: c ? widget.color.withOpacity(0.67) : widget.color,
               borderRadius: BorderRadius.circular(8.0),
             ),
             child: new Text(

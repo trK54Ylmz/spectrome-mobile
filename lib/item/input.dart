@@ -147,7 +147,7 @@ class TextInputState extends State<FormText> {
       suffix: suffix,
       decoration: new BoxDecoration(
         borderRadius: new BorderRadius.circular(widget.radius),
-        color: ColorConst.white,
+        color: widget.enabled ? ColorConst.white : ColorConst.grayColor.withOpacity(0.33),
         border: new Border.all(
           width: 1.0,
           color: widget.borderColor.withOpacity(0.67),

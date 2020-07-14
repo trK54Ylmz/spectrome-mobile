@@ -2,6 +2,7 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/form.dart';
@@ -12,7 +13,6 @@ import 'package:spectrome/page/waterfall.dart';
 import 'package:spectrome/service/account/sign_in.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/util/error.dart';
 
 class SignInPage extends StatefulWidget {
@@ -52,6 +52,9 @@ class _SignInState extends State<SignInPage> {
 
     // Shared preferences callback
     final spc = (SharedPreferences s) {
+      // Remove if legacy session code still exists
+      s.remove('_st');
+
       _sp = s;
 
       setState(() => _loading = false);
@@ -70,6 +73,7 @@ class _SignInState extends State<SignInPage> {
       backgroundColor: ColorConst.white,
       body: new SingleChildScrollView(
         child: new Container(
+          width: width,
           height: height,
           child: new Padding(
             padding: EdgeInsets.symmetric(horizontal: pv),
@@ -249,6 +253,7 @@ class _SignInState extends State<SignInPage> {
     // Create sign-in submit button
     final sib = new Button(
       text: 'Sign In',
+      disabled: _loading,
       onPressed: _signIn,
     );
 
@@ -292,6 +297,7 @@ class _SignInState extends State<SignInPage> {
     // Create sign-up page button
     final sub = new Button(
       text: 'Sign Up',
+      disabled: _loading,
       color: ColorConst.grayColor,
       onPressed: () => Navigator.of(context).pushReplacementNamed(SignUpPage.tag),
     );

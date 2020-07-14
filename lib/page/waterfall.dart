@@ -16,8 +16,10 @@ class WaterFallPage extends StatefulWidget {
 }
 
 class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClientMixin {
+  // Account session key
   String _session;
 
+  // Cursor timestamp value
   double _timestamp;
 
   @override
