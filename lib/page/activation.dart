@@ -223,13 +223,14 @@ class _ActivationState extends State<ActivationPage> {
       for (int i = 0; i < 6; i++) {
         // Activation input
         final item = new Padding(
-          padding: EdgeInsets.only(right: i < 5 ? 8.0 : 0.0),
+          padding: EdgeInsets.only(right: i < 5 ? 4.0 : 0.0),
           child: new Container(
-            width: 30.0,
+            width: 34.0,
             child: new FormText(
               controller: _inputs[i],
               focusNode: _focuses[i],
               inputType: TextInputType.number,
+              textAlign: TextAlign.center,
               size: 1,
               cursorWidth: 1.0,
               style: new TextStyle(

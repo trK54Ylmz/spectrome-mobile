@@ -7,7 +7,7 @@ import 'package:spectrome/util/http.dart';
 class LocationService extends Service {
   /// Check user session by using session code
   static Future<LocationResponse> call(String session, String country, String language) {
-    final path = '/profile/location';
+    final path = '/users/location';
     final headers = {Http.TOKEN_HEADER: session};
     final body = {'session': session, 'country': country, 'language': language};
 

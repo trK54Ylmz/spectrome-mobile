@@ -7,7 +7,7 @@ import 'package:spectrome/util/http.dart';
 class MyProfileService extends Service {
   /// Get my profile by using session code
   static Future<MyProfileResponse> call(String session) {
-    final path = '/profile/me';
+    final path = '/p/me';
     final headers = {Http.TOKEN_HEADER: session};
 
     // Http response handle callback
@@ -34,30 +34,24 @@ class MyProfileService extends Service {
 }
 
 class MyProfile {
-  String username;
+  final String username;
 
-  String name;
+  final String name;
 
-  String photoUrl;
+  final String photoUrl;
 
-  int followers;
+  final int followers;
 
-  int followings;
+  final int followings;
 
   /// Create my profile object
-  MyProfile({
-    String username,
-    String name,
-    String photoUrl,
-    int followers,
-    int followings,
-  }) {
-    this.username = username;
-    this.name = name;
-    this.photoUrl = photoUrl;
-    this.followers = followers;
-    this.followings = followings;
-  }
+  const MyProfile({
+    this.username,
+    this.name,
+    this.photoUrl,
+    this.followers,
+    this.followings,
+  });
 }
 
 class MyProfileResponse extends BasicResponse {
@@ -77,7 +71,7 @@ class MyProfileResponse extends BasicResponse {
     final json = super.fromJson(input);
 
     final p = json['user'] as Map<String, dynamic>;
-    
+
     profile = new MyProfile(
       username: p['username'] as String,
       name: p['name'] as String,

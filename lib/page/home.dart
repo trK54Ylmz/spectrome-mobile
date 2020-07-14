@@ -7,7 +7,7 @@ import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/page/waterfall.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
-import 'package:spectrome/service/profile/location.dart';
+import 'package:spectrome/service/user/location.dart';
 import 'package:spectrome/service/account/session.dart';
 import 'package:spectrome/util/error.dart';
 import 'package:spectrome/util/route.dart';

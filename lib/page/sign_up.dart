@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/form.dart';
 import 'package:spectrome/item/input.dart';
+import 'package:spectrome/page/activation.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/service/account/sign_up.dart';
 import 'package:spectrome/theme/color.dart';
@@ -45,9 +46,6 @@ class _SignUpState extends State<SignUpPage> {
   // Loading indicator
   bool _loading = false;
 
-  // Is sign up operation completed
-  bool _completed = false;
-
   // Error message
   ErrorMessage _error;
 
@@ -69,7 +67,7 @@ class _SignUpState extends State<SignUpPage> {
             height: height,
             child: new Padding(
               padding: EdgeInsets.symmetric(horizontal: pv),
-              child: _completed ? getCompleted() : getForm(),
+              child: getForm(),
             ),
           ),
         ),
@@ -228,6 +226,7 @@ class _SignUpState extends State<SignUpPage> {
       final password = new FormText(
         hint: 'Password',
         obscure: true,
+        showObscure: true,
         controller: _password,
         style: ts,
         hintStyle: hs,
@@ -378,40 +377,11 @@ class _SignUpState extends State<SignUpPage> {
     }
   }
 
-  /// Get sign up completed screen
-  Widget getCompleted() {
-    return new Center(
-      child: new Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          new Icon(
-            new IconData(
-              0xf058,
-              fontFamily: FontConst.fa,
-            ),
-            color: ColorConst.successColor,
-            size: 60.0,
-          ),
-          new Text(
-            'Sign up completed.',
-            style: new TextStyle(
-              fontFamily: FontConst.primary,
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
   /// Make sign up
   ///
   /// Account service must be initialized
   void _signUp() {
     dev.log('Sign up button clicked.');
-
-    // Say application to sign up in process
-    setState(() => _completed = false);
 
     // Clear message
     setState(() => _message = null);
@@ -455,8 +425,8 @@ class _SignUpState extends State<SignUpPage> {
       // Set loading false
       setState(() => _loading = false);
 
-      // Say application to sign up completed
-      setState(() => _completed = true);
+      // Move to activation page
+      Navigator.of(context).pushReplacementNamed(ActivationPage.tag);
     };
 
     final email = _email.text;

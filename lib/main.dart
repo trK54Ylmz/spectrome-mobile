@@ -9,8 +9,10 @@ import 'package:spectrome/item/input.dart';
 import 'package:spectrome/page/activation.dart';
 import 'package:spectrome/page/guide.dart';
 import 'package:spectrome/page/home.dart';
+import 'package:spectrome/page/invite.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/page/sign_up.dart';
+import 'package:spectrome/page/sign_up_done.dart';
 import 'package:spectrome/page/waterfall.dart';
 import 'package:spectrome/page/version.dart';
 import 'package:spectrome/theme/color.dart';
@@ -24,8 +26,10 @@ void main() => runApp(MainPage());
 final routes = <String, WidgetBuilder>{
   GuidePage.tag: (c) => new GuidePage(),
   HomePage.tag: (c) => new HomePage(),
+  InvitePage.tag: (c) => new InvitePage(),
   SignInPage.tag: (c) => new SignInPage(),
   SignUpPage.tag: (c) => new SignUpPage(),
+  SignUpDonePage.tag: (c) => new SignUpDonePage(),
   ActivationPage.tag: (c) => new ActivationPage(),
   WaterFallPage.tag: (c) => new WaterFallPage(),
   VersionPage.tag: (c) => new VersionPage(),
