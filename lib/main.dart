@@ -18,6 +18,7 @@ import 'package:spectrome/page/waterfall.dart';
 import 'package:spectrome/page/version.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
+import 'package:spectrome/util/const.dart';
 import 'package:spectrome/util/http.dart';
 import 'package:spectrome/util/storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -103,23 +104,12 @@ class _MainState extends State<MainPage> {
       ),
     );
 
-    final loading = new Container(
-      color: ColorConst.white,
-      child: new Center(
-        child: new Image.asset(
-          'assets/images/loading.gif',
-          width: 60.0,
-          height: 60.0,
-        ),
-      ),
-    );
-
     if (kReleaseMode) {
       // Select API endpoint domain, if app is in release mode
       return new CupertinoApp(
         title: 'Spectrome',
         debugShowCheckedModeBanner: false,
-        home: _tag == null ? loading : routes[_tag](context),
+        home: _tag == null ? AppConst.loading() : routes[_tag](context),
         routes: routes,
         theme: theme,
       );
@@ -128,7 +118,7 @@ class _MainState extends State<MainPage> {
       return new CupertinoApp(
         title: 'Spectrome',
         debugShowCheckedModeBanner: false,
-        home: _tag == null ? loading : _getDevelop(),
+        home: _tag == null ? AppConst.loading() : _getDevelop(),
         routes: routes,
         theme: theme,
       );

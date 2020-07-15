@@ -10,6 +10,7 @@ import 'package:spectrome/service/account/activate.dart';
 import 'package:spectrome/service/account/activation.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
+import 'package:spectrome/util/const.dart';
 import 'package:spectrome/util/storage.dart';
 import 'package:spectrome/util/error.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -112,75 +113,9 @@ class _ActivationState extends State<ActivationPage> {
           height: height,
           child: new Padding(
             padding: EdgeInsets.symmetric(horizontal: pv),
-            child: _sp == null ? _getLoading() : _getForm(),
+            child: AppConst.loader(context, _sp == null, _error, _getForm),
           ),
         ),
-      ),
-    );
-  }
-
-  /// Get loading form
-  Widget _getLoading() {
-    final ts = new TextStyle(
-      fontFamily: FontConst.primary,
-      fontSize: 14.0,
-      letterSpacing: 0.33,
-    );
-
-    if (_error != null) {
-      final icon = new Icon(
-        new IconData(
-          _error.icon,
-          fontFamily: FontConst.fa,
-        ),
-        color: ColorConst.grayColor,
-        size: 32.0,
-      );
-
-      final message = new Padding(
-        padding: EdgeInsets.only(top: 8.0),
-        child: new Text(_error.error, style: ts),
-      );
-
-      // Add re-try button
-      final button = new Padding(
-        padding: EdgeInsets.only(top: 16.0),
-        child: new CupertinoButton(
-          color: ColorConst.grayColor,
-          onPressed: () {
-            // Reload sign in screen
-            Navigator.of(context).pushReplacementNamed(ActivationPage.tag);
-          },
-          child: new Text(
-            'Try again',
-            style: new TextStyle(
-              color: const Color(0xffffffff),
-              fontFamily: FontConst.primary,
-              fontSize: 14.0,
-              letterSpacing: 0.33,
-            ),
-          ),
-        ),
-      );
-
-      // Handle error
-      return new Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          icon,
-          message,
-          button,
-        ],
-      );
-    }
-
-    // Use loading animation
-    return new Center(
-      child: new Image.asset(
-        'assets/images/loading.gif',
-        width: 60.0,
-        height: 60.0,
       ),
     );
   }
@@ -416,7 +351,7 @@ class _ActivationState extends State<ActivationPage> {
     // Set loading true
     setState(() => _loading = true);
 
-    final sc = (ActivateResponse r) {
+    final sc = (ActivateResponse r) async {
       dev.log('Activation request sent.');
 
       if (!r.status) {
@@ -438,7 +373,7 @@ class _ActivationState extends State<ActivationPage> {
       _sp.setString('_session', r.session);
 
       // Route to sign up complete page
-      Navigator.of(context).pushReplacementNamed(SignUpDonePage.tag);
+      await Navigator.of(context).pushReplacementNamed(SignUpDonePage.tag);
     };
 
     // Error callback

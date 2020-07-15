@@ -11,6 +11,7 @@ import 'package:spectrome/page/waterfall.dart';
 import 'package:spectrome/service/user/invite.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
+import 'package:spectrome/util/const.dart';
 import 'package:spectrome/util/error.dart';
 
 class InvitePage extends StatefulWidget {
@@ -81,72 +82,9 @@ class _InviteState extends State<InvitePage> {
           height: height,
           child: new Padding(
             padding: EdgeInsets.symmetric(horizontal: pv),
-            child: _session == null ? _getLoading() : _getForm(),
+            child: AppConst.loader(context, _session == null, _error, _getForm),
           ),
         ),
-      ),
-    );
-  }
-
-  /// Get loading form
-  Widget _getLoading() {
-    final ts = new TextStyle(
-      fontFamily: FontConst.primary,
-      fontSize: 14.0,
-      letterSpacing: 0.33,
-    );
-
-    if (_error != null) {
-      final icon = new Icon(
-        new IconData(
-          _error.icon,
-          fontFamily: FontConst.fa,
-        ),
-        color: ColorConst.grayColor,
-        size: 32.0,
-      );
-
-      final message = new Padding(
-        padding: EdgeInsets.only(top: 8.0),
-        child: new Text(_error.error, style: ts),
-      );
-
-      // Add re-try button
-      final button = new Padding(
-        padding: EdgeInsets.only(top: 16.0),
-        child: new CupertinoButton(
-          color: ColorConst.grayColor,
-          onPressed: () => Navigator.of(context).pushReplacementNamed(InvitePage.tag),
-          child: new Text(
-            'Try again',
-            style: new TextStyle(
-              color: ColorConst.white,
-              fontFamily: FontConst.primary,
-              fontSize: 14.0,
-              letterSpacing: 0.33,
-            ),
-          ),
-        ),
-      );
-
-      // Handle error
-      return new Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          icon,
-          message,
-          button,
-        ],
-      );
-    }
-
-    // Use loading animation
-    return new Center(
-      child: new Image.asset(
-        'assets/images/loading.gif',
-        width: 60.0,
-        height: 60.0,
       ),
     );
   }
@@ -392,7 +330,7 @@ class _InviteState extends State<InvitePage> {
     setState(() => _loading = true);
 
     // Handle HTTP response
-    final sc = (InviteResponse r) {
+    final sc = (InviteResponse r) async {
       dev.log('Invitation request sent.');
 
       if (!r.status) {
@@ -408,7 +346,7 @@ class _InviteState extends State<InvitePage> {
       }
 
       // Move to activation page
-      Navigator.of(context).pushReplacementNamed(WaterFallPage.tag);
+      await Navigator.of(context).pushReplacementNamed(WaterFallPage.tag);
     };
 
     // Error callback
