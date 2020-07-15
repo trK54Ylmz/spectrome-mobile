@@ -36,14 +36,11 @@ class _VersionState extends State<VersionPage> {
       if (!v.status) {
         if (v.isNetErr ?? false) {
           // Create network error
-          setState(() => _error = ErrorMessage.network());
+          _error = ErrorMessage.network();
         } else {
           // Create custom error
-          setState(() => _error = ErrorMessage.custom(v.message));
+          _error = ErrorMessage.custom(v.message);
         }
-
-        // Set loading false
-        setState(() => _loading = false);
         return;
       }
 
@@ -52,25 +49,22 @@ class _VersionState extends State<VersionPage> {
         Navigator.of(context).pushReplacementNamed(HomePage.tag);
         return;
       }
-
-      // Set loading false
-      setState(() => _loading = false);
     };
 
     // Error callback
     final e = (e, s) {
-      // Create unknown error message
-      final st = () {
-        _loading = false;
+      final msg = 'Unknown error. Please try again later.';
 
-        final msg = 'Unknown error. Please try again later.';
-        _error = ErrorMessage.custom(msg);
-      };
-
-      setState(st);
+      // Create error message
+      _error = ErrorMessage.custom(msg);
     };
 
-    VersionService.call().then(c).catchError(e);
+    // Complete callback
+    final cc = () {
+      setState(() => _loading = false);
+    };
+
+    VersionService.call().then(c).catchError(e).whenComplete(cc);
   }
 
   @override

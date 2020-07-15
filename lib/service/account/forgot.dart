@@ -37,7 +37,6 @@ class ForgotService extends Service {
 }
 
 class ForgotResponse extends BasicResponse {
-
   /// Create empty object
   ForgotResponse.empty() : super.empty();
 

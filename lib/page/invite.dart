@@ -44,7 +44,7 @@ class _InviteState extends State<InvitePage> {
   // Error message
   ErrorMessage _error;
 
-    // Account session key
+  // Account session key
   String _session;
 
   // API response, validation error messages
@@ -371,12 +371,12 @@ class _InviteState extends State<InvitePage> {
   void _invite() {
     dev.log('Invite button clicked.');
 
-    // Clear message
-    setState(() => _message = null);
-
     if (_loading) {
       return;
     }
+
+    // Clear message
+    setState(() => _message = null);
 
     // Validate form key
     if (!_formKey.currentState.validate()) {
@@ -398,23 +398,30 @@ class _InviteState extends State<InvitePage> {
       if (!r.status) {
         if (r.isNetErr ?? false) {
           // Create network error
-          setState(() => _error = ErrorMessage.network());
+          _error = ErrorMessage.network();
         } else {
           // Create custom error
-          setState(() => _message = r.message);
+          _message = r.message;
         }
-
-        // Set loading false
-        setState(() => _loading = false);
 
         return;
       }
 
-      // Set loading false
-      setState(() => _loading = false);
-
       // Move to activation page
       Navigator.of(context).pushReplacementNamed(WaterFallPage.tag);
+    };
+
+    // Error callback
+    final e = (e, s) {
+      final msg = 'Unknown error. Please try again later.';
+
+      // Create error message
+      _error = ErrorMessage.custom(msg);
+    };
+
+    // Complete callback
+    final cc = () {
+      setState(() => _loading = false);
     };
 
     final emails = <String>[_first.text];
@@ -430,6 +437,6 @@ class _InviteState extends State<InvitePage> {
     }
 
     // Send sign up request
-    InviteService.call(_session, emails).then(sc);
+    InviteService.call(_session, emails).then(sc).catchError(e).whenComplete(cc);
   }
 }
