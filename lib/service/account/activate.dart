@@ -37,8 +37,6 @@ class ActivateService extends Service {
 }
 
 class ActivateResponse extends BasicResponse {
-  bool expired = false;
-
   String session;
 
   /// Create empty object
@@ -55,6 +53,5 @@ class ActivateResponse extends BasicResponse {
     final json = super.fromJson(input);
 
     session = json['session'] ?? null;
-    expired = json['expired'] ?? false;
   }
 }
