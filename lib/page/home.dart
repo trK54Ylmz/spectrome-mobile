@@ -33,12 +33,17 @@ class _HomeState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    // Handle exceptions
-    final e = (e, StackTrace s) {
-      dev.log(e.toString(), stackTrace: s);
+    // Error callback
+    final e = (e, s) {
+      final msg = 'Unknown error. Please try again later.';
 
-      final m = 'Something wrong happened';
-      setState(() => _error = ErrorMessage.custom(m));
+      // Create unknown error message
+      _error = ErrorMessage.custom(msg);
+    };
+
+    // Complete callback
+    final cc = () {
+      setState(() => _loading = false);
     };
 
     final sc = (SharedPreferences sp, SessionResponse res) {
@@ -68,8 +73,6 @@ class _HomeState extends State<HomePage> {
 
       // Replace page with sign in screen
       Navigator.of(context).pushReplacement(route);
-
-      setState(() => _loading = false);
     };
 
     // Check session etc.
@@ -84,39 +87,54 @@ class _HomeState extends State<HomePage> {
         // Replace page with sign in screen
         Navigator.of(context).pushReplacement(route);
 
-        setState(() => _loading = false);
         return;
       }
 
       // Check session and route according to response
-      SessionService.call(session).then((r) => sc(sp, r)).catchError(e);
+      await SessionService.call(session).then((r) => sc(sp, r)).catchError(e);
     };
 
-    // Show loading icon when screen initialized
-    setState(() => _loading = true);
-
-    SharedPreferences.getInstance().then(c);
+    SharedPreferences.getInstance().then(c).whenComplete(cc);
   }
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+    final pv = width > 400 ? 100.0 : 60.0;
+
+    // Show loading icon
+    return new Container(
+      color: ColorConst.white,
+      width: width,
+      height: height,
+      child: new Padding(
+        padding: EdgeInsets.symmetric(horizontal: pv),
+        child: _getPage(),
+      ),
+    );
+  }
+
+  /// Get main page
+  Widget _getPage() {
     final ts = new TextStyle(
       fontFamily: FontConst.primary,
       color: ColorConst.grayColor,
       fontSize: 14.0,
     );
 
-    Widget w;
     if (_loading) {
       // Use loading animation
-      w = new Center(
+      return new Center(
         child: new Image.asset(
           'assets/images/loading.gif',
           width: 60.0,
           height: 60.0,
         ),
       );
-    } else if (_error != null) {
+    }
+
+    if (_error != null) {
       final icon = new Icon(
         new IconData(
           _error.icon,
@@ -153,7 +171,7 @@ class _HomeState extends State<HomePage> {
       );
 
       // Handle error
-      w = new Column(
+      return new Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
@@ -162,17 +180,11 @@ class _HomeState extends State<HomePage> {
           button,
         ],
       );
-    } else {
-      // Create empty container if everything is okay
-      w = new Container(
-        color: ColorConst.white,
-      );
     }
 
-    // Show loading icon
+    // Create empty container if everything is okay
     return new Container(
       color: ColorConst.white,
-      child: w,
     );
   }
 }

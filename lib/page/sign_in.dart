@@ -78,7 +78,7 @@ class _SignInState extends State<SignInPage> {
           height: height,
           child: new Padding(
             padding: EdgeInsets.symmetric(horizontal: pv),
-            child: _sp == null ? getLoading() : getForm(),
+            child: _sp == null ? _getLoading() : _getForm(),
           ),
         ),
       ),
@@ -86,7 +86,7 @@ class _SignInState extends State<SignInPage> {
   }
 
   /// Get loading form
-  Widget getLoading() {
+  Widget _getLoading() {
     final ts = new TextStyle(
       fontFamily: FontConst.primary,
       fontSize: 14.0,
@@ -149,7 +149,7 @@ class _SignInState extends State<SignInPage> {
   }
 
   /// Get sign in form
-  Widget getForm() {
+  Widget _getForm() {
     final height = MediaQuery.of(context).size.height;
     final ph = height > 800 ? 64.0 : 32.0;
 
@@ -367,26 +367,20 @@ class _SignInState extends State<SignInPage> {
 
         if (r.isNetErr ?? false) {
           // Create network error
-          setState(() => _error = ErrorMessage.network());
+          _error = ErrorMessage.network();
         } else {
           // Create custom error
-          setState(() => _message = r.message);
+          _message = r.message;
         }
-
-        // Set loading false
-        setState(() => _loading = false);
 
         return;
       }
 
       // Clear API response message
-      setState(() => _message = null);
+      _message = null;
 
       // Create new auth key
       _sp.setString('_session', r.session);
-
-      // Set loading false
-      setState(() => _loading = false);
 
       // Show invitation control
       final ac = _sp.getBool('_ac');
@@ -402,18 +396,21 @@ class _SignInState extends State<SignInPage> {
 
     // Error callback
     final e = (e, s) {
+      final msg = 'Unknown error. Please try again later.';
+
       // Create unknown error message
-      final st = () {
-        _loading = false;
-
-        final msg = 'Unknown error. Please try again later.';
-        _error = ErrorMessage.custom(msg);
-      };
-
-      setState(st);
+      _error = ErrorMessage.custom(msg);
     };
 
+    // Complete callback
+    final cc = () {
+      setState(() => _loading = false);
+    };
+
+    final l = _loginId.text;
+    final p = _password.text;
+
     // Send sign in request
-    SignInService.call(_loginId.text, _password.text).then(sc).catchError(e);
+    SignInService.call(l, p).then(sc).catchError(e).whenComplete(cc);
   }
 }

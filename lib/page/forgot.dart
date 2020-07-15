@@ -6,6 +6,7 @@ import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/form.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/page/sign_in.dart';
+import 'package:spectrome/service/account/forgot.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/error.dart';
@@ -263,5 +264,56 @@ class _ForgotState extends State<ForgotPage> {
   /// Send e-mail to reset password
   void _forgot() {
     dev.log('Reset password button clicked.');
+
+    // Clear message
+    _message = null;
+
+    if (_loading) {
+      return;
+    }
+
+    setState(() => _loading = true);
+
+    dev.log('Resend request sending.');
+
+    final sc = (ForgotResponse r) {
+      dev.log('Forgot password request sent.');
+
+      if (!r.status) {
+        if (r.isNetErr ?? false) {
+          // Create network error
+          setState(() => _error = ErrorMessage.network());
+        } else {
+          // Create custom error
+          setState(() => _message = r.message);
+        }
+
+        return;
+      }
+
+      // Clear API response message
+      setState(() => _message = null);
+    };
+
+    // Error callback
+    final e = (e, s) {
+      // Create unknown error message
+      final st = () {
+        final msg = 'Unknown error. Please try again later.';
+        _error = ErrorMessage.custom(msg);
+      };
+
+      setState(st);
+    };
+
+    final cc = () {
+      setState(() => _loading = false);
+    };
+
+    final u = _username.text;
+    final p = _phone.text;
+
+    // Send activation code again by using request
+    ForgotService.call(u, p).then(sc).catchError(e).whenComplete(cc);
   }
 }

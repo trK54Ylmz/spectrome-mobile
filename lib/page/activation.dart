@@ -326,7 +326,9 @@ class _ActivationState extends State<ActivationPage> {
         ),
         new GestureDetector(
           onTap: () {
-            setState(() => _loading = true);
+            if (_sending) {
+              return;
+            }
 
             final now = DateTime.now();
 
@@ -337,8 +339,6 @@ class _ActivationState extends State<ActivationPage> {
               // Clear message 5 seconds later
               final c = (_) => setState(() => _message = null);
               Future.delayed(Duration(seconds: 5)).then(c);
-
-              setState(() => _loading = false);
 
               return;
             }
@@ -396,12 +396,12 @@ class _ActivationState extends State<ActivationPage> {
   void _activate() {
     dev.log('Activation button clicked.');
 
-    // Clear message
-    setState(() => _message = null);
-
     if (_loading) {
       return;
     }
+
+    // Clear message
+    setState(() => _message = null);
 
     // Validate form key
     if (!_formKey.currentState.validate()) {
@@ -422,26 +422,20 @@ class _ActivationState extends State<ActivationPage> {
       if (!r.status) {
         if (r.isNetErr ?? false) {
           // Create network error
-          setState(() => _error = ErrorMessage.network());
+          _error = ErrorMessage.network();
         } else {
           // Create custom error
-          setState(() => _message = r.message);
+          _message = r.message;
         }
-
-        // Set loading false
-        setState(() => _loading = false);
 
         return;
       }
 
       // Clear API response message
-      setState(() => _message = null);
+      _message = null;
 
       // Create new auth key
       _sp.setString('_session', r.session);
-
-      // Set loading false
-      setState(() => _loading = false);
 
       // Route to sign up complete page
       Navigator.of(context).pushReplacementNamed(SignUpDonePage.tag);
@@ -449,15 +443,15 @@ class _ActivationState extends State<ActivationPage> {
 
     // Error callback
     final e = (e, s) {
-      // Create unknown error message
-      final st = () {
-        _loading = false;
+      final msg = 'Unknown error. Please try again later.';
 
-        final msg = 'Unknown error. Please try again later.';
-        _error = ErrorMessage.custom(msg);
-      };
+      // Create error message
+      _error = ErrorMessage.custom(msg);
+    };
 
-      setState(st);
+    // Complete callback
+    final cc = () {
+      setState(() => _loading = false);
     };
 
     // Create activation code as integer
@@ -468,7 +462,7 @@ class _ActivationState extends State<ActivationPage> {
 
     // Send activation request
     final code = buffer.join();
-    ActivateService.call(code, _token).then(sc).catchError(e);
+    ActivateService.call(code, _token).then(sc).catchError(e).whenComplete(cc);
   }
 
   void _activation() {
@@ -482,7 +476,6 @@ class _ActivationState extends State<ActivationPage> {
 
     if (_token == null) {
       _message = 'The token is required.';
-      setState(() => _loading = false);
       return;
     }
 
@@ -496,17 +489,17 @@ class _ActivationState extends State<ActivationPage> {
       if (!r.status) {
         if (r.isNetErr ?? false) {
           // Create network error
-          setState(() => _error = ErrorMessage.network());
+          _error = ErrorMessage.network();
         } else {
           // Create custom error
-          setState(() => _message = r.message);
+          _message = r.message;
         }
 
         return;
       }
 
       // Clear API response message
-      setState(() => _message = null);
+      _message = null;
 
       // Update sign in token
       _token = r.token;
@@ -514,20 +507,18 @@ class _ActivationState extends State<ActivationPage> {
 
     // Error callback
     final e = (e, s) {
-      // Create unknown error message
-      final st = () {
-        final msg = 'Unknown error. Please try again later.';
-        _error = ErrorMessage.custom(msg);
-      };
+      final msg = 'Unknown error. Please try again later.';
 
-      setState(st);
+      // Create error message
+      _error = ErrorMessage.custom(msg);
     };
 
-    final c = () {
+    // Complete callback
+    final cc = () {
       setState(() => _sending = false);
     };
 
     // Send activation code again by using request
-    ActivationService.call(_token).then(sc).catchError(e).whenComplete(c);
+    ActivationService.call(_token).then(sc).catchError(e).whenComplete(cc);
   }
 }

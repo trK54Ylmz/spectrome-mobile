@@ -422,14 +422,11 @@ class _SignUpState extends State<SignUpPage> {
       if (!r.status) {
         if (r.isNetErr ?? false) {
           // Create network error
-          setState(() => _error = ErrorMessage.network());
+          _error = ErrorMessage.network();
         } else {
           // Create custom error
-          setState(() => _message = r.message);
+          _message = r.message;
         }
-
-        // Set loading false
-        setState(() => _loading = false);
 
         return;
       }
@@ -437,19 +434,29 @@ class _SignUpState extends State<SignUpPage> {
       // Set session token
       _sp.setString('_st', r.token);
 
-      // Set loading false
-      setState(() => _loading = false);
-
       // Move to activation page
       Navigator.of(context).pushReplacementNamed(ActivationPage.tag);
     };
 
-    final email = _email.text;
-    final password = _password.text;
-    final username = _username.text;
-    final name = _name.text;
+    // Error callback
+    final e = (e, s) {
+      final msg = 'Unknown error. Please try again later.';
+
+      // Create unknown error message
+      _error = ErrorMessage.custom(msg);
+    };
+
+    // Complete callback
+    final cc = () {
+      setState(() => _loading = false);
+    };
+
+    final m = _email.text;
+    final p = _password.text;
+    final u = _username.text;
+    final n = _name.text;
 
     // Send sign up request
-    SignUpService.call(email, password, username, name).then(sc);
+    SignUpService.call(m, p, u, n).then(sc).catchError(e).whenComplete(cc);
   }
 }
