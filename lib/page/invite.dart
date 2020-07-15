@@ -211,7 +211,7 @@ class _InviteState extends State<InvitePage> {
     }
 
     final msg = new Text(
-      'Would you like to invite up to 3 people? ',
+      'Would you like to invite up to 3 people?',
       style: new TextStyle(
         fontFamily: FontConst.primary,
         fontSize: 14.0,

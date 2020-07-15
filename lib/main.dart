@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/page/activation.dart';
+import 'package:spectrome/page/forgot.dart';
 import 'package:spectrome/page/guide.dart';
 import 'package:spectrome/page/home.dart';
 import 'package:spectrome/page/invite.dart';
@@ -24,6 +25,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() => runApp(MainPage());
 
 final routes = <String, WidgetBuilder>{
+  ForgotPage.tag: (c) => new ForgotPage(),
   GuidePage.tag: (c) => new GuidePage(),
   HomePage.tag: (c) => new HomePage(),
   InvitePage.tag: (c) => new InvitePage(),
@@ -101,18 +103,18 @@ class _MainState extends State<MainPage> {
       ),
     );
 
-    if (kReleaseMode) {
-      final loading = new Container(
-        color: ColorConst.white,
-        child: new Center(
-          child: new Image.asset(
-            'assets/images/loading.gif',
-            width: 60.0,
-            height: 60.0,
-          ),
+    final loading = new Container(
+      color: ColorConst.white,
+      child: new Center(
+        child: new Image.asset(
+          'assets/images/loading.gif',
+          width: 60.0,
+          height: 60.0,
         ),
-      );
+      ),
+    );
 
+    if (kReleaseMode) {
       // Select API endpoint domain, if app is in release mode
       return new CupertinoApp(
         title: 'Spectrome',
@@ -126,7 +128,7 @@ class _MainState extends State<MainPage> {
       return new CupertinoApp(
         title: 'Spectrome',
         debugShowCheckedModeBanner: false,
-        home: getDevelop(),
+        home: _tag == null ? loading : _getDevelop(),
         routes: routes,
         theme: theme,
       );
@@ -134,11 +136,11 @@ class _MainState extends State<MainPage> {
   }
 
   /// Get develop widgets for main page
-  Widget getDevelop() {
+  Widget _getDevelop() {
     // Show loading indicator if any tag have not selected yet
     if (_tag == null) {
       return new Container(
-        color: const Color(0xffffffff),
+        color: ColorConst.white,
         child: new Center(
           child: new Image.asset(
             'assets/images/loading.gif',
@@ -207,7 +209,6 @@ class _MainState extends State<MainPage> {
       // Default API domain button
       final ib = new Button(
         text: 'Custom',
-        width: 160.0,
         onPressed: () {
           if (ip.controller.text.length == 0) {
             setState(() => _error = true);

@@ -1,6 +1,7 @@
 import 'dart:developer' as dev;
 
 import 'package:flutter/cupertino.dart';
+import 'package:spectrome/page/home.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/storage.dart';
@@ -79,6 +80,7 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
     final vp = height > 800.0 ? 64.0 : 48.0;
     final hp = width > 400.0 ? 64.0 : 32.0;
     final tp = const Padding(padding: EdgeInsets.only(top: 16.0));
+    final stp = const Padding(padding: EdgeInsets.only(top: 8.0));
 
     // Carousel image group
     final images = <Widget>[
@@ -180,13 +182,16 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
     // Skip button
     final skip = new GestureDetector(
       onTap: () => _end(context),
-      child: new Text(
+      child: new Padding(
+        padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+        child: new Text(
         'skip',
         style: new TextStyle(
           fontFamily: FontConst.primary,
           color: ColorConst.grayColor,
           fontSize: 14.0,
           decoration: TextDecoration.underline,
+        ),
         ),
       ),
     );
@@ -211,7 +216,7 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
             msg,
             tp,
             dots,
-            tp,
+            stp,
             skip,
           ],
         ),
@@ -272,6 +277,9 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
 
     final cb = (SharedPreferences sb) {
       sb.setBool('guided', true);
+
+      // Redirect to home page
+      Navigator.of(context).pushReplacementNamed(HomePage.tag);
     };
 
     Storage.load().then(cb);

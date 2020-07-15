@@ -23,7 +23,7 @@ class Button extends StatefulWidget {
     this.onPressed,
     this.disabled = false,
     this.width = double.infinity,
-    this.color = const Color(0xff007aff),
+    this.color = ColorConst.buttonColor,
   })  : assert(text != null),
         super(key: key);
 
@@ -70,7 +70,7 @@ class _ButtonState extends State<Button> {
               maxLines: 1,
               textAlign: TextAlign.center,
               style: new TextStyle(
-                color: ColorConst.white,
+                color: c ? ColorConst.white.withOpacity(0.67) : ColorConst.white,
                 fontFamily: FontConst.primary,
                 fontSize: 14.0,
               ),

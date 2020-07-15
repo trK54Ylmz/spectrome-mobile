@@ -1,5 +1,3 @@
-import 'dart:developer' as dev;
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -99,9 +97,7 @@ class _SignUpDoneState extends State<SignUpDonePage> {
     final sib = new Button(
       color: ColorConst.buttonColor,
       text: 'Sign In',
-      onPressed: () {
-        Navigator.of(context).pushReplacementNamed(SignInPage.tag);
-      },
+      onPressed: () => Navigator.of(context).pushReplacementNamed(SignInPage.tag),
     );
 
     return new Padding(
