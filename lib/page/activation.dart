@@ -232,16 +232,12 @@ class _ActivationState extends State<ActivationPage> {
       );
     }
 
-    final at = '''
-      Please enter activation code as one-by-one 
-      which sent to your e-mail address
-      ''';
-
     final t = new Text(
-      at.replaceAll(new RegExp(r'[\s]{2,}'), ' ').trim(),
+      'Please enter 6 digits which we have sent to your e-mail address.',
+      textAlign: TextAlign.center,
       style: new TextStyle(
         fontFamily: FontConst.primary,
-        fontSize: 12.0,
+        fontSize: 14.0,
         letterSpacing: 0.33,
         color: ColorConst.grayColor,
       ),
@@ -308,7 +304,7 @@ class _ActivationState extends State<ActivationPage> {
 
     // Create activation submit button
     final aib = new Button(
-      text: 'Activation',
+      text: 'Complete',
       disabled: _loading,
       onPressed: _activate,
     );

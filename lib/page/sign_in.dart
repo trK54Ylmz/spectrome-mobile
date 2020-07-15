@@ -7,6 +7,7 @@ import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/form.dart';
 import 'package:spectrome/page/activation.dart';
+import 'package:spectrome/page/forgot.dart';
 import 'package:spectrome/page/invite.dart';
 import 'package:spectrome/page/sign_up.dart';
 import 'package:spectrome/page/waterfall.dart';
@@ -272,7 +273,7 @@ class _SignInState extends State<SignInPage> {
           ),
         ),
         new GestureDetector(
-          onTap: () => Navigator.of(context).pushReplacementNamed(SignUpPage.tag),
+          onTap: () => Navigator.of(context).pushReplacementNamed(ForgotPage.tag),
           child: new Padding(
             padding: const EdgeInsets.symmetric(
               vertical: 8.0,

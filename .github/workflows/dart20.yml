@@ -1,0 +1,17 @@
+name: Spectrome mobile
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Analyze app
+        uses: subosito/flutter-action@v1
+        run: flutter analyze
