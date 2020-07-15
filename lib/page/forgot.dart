@@ -2,6 +2,7 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/form.dart';
 import 'package:spectrome/item/input.dart';
@@ -9,6 +10,7 @@ import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/service/account/forgot.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
+import 'package:spectrome/util/const.dart';
 import 'package:spectrome/util/error.dart';
 
 class ForgotPage extends StatefulWidget {
@@ -33,11 +35,31 @@ class _ForgotState extends State<ForgotPage> {
   // Loading indicator
   bool _loading = false;
 
+  // Shared preferences instance
+  SharedPreferences _sp;
+
   // Error message
   ErrorMessage _error;
 
   // API response, validation error messages
   String _message;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Shared preferences callback
+    final spc = (SharedPreferences s) {
+      // Remove if legacy forgot token still exists
+      s.remove('_fpt');
+
+      _sp = s;
+
+      setState(() => _loading = false);
+    };
+
+    SharedPreferences.getInstance().then(spc);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,13 +75,14 @@ class _ForgotState extends State<ForgotPage> {
           height: height,
           child: new Padding(
             padding: EdgeInsets.symmetric(horizontal: pv),
-            child: _getForm(),
+            child: AppConst.loader(context, _sp == null, _error, _getForm),
           ),
         ),
       ),
     );
   }
 
+  /// Get forgot password form
   Widget _getForm() {
     final height = MediaQuery.of(context).size.height;
     final ph = height > 800 ? 64.0 : 32.0;
@@ -84,46 +107,6 @@ class _ForgotState extends State<ForgotPage> {
       letterSpacing: 0.33,
       color: ColorConst.grayColor,
     );
-
-    if (_error != null) {
-      final icon = new Icon(
-        new IconData(
-          _error.icon,
-          fontFamily: FontConst.fa,
-        ),
-        color: ColorConst.grayColor,
-        size: 32.0,
-      );
-
-      final message = new Padding(
-        padding: EdgeInsets.only(top: 8.0),
-        child: new Text(
-          _error.error,
-          style: hs,
-        ),
-      );
-
-      // Add re-try button
-      final button = new Padding(
-        padding: EdgeInsets.only(top: 16.0),
-        child: new Button(
-          text: 'Try again',
-          color: ColorConst.grayColor,
-          onPressed: () => Navigator.of(context).pushReplacementNamed(ForgotPage.tag),
-        ),
-      );
-
-      // Handle error
-      return new Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          icon,
-          message,
-          button,
-        ],
-      );
-    }
 
     final logo = new Image.asset(
       'assets/images/logo@2x.png',
@@ -291,19 +274,18 @@ class _ForgotState extends State<ForgotPage> {
         return;
       }
 
+      _sp.setString('_fpt', r.token);
+
       // Clear API response message
       setState(() => _message = null);
     };
 
     // Error callback
     final e = (e, s) {
-      // Create unknown error message
-      final st = () {
-        final msg = 'Unknown error. Please try again later.';
-        _error = ErrorMessage.custom(msg);
-      };
+      final msg = 'Unknown error. Please try again later.';
 
-      setState(st);
+      // Create unknown error message
+      _error = ErrorMessage.custom(msg);
     };
 
     final cc = () {

@@ -30,7 +30,7 @@ class _VersionState extends State<VersionPage> {
   void initState() {
     super.initState();
 
-    final c = (VersionResponse v) {
+    final c = (VersionResponse v) async {
       dev.log('Version request sent.');
 
       if (!v.status) {
@@ -46,8 +46,7 @@ class _VersionState extends State<VersionPage> {
 
       // Move to home page
       if (v.version == AppConst.version) {
-        Navigator.of(context).pushReplacementNamed(HomePage.tag);
-        return;
+        await Navigator.of(context).pushReplacementNamed(HomePage.tag);
       }
     };
 
@@ -81,7 +80,7 @@ class _VersionState extends State<VersionPage> {
           child: new Padding(
             padding: EdgeInsets.symmetric(horizontal: pv),
             child: new Center(
-              child: _getPage(),
+              child: AppConst.loader(context, _loading, _error, _getPage),
             ),
           ),
         ),
@@ -97,62 +96,6 @@ class _VersionState extends State<VersionPage> {
       letterSpacing: 0.33,
       color: ColorConst.darkGrayColor,
     );
-
-    if (_loading) {
-      // Use loading animation
-      return new Center(
-        child: new Image.asset(
-          'assets/images/loading.gif',
-          width: 60.0,
-          height: 60.0,
-        ),
-      );
-    }
-
-    if (_error != null) {
-      final icon = new Icon(
-        new IconData(
-          _error.icon,
-          fontFamily: FontConst.fa,
-        ),
-        color: ColorConst.grayColor,
-        size: 32.0,
-      );
-
-      final message = new Padding(
-        padding: EdgeInsets.only(top: 8.0),
-        child: new Text(_error.error, style: ts),
-      );
-
-      // Add re-try button
-      final button = new Padding(
-        padding: EdgeInsets.only(top: 16.0),
-        child: new CupertinoButton(
-          color: ColorConst.grayColor,
-          onPressed: () => Navigator.of(context).pushReplacementNamed(VersionPage.tag),
-          child: new Text(
-            'Try again',
-            style: new TextStyle(
-              color: ColorConst.white,
-              fontFamily: FontConst.primary,
-              fontSize: 14.0,
-              letterSpacing: 0.33,
-            ),
-          ),
-        ),
-      );
-
-      // Handle error
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          icon,
-          message,
-          button,
-        ],
-      );
-    }
 
     final icon = new Icon(
       new IconData(

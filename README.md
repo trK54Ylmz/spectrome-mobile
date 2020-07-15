@@ -1,5 +1,7 @@
 ### Spectrome mobile application
 
+![Spectrome mobile](https://github.com/trK54Ylmz/spectrome-mobile/workflows/Spectrome%20mobile/badge.svg)
+
 The mobile application of Spectrome.
 
 <p align="center">

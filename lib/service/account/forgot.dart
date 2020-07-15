@@ -37,6 +37,9 @@ class ForgotService extends Service {
 }
 
 class ForgotResponse extends BasicResponse {
+  /// Validation token
+  String token;
+
   /// Create empty object
   ForgotResponse.empty() : super.empty();
 
@@ -47,5 +50,9 @@ class ForgotResponse extends BasicResponse {
   }) : super.bind(status: status, message: message);
 
   /// Create response by using JSON input
-  ForgotResponse.fromJson(String input) : super.fromJson(input);
+  ForgotResponse.fromJson(String input) {
+    final json = super.fromJson(input);
+
+    token = json['token'] ?? null;
+  }
 }
