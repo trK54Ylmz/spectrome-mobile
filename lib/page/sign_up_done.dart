@@ -5,6 +5,7 @@ import 'package:spectrome/item/button.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
+import 'package:spectrome/util/storage.dart';
 
 class SignUpDonePage extends StatefulWidget {
   static const tag = 'sign_up_done';
@@ -31,7 +32,7 @@ class _SignUpDoneState extends State<SignUpDonePage> {
     };
 
     // Get shared preferences
-    SharedPreferences.getInstance().then(c);
+    Storage.load().then(c);
   }
 
   @override
