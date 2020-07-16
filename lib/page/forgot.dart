@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/form.dart';
 import 'package:spectrome/item/input.dart';
+import 'package:spectrome/page/reset.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/service/account/forgot.dart';
 import 'package:spectrome/theme/color.dart';
@@ -280,6 +281,9 @@ class _ForgotState extends State<ForgotPage> {
 
       // Clear API response message
       _message = null;
+
+      // Move to reset page
+      Navigator.of(context).pushReplacementNamed(ResetPage.tag);
     };
 
     // Error callback

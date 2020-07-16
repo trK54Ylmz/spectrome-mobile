@@ -8,6 +8,7 @@ class SignUpService extends Service {
   /// Create new user account
   /// by using e-mail address, password, name and username
   static Future<SignUpResponse> call(
+    String phone,
     String email,
     String password,
     String username,
@@ -15,6 +16,7 @@ class SignUpService extends Service {
   ) {
     final path = '/account/create';
     final body = {
+      'phone': phone,
       'username': username,
       'email': email,
       'password': password,

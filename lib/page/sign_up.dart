@@ -413,12 +413,13 @@ class _SignUpState extends State<SignUpPage> {
       setState(() => _loading = false);
     };
 
+    final t = _phone.text;
     final m = _email.text;
     final p = _password.text;
     final u = _username.text;
     final n = _name.text;
 
     // Send sign up request
-    SignUpService.call(m, p, u, n).then(sc).catchError(e).whenComplete(cc);
+    SignUpService.call(t, m, p, u, n).then(sc).catchError(e).whenComplete(cc);
   }
 }
