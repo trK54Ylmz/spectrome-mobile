@@ -262,7 +262,7 @@ class _ForgotState extends State<ForgotPage> {
 
     dev.log('Resend request sending.');
 
-    final sc = (ForgotResponse r) {
+    final sc = (ForgotResponse r) async {
       dev.log('Forgot password request sent.');
 
       if (!r.status) {
@@ -283,7 +283,7 @@ class _ForgotState extends State<ForgotPage> {
       _message = null;
 
       // Move to reset page
-      Navigator.of(context).pushReplacementNamed(ResetPage.tag);
+      await Navigator.of(context).pushReplacementNamed(ResetPage.tag);
     };
 
     // Error callback
