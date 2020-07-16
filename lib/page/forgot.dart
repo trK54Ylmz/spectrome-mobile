@@ -12,6 +12,7 @@ import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
 import 'package:spectrome/util/error.dart';
+import 'package:spectrome/util/storage.dart';
 
 class ForgotPage extends StatefulWidget {
   static final tag = 'forgot';
@@ -58,7 +59,8 @@ class _ForgotState extends State<ForgotPage> {
       setState(() => _loading = false);
     };
 
-    SharedPreferences.getInstance().then(spc);
+    // Load shared preferences
+    Storage.load().then(spc);
   }
 
   @override
@@ -265,10 +267,10 @@ class _ForgotState extends State<ForgotPage> {
       if (!r.status) {
         if (r.isNetErr ?? false) {
           // Create network error
-          setState(() => _error = ErrorMessage.network());
+          _error = ErrorMessage.network();
         } else {
           // Create custom error
-          setState(() => _message = r.message);
+          _message = r.message;
         }
 
         return;
@@ -277,7 +279,7 @@ class _ForgotState extends State<ForgotPage> {
       _sp.setString('_fpt', r.token);
 
       // Clear API response message
-      setState(() => _message = null);
+      _message = null;
     };
 
     // Error callback

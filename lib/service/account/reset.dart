@@ -6,9 +6,9 @@ import 'package:spectrome/util/http.dart';
 
 class ResetService extends Service {
   /// Reset password by using code
-  static Future<ResetResponse> call(String code, String token) {
+  static Future<ResetResponse> call(String code, String password, String token) {
     final path = '/account/reset';
-    final body = {'code': code, 'token': token};
+    final body = {'code': code, 'password': password, 'token': token};
 
     // Http response handle callback
     final c = (Response r) {

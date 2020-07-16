@@ -3,42 +3,41 @@ import 'dart:developer' as dev;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/form.dart';
-import 'package:spectrome/page/activation.dart';
-import 'package:spectrome/page/forgot.dart';
-import 'package:spectrome/page/invite.dart';
-import 'package:spectrome/page/sign_up.dart';
-import 'package:spectrome/page/waterfall.dart';
-import 'package:spectrome/service/account/sign_in.dart';
+import 'package:spectrome/item/input.dart';
+import 'package:spectrome/page/sign_in.dart';
+import 'package:spectrome/service/account/reset.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
 import 'package:spectrome/util/error.dart';
 import 'package:spectrome/util/storage.dart';
 
-class SignInPage extends StatefulWidget {
-  static final tag = 'sign_in';
+class ResetPage extends StatefulWidget {
+  static final tag = 'reset';
 
-  SignInPage() : super();
+  ResetPage() : super();
 
   @override
-  _SignInState createState() => new _SignInState();
+  _ResetState createState() => new _ResetState();
 }
 
-class _SignInState extends State<SignInPage> {
+class _ResetState extends State<ResetPage> {
   // Form validation key
   final _formKey = GlobalKey<FormValidationState>();
 
-  // Username or e-mail input controller
-  final _loginId = new TextEditingController();
+  // Code input controller group
+  final _inputs = <TextEditingController>[];
+
+  // Code input focus node group
+  final _focuses = <FocusNode>[];
 
   // Password input controller
   final _password = new TextEditingController();
 
   // Loading indicator
-  bool _loading = true;
+  bool _loading = false;
 
   // Shared preferences instance
   SharedPreferences _sp;
@@ -49,21 +48,51 @@ class _SignInState extends State<SignInPage> {
   // API response, validation error messages
   String _message;
 
+  /// Forgot password token
+  String _token;
+
   @override
   void initState() {
     super.initState();
 
     // Shared preferences callback
     final spc = (SharedPreferences s) {
-      // Remove if legacy session code still exists
-      s.remove('_st');
-
       _sp = s;
+
+      // Set token code
+      _token = s.getString('_fpt');
+
+      // Remove code from shared preferences store
+      s.remove('_fpt');
 
       setState(() => _loading = false);
     };
 
     Storage.load().then(spc);
+
+    // Create text controllers
+    for (int i = 0; i < 6; i++) {
+      _inputs.add(new TextEditingController());
+      _focuses.add(new FocusNode());
+    }
+
+    final dcb = (_) {
+      _focuses[0].requestFocus();
+    };
+
+    // Focus to first input
+    WidgetsBinding.instance.addPostFrameCallback(dcb);
+  }
+
+  @override
+  void dispose() {
+    // Dispose all controllers and focus nodes
+    for (int i = 0; i < 6; i++) {
+      _inputs[i].dispose();
+      _focuses[i].dispose();
+    }
+
+    super.dispose();
   }
 
   @override
@@ -87,7 +116,7 @@ class _SignInState extends State<SignInPage> {
     );
   }
 
-  /// Get sign in form
+  /// Get forgot password form
   Widget _getForm() {
     final height = MediaQuery.of(context).size.height;
     final ph = height > 800 ? 64.0 : 32.0;
@@ -98,11 +127,6 @@ class _SignInState extends State<SignInPage> {
 
     final ptl = new Padding(
       padding: EdgeInsets.only(top: ph),
-    );
-
-    final logo = new Image.asset(
-      'assets/images/logo@2x.png',
-      width: 128.0,
     );
 
     final ts = new TextStyle(
@@ -116,6 +140,22 @@ class _SignInState extends State<SignInPage> {
       fontSize: 14.0,
       letterSpacing: 0.33,
       color: ColorConst.grayColor,
+    );
+
+    final logo = new Image.asset(
+      'assets/images/logo@2x.png',
+      width: 128.0,
+    );
+
+    final t = new Text(
+      'Please enter code you have received and your new password.',
+      textAlign: TextAlign.center,
+      style: new TextStyle(
+        fontFamily: FontConst.primary,
+        fontSize: 14.0,
+        letterSpacing: 0.33,
+        color: ColorConst.grayColor,
+      ),
     );
 
     Widget s;
@@ -146,31 +186,71 @@ class _SignInState extends State<SignInPage> {
       );
     }
 
-    // Create e-mail address input
-    final email = new FormText(
-      hint: 'Username or e-mail address',
-      controller: _loginId,
-      style: ts,
-      hintStyle: hs,
-      validator: (i) {
-        if (i.length == 0) {
-          return 'The username or e-mail address is required.';
-        }
+    final items = <Widget>[];
+    for (int i = 0; i < 6; i++) {
+      // Activation input
+      final item = new Padding(
+        padding: EdgeInsets.only(right: i < 5 ? 4.0 : 0.0),
+        child: new Container(
+          width: 34.0,
+          child: new FormText(
+            controller: _inputs[i],
+            focusNode: _focuses[i],
+            inputType: TextInputType.number,
+            textAlign: TextAlign.center,
+            size: 1,
+            cursorWidth: 1.0,
+            style: new TextStyle(
+              fontFamily: FontConst.primary,
+              fontSize: 24.0,
+              letterSpacing: 0.0,
+            ),
+            onChange: (i) {
+              int index = 0;
+              for (int i = 0; i < 6; i++) {
+                if (_focuses[i].hasFocus) {
+                  index = i;
+                  break;
+                }
+              }
 
-        if (i.runes.length < 2) {
-          return 'The username or e-mail address is too short.';
-        }
+              if (i.length > 0 && index < 5) {
+                _focuses[index + 1].requestFocus();
+              }
 
-        return null;
-      },
+              if (i.length == 0 && index > 0) {
+                _focuses[index - 1].requestFocus();
+              }
+
+              return null;
+            },
+            validator: (i) {
+              if (i.length == 0) {
+                return 'All fields are required.';
+              }
+
+              return null;
+            },
+          ),
+        ),
+      );
+
+      items.add(item);
+    }
+
+    // Activation input items
+    final c = new Row(
+      children: items,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
     );
 
     // Create password input
     final password = new FormText(
       hint: 'Password',
-      controller: _password,
       obscure: true,
       showObscure: true,
+      controller: _password,
       style: ts,
       hintStyle: hs,
       validator: (i) {
@@ -190,56 +270,19 @@ class _SignInState extends State<SignInPage> {
       },
     );
 
-    // Create sign-in submit button
+    // Reset password submit button
+    final fpb = new Button(
+      text: 'Change password',
+      disabled: _loading,
+      onPressed: _reset,
+    );
+
+    // Sign in page button
     final sib = new Button(
       text: 'Sign In',
       disabled: _loading,
-      onPressed: _signIn,
-    );
-
-    // Forgot password page button
-    final fpt = new Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        new Text(
-          'forgot password? ',
-          style: new TextStyle(
-            fontFamily: FontConst.primary,
-            fontSize: 12.0,
-            letterSpacing: 0.33,
-            color: ColorConst.grayColor,
-          ),
-        ),
-        new GestureDetector(
-          onTap: () => Navigator.of(context).pushReplacementNamed(ForgotPage.tag),
-          child: new Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 8.0,
-              horizontal: 4.0,
-            ),
-            child: new Text(
-              'reset',
-              style: new TextStyle(
-                fontFamily: FontConst.primary,
-                fontSize: 12.0,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.33,
-                color: ColorConst.grayColor,
-                decoration: TextDecoration.underline,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-
-    // Create sign-up page button
-    final sub = new Button(
-      text: 'Sign Up',
-      disabled: _loading,
       color: ColorConst.grayColor,
-      onPressed: () => Navigator.of(context).pushReplacementNamed(SignUpPage.tag),
+      onPressed: () => Navigator.of(context).pushReplacementNamed(SignInPage.tag),
     );
 
     // Create main container
@@ -251,59 +294,43 @@ class _SignInState extends State<SignInPage> {
         children: <Widget>[
           pt,
           logo,
+          ptl,
+          t,
+          pt,
           s,
-          email,
+          c,
           pt,
           password,
           pt,
-          sib,
+          fpb,
           pt,
-          fpt,
           ptl,
-          sub,
+          sib,
           pt,
         ],
       ),
     );
   }
 
-  /// Make sign in
-  ///
-  /// Account service must be initialized
-  void _signIn() {
-    dev.log('Sign in button clicked.');
+  /// Send e-mail to reset password
+  void _reset() {
+    dev.log('Reset password button clicked.');
+
+    // Clear message
+    _message = null;
 
     if (_loading) {
       return;
     }
 
-    // Validate form key
-    if (!_formKey.currentState.validate()) {
-      // Create custom error
-      setState(() => _message = _formKey.currentState.errors.first);
-
-      return;
-    }
-
-    dev.log('Sign in request sending.');
-
-    // Set loading true
     setState(() => _loading = true);
 
-    // Handle HTTP response
-    final sc = (SignInResponse r) async {
-      dev.log('Sign in request sent.');
+    dev.log('Resend request sending.');
+
+    final sc = (ResetResponse r) {
+      dev.log('Reset password request sent.');
 
       if (!r.status) {
-        // Route to activation page, if activation is wating
-        if (r.activation == false) {
-          // Set session token
-          _sp.setString('_st', r.token);
-
-          await Navigator.of(context).pushReplacementNamed(ActivationPage.tag);
-          return;
-        }
-
         if (r.isNetErr ?? false) {
           // Create network error
           _error = ErrorMessage.network();
@@ -317,16 +344,6 @@ class _SignInState extends State<SignInPage> {
 
       // Clear API response message
       _message = null;
-
-      // Create new auth key
-      _sp.setString('_session', r.session);
-
-      // Show invitation control
-      final ac = _sp.getBool('_ac');
-
-      final tag = ac ? InvitePage.tag : WaterFallPage.tag;
-
-      await Navigator.of(context).pushReplacementNamed(tag);
     };
 
     // Error callback
@@ -337,15 +354,21 @@ class _SignInState extends State<SignInPage> {
       _error = ErrorMessage.custom(msg);
     };
 
-    // Complete callback
     final cc = () {
       setState(() => _loading = false);
     };
 
-    final l = _loginId.text;
+    // Create activation code as integer
+    final buffer = <String>[];
+    for (int i = 0; i < 6; i++) {
+      buffer.add(_inputs[i].text);
+    }
+
+    // Send activation request
+    final c = buffer.join();
     final p = _password.text;
 
-    // Send sign in request
-    SignInService.call(l, p).then(sc).catchError(e).whenComplete(cc);
+    // Send activation code again by using request
+    ResetService.call(c, p, _token).then(sc).catchError(e).whenComplete(cc);
   }
 }

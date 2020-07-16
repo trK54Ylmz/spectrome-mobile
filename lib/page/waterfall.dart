@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/service/post/waterfall.dart';
 import 'package:spectrome/theme/color.dart';
+import 'package:spectrome/util/storage.dart';
 
 class WaterFallPage extends StatefulWidget {
   static final tag = 'waterfall';
@@ -34,7 +35,7 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
     };
 
     // Get shared preferences
-    SharedPreferences.getInstance().then(c);
+    Storage.load().then(c);
   }
 
   @override

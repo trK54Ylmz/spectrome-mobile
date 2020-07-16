@@ -12,6 +12,7 @@ import 'package:spectrome/util/const.dart';
 import 'package:spectrome/util/error.dart';
 import 'package:spectrome/util/route.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spectrome/util/storage.dart';
 
 class HomePage extends StatefulWidget {
   static final tag = 'home';
@@ -94,7 +95,7 @@ class _HomeState extends State<HomePage> {
       await SessionService.call(session).then((r) => sc(sp, r)).catchError(e);
     };
 
-    SharedPreferences.getInstance().then(c).whenComplete(cc);
+    Storage.load().then(c).whenComplete(cc);
   }
 
   @override

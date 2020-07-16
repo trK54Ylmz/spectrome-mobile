@@ -13,6 +13,7 @@ import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
 import 'package:spectrome/util/error.dart';
+import 'package:spectrome/util/storage.dart';
 
 class InvitePage extends StatefulWidget {
   static const tag = 'invite';
@@ -66,7 +67,7 @@ class _InviteState extends State<InvitePage> {
     };
 
     // Get shared preferences
-    SharedPreferences.getInstance().then(c);
+    Storage.load().then(c);
   }
 
   @override
