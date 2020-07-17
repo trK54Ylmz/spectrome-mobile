@@ -48,11 +48,17 @@ class Post {
 
   final List<String> tags;
 
+  final int width;
+
+  final int height;
+
   /// Create post object
   const Post({
     this.username,
     this.photoUrl,
     this.tags,
+    this.width,
+    this.height,
   });
 }
 
@@ -83,6 +89,8 @@ class WaterFallResponse extends BasicResponse {
           username: p['username'] as String,
           photoUrl: p['photo_url'] as String,
           tags: p['tags'] as List<String>,
+          width: p['width'] as int,
+          height: p['height'] as int,
         );
       };
 

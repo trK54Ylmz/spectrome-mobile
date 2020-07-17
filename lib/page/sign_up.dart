@@ -410,6 +410,11 @@ class _SignUpState extends State<SignUpPage> {
 
     // Complete callback
     final cc = () {
+      // Skip if dispose method called from application
+      if (!this.mounted) {
+        return;
+      }
+
       setState(() => _loading = false);
     };
 

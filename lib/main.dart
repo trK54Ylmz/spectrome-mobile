@@ -10,6 +10,7 @@ import 'package:spectrome/page/activation.dart';
 import 'package:spectrome/page/forgot.dart';
 import 'package:spectrome/page/guide.dart';
 import 'package:spectrome/page/home.dart';
+import 'package:spectrome/page/session.dart';
 import 'package:spectrome/page/invite.dart';
 import 'package:spectrome/page/reset.dart';
 import 'package:spectrome/page/sign_in.dart';
@@ -32,6 +33,7 @@ final routes = <String, WidgetBuilder>{
   HomePage.tag: (c) => new HomePage(),
   InvitePage.tag: (c) => new InvitePage(),
   ResetPage.tag: (c) => new ResetPage(),
+  SessionPage.tag: (c) => new SessionPage(),
   SignInPage.tag: (c) => new SignInPage(),
   SignUpPage.tag: (c) => new SignUpPage(),
   SignUpDonePage.tag: (c) => new SignUpDonePage(),

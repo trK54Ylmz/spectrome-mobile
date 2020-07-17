@@ -295,6 +295,11 @@ class _ForgotState extends State<ForgotPage> {
     };
 
     final cc = () {
+      // Skip if dispose method called from application
+      if (!this.mounted) {
+        return;
+      }
+
       setState(() => _loading = false);
     };
 

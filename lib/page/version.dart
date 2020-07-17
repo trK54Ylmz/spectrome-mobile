@@ -3,7 +3,7 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:spectrome/page/home.dart';
+import 'package:spectrome/page/session.dart';
 import 'package:spectrome/service/system/version.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
@@ -46,7 +46,7 @@ class _VersionState extends State<VersionPage> {
 
       // Move to home page
       if (v.version == AppConst.version) {
-        await Navigator.of(context).pushReplacementNamed(HomePage.tag);
+        await Navigator.of(context).pushReplacementNamed(SessionPage.tag);
       }
     };
 
@@ -60,6 +60,11 @@ class _VersionState extends State<VersionPage> {
 
     // Complete callback
     final cc = () {
+      // Skip if dispose method called from application
+      if (!this.mounted) {
+        return;
+      }
+
       setState(() => _loading = false);
     };
 
