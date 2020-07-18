@@ -1,5 +1,3 @@
-import 'dart:developer' as dev;
-
 import 'package:flutter/cupertino.dart';
 import 'package:spectrome/page/waterfall.dart';
 import 'package:spectrome/theme/color.dart';

@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/post.dart';
 import 'package:spectrome/service/post/waterfall.dart';
 import 'package:spectrome/theme/color.dart';
-import 'package:spectrome/util/error.dart';
+import 'package:spectrome/util/const.dart';
 import 'package:spectrome/util/storage.dart';
 
 class WaterFallPage extends StatefulWidget {
@@ -31,12 +31,6 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
 
   // Account session key
   String _session;
-
-// Error message
-  ErrorMessage _error;
-
-  // API response, validation error messages
-  String _message;
 
   // Cursor timestamp value
   double _timestamp;
@@ -73,12 +67,24 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
   Widget build(BuildContext context) {
     super.build(context);
 
+    // Use multiple widgets to show shimmer
+    final items = <Widget>[
+      _getWaterFall(),
+    ];
+
+    // Add shimmer in case of loading state
+    if (_loading) {
+      items.add(AppConst.shimmer());
+    }
+
     return new Scaffold(
       key: _sk,
       backgroundColor: ColorConst.white,
       body: new SingleChildScrollView(
-        child: new Container(
-          child: _getWaterFall(),
+        child: new Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: items,
         ),
       ),
     );
@@ -88,10 +94,10 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
   bool get wantKeepAlive => true;
 
   // Show error when error not empty
-  void _showError() {
+  void _showSnackBar(String message, {isError = true}) {
     final snackBar = SnackBar(
-      content: Text(_error.error),
-      backgroundColor: ColorConst.darkRed,
+      content: Text(message),
+      backgroundColor: isError ? ColorConst.darkRed : ColorConst.dark,
     );
 
     _sk.currentState.showSnackBar(snackBar);
@@ -99,9 +105,6 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
 
   /// Get waterfall posts widget
   Widget _getWaterFall() {
-    // Clear error message
-    _error = null;
-
     final builder = (context, index) {
       return new PostCard(
         post: _posts[index],
@@ -128,7 +131,8 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
 
     final c = (WaterFallResponse r) {
       if (!r.status) {
-        _message = r.message;
+        // Show snackbar error indicator
+        _showSnackBar(r.message, isError: false);
         return;
       }
 
@@ -140,11 +144,8 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
     final e = (e, s) {
       final msg = 'Unknown error. Please try again later.';
 
-      // Create unknown error message
-      _error = ErrorMessage.custom(msg);
-
       // Show snackbar error indicator
-      _showError();
+      _showSnackBar(msg);
     };
 
     WaterFallService.call(_session, _timestamp).then(c).catchError(e);

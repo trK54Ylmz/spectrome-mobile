@@ -3,8 +3,8 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart';
 import 'package:spectrome/main.dart';
-import 'package:spectrome/page/home.dart';
 import 'package:spectrome/page/sign_in.dart';
+import 'package:spectrome/page/view.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/service/user/location.dart';
 import 'package:spectrome/service/account/session.dart';
@@ -63,7 +63,7 @@ class _SessionState extends State<SessionPage> {
       if (!res.status || res.expired ?? false) {
         r = routes[SignInPage.tag](context);
       } else {
-        r = routes[HomePage.tag](context);
+        r = routes[ViewPage.tag](context);
 
         // Detect location and send by using session code
         final language = ui.window.locale.languageCode;
