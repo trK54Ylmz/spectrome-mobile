@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:spectrome/page/home.dart';
-import 'package:spectrome/page/me.dart';
 import 'package:spectrome/page/share.dart';
 import 'package:spectrome/theme/color.dart';
 
@@ -27,7 +26,6 @@ class _ViewState extends State<ViewPage> {
         children: <Widget>[
           new SharePage(),
           new HomePage(),
-          new MePage(),
         ],
       ),
     ); 
