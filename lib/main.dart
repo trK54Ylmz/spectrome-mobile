@@ -10,12 +10,16 @@ import 'package:spectrome/page/activation.dart';
 import 'package:spectrome/page/forgot.dart';
 import 'package:spectrome/page/guide.dart';
 import 'package:spectrome/page/home.dart';
+import 'package:spectrome/page/me.dart';
+import 'package:spectrome/page/profile.dart';
 import 'package:spectrome/page/session.dart';
 import 'package:spectrome/page/invite.dart';
 import 'package:spectrome/page/reset.dart';
+import 'package:spectrome/page/share.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/page/sign_up.dart';
 import 'package:spectrome/page/sign_up_done.dart';
+import 'package:spectrome/page/view.dart';
 import 'package:spectrome/page/waterfall.dart';
 import 'package:spectrome/page/version.dart';
 import 'package:spectrome/theme/color.dart';
@@ -32,14 +36,18 @@ final routes = <String, WidgetBuilder>{
   GuidePage.tag: (c) => new GuidePage(),
   HomePage.tag: (c) => new HomePage(),
   InvitePage.tag: (c) => new InvitePage(),
+  MePage.tag: (c) => new MePage(),
+  ProfilePage.tag: (c) => new ProfilePage(),
   ResetPage.tag: (c) => new ResetPage(),
   SessionPage.tag: (c) => new SessionPage(),
+  SharePage.tag: (c) => new SharePage(),
   SignInPage.tag: (c) => new SignInPage(),
   SignUpPage.tag: (c) => new SignUpPage(),
   SignUpDonePage.tag: (c) => new SignUpDonePage(),
   ActivationPage.tag: (c) => new ActivationPage(),
   WaterFallPage.tag: (c) => new WaterFallPage(),
   VersionPage.tag: (c) => new VersionPage(),
+  ViewPage.tag: (c) => new ViewPage(),
 };
 
 class MainPage extends StatefulWidget {

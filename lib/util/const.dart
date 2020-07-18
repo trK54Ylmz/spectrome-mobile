@@ -24,6 +24,13 @@ class AppConst {
     return callback.call();
   }
 
+  /// Get shimmer widget
+  static Widget shimmer() {
+    return new Container(
+
+    );
+  }
+
   /// Get loading indicator
   static Widget loading() {
     return new Container(

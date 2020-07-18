@@ -1,6 +1,5 @@
-import 'dart:developer' as dev;
-
 import 'package:flutter/cupertino.dart';
+import 'package:spectrome/page/me.dart';
 import 'package:spectrome/page/waterfall.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
@@ -85,8 +84,11 @@ class _HomeState extends State<HomePage> {
       ),
       tabBuilder: (context, index) {
         switch (index) {
+          case 2:
+            return new MePage();
+            break;
           default:
-            return WaterFallPage();
+            return new WaterFallPage();
             break;
         }
       },
