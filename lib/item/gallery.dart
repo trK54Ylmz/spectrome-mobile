@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
 
 class Gallery extends StatefulWidget {

@@ -1,6 +1,5 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
 
 class Camera extends StatefulWidget {
