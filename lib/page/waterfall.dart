@@ -3,8 +3,10 @@ import 'dart:developer' as dev;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spectrome/item/post.dart';
 import 'package:spectrome/service/post/waterfall.dart';
 import 'package:spectrome/theme/color.dart';
+import 'package:spectrome/util/error.dart';
 import 'package:spectrome/util/storage.dart';
 
 class WaterFallPage extends StatefulWidget {
@@ -17,8 +19,24 @@ class WaterFallPage extends StatefulWidget {
 }
 
 class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClientMixin {
+  final _sk = GlobalKey<ScaffoldState>();
+
+  // Post items
+  final _posts = <Post>[];
+
+  final _sc = new ScrollController();
+
+  // Loading indicator
+  bool _loading = true;
+
   // Account session key
   String _session;
+
+// Error message
+  ErrorMessage _error;
+
+  // API response, validation error messages
+  String _message;
 
   // Cursor timestamp value
   double _timestamp;
@@ -27,6 +45,13 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
   void initState() {
     super.initState();
 
+    _sc.addListener(() {
+      // Load more posts
+      if (_sc.offset == _sc.position.maxScrollExtent) {
+        _getPosts();
+      }
+    });
+
     // Shared preferences callback
     final c = (SharedPreferences sp) {
       final session = sp.getString('_session');
@@ -34,8 +59,14 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
       setState(() => _session = session);
     };
 
+    // Complete callback
+    final cc = () {
+      // Load posts for the first time
+      _getPosts();
+    };
+
     // Get shared preferences
-    Storage.load().then(c);
+    Storage.load().then(c).whenComplete(cc);
   }
 
   @override
@@ -43,10 +74,11 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
     super.build(context);
 
     return new Scaffold(
+      key: _sk,
       backgroundColor: ColorConst.white,
       body: new SingleChildScrollView(
         child: new Container(
-          child: getWaterFall(),
+          child: _getWaterFall(),
         ),
       ),
     );
@@ -55,42 +87,66 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
   @override
   bool get wantKeepAlive => true;
 
-  /// Get waterfall posts
-  Future<List<Post>> getPosts() async {
-    dev.log('Waterfall posts request sent.');
+  // Show error when error not empty
+  void _showError() {
+    final snackBar = SnackBar(
+      content: Text(_error.error),
+      backgroundColor: ColorConst.darkRed,
+    );
 
-    final c = (WaterFallResponse r) {
-      if (r.status) {
-        return r.posts;
-      }
-
-      return null;
-    };
-
-    return WaterFallService.call(_session, _timestamp).then(c);
+    _sk.currentState.showSnackBar(snackBar);
   }
 
   /// Get waterfall posts widget
-  Widget getWaterFall() {
-    if (_session == null) {
-      return new Center(
-        child: new Image.asset(
-          'assets/images/loading.gif',
-          width: 60.0,
-          height: 60.0,
-        ),
+  Widget _getWaterFall() {
+    // Clear error message
+    _error = null;
+
+    final builder = (context, index) {
+      return new PostCard(
+        post: _posts[index],
       );
+    };
+
+    return ListView.builder(
+      shrinkWrap: true,
+      controller: _sc,
+      padding: new EdgeInsets.only(top: 8.0, bottom: 8.0),
+      itemCount: _posts.length,
+      itemBuilder: builder,
+    );
+  }
+
+  /// Get waterfall posts
+  void _getPosts() {
+    dev.log('Waterfall posts request sent.');
+
+    // Log timestamp value for debugging
+    if (_timestamp != null) {
+      dev.log('Waterfall active pagination is $_timestamp');
     }
 
-    return new FutureBuilder(
-      builder: (context, res) {
-        if (res.connectionState == ConnectionState.none && res.hasData == null) {
-          return new Container();
-        }
+    final c = (WaterFallResponse r) {
+      if (!r.status) {
+        _message = r.message;
+        return;
+      }
 
-        return ListView();
-      },
-      future: getPosts(),
-    );
+      // Add posts into the posts sequence
+      _posts.addAll(r.posts);
+    };
+
+    // Error callback
+    final e = (e, s) {
+      final msg = 'Unknown error. Please try again later.';
+
+      // Create unknown error message
+      _error = ErrorMessage.custom(msg);
+
+      // Show snackbar error indicator
+      _showError();
+    };
+
+    WaterFallService.call(_session, _timestamp).then(c).catchError(e);
   }
 }

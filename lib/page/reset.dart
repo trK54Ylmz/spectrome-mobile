@@ -327,7 +327,7 @@ class _ResetState extends State<ResetPage> {
 
     dev.log('Resend request sending.');
 
-    final sc = (ResetResponse r) {
+    final sc = (ResetResponse r) async {
       dev.log('Reset password request sent.');
 
       if (!r.status) {
@@ -344,6 +344,8 @@ class _ResetState extends State<ResetPage> {
 
       // Clear API response message
       _message = null;
+
+      await Navigator.of(context).pushReplacementNamed(SignInPage.tag);
     };
 
     // Error callback
@@ -355,6 +357,11 @@ class _ResetState extends State<ResetPage> {
     };
 
     final cc = () {
+      // Skip if dispose method called from application
+      if (!this.mounted) {
+        return;
+      }
+
       setState(() => _loading = false);
     };
 

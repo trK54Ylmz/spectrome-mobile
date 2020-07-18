@@ -1,7 +1,7 @@
 import 'dart:developer' as dev;
 
 import 'package:flutter/cupertino.dart';
-import 'package:spectrome/page/home.dart';
+import 'package:spectrome/page/session.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/storage.dart';
@@ -279,7 +279,7 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
       sb.setBool('guided', true);
 
       // Redirect to home page
-      Navigator.of(context).pushReplacementNamed(HomePage.tag);
+      Navigator.of(context).pushReplacementNamed(SessionPage.tag);
     };
 
     Storage.load().then(cb);

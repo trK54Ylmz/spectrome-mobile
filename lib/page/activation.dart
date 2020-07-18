@@ -386,6 +386,11 @@ class _ActivationState extends State<ActivationPage> {
 
     // Complete callback
     final cc = () {
+      // Skip if dispose method called from application
+      if (!this.mounted) {
+        return;
+      }
+
       setState(() => _loading = false);
     };
 
@@ -450,6 +455,11 @@ class _ActivationState extends State<ActivationPage> {
 
     // Complete callback
     final cc = () {
+      // Skip if dispose method called from application
+      if (!this.mounted) {
+        return;
+      }
+
       setState(() => _sending = false);
     };
 

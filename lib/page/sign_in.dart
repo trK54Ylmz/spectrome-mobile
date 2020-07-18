@@ -324,7 +324,7 @@ class _SignInState extends State<SignInPage> {
       // Show invitation control
       final ac = _sp.getBool('_ac');
 
-      final tag = ac ? InvitePage.tag : WaterFallPage.tag;
+      final tag = ac == true ? InvitePage.tag : WaterFallPage.tag;
 
       await Navigator.of(context).pushReplacementNamed(tag);
     };
@@ -339,6 +339,11 @@ class _SignInState extends State<SignInPage> {
 
     // Complete callback
     final cc = () {
+      // Skip if dispose method called from application
+      if (!this.mounted) {
+        return;
+      }
+
       setState(() => _loading = false);
     };
 
