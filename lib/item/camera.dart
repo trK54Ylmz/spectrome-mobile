@@ -10,9 +10,6 @@ class Camera extends StatefulWidget {
 }
 
 class _CameraState extends State<Camera> {
-  // Camera aspect ratio
-  final _ratio = 1;
-
   // Loading indicator
   bool _loading = true;
 
@@ -39,7 +36,7 @@ class _CameraState extends State<Camera> {
       if (!mounted) {
         return;
       }
-      
+
       setState(() => _loading = false);
     };
 
@@ -51,7 +48,9 @@ class _CameraState extends State<Camera> {
     // Camera controller callback
     final cc = (_) {
       final d = _cs.where((e) => e.lensDirection == CameraLensDirection.back).first;
-      final r = ResolutionPreset.veryHigh;
+
+      // 1280 x 720 pixel HD camera
+      final r = ResolutionPreset.high;
 
       _cc = new CameraController(d, r);
       _cc.initialize().then(_ic);
@@ -84,28 +83,26 @@ class _CameraState extends State<Camera> {
     if (_message != null) return AppConst.error(_message);
 
     // Get gallery widget
-    return _getCamera();    
+    return _getCamera();
   }
 
   /// Get camera widget
   Widget _getCamera() {
     final width = MediaQuery.of(context).size.width;
 
-    // Camera height before clipping
-    final height = width * (1 / _cc.value.aspectRatio);
-
     // Expected height
-    final eh = width / _ratio;
+    final ratio = width / 720.0;
 
-    return new ClipRRect(
-      child: Align(
+    return ClipRect(
+      child: OverflowBox(
         alignment: Alignment.center,
-        heightFactor: eh / height,
-        widthFactor: 1,
-        child: new Container(
-          width: width,
-          height: height,
-          child: CameraPreview(_cc),
+        child: FittedBox(
+          fit: BoxFit.fitWidth,
+          child: new Container(
+            width: width,
+            height: ratio * 1280.0,
+            child: CameraPreview(_cc),
+          ),
         ),
       ),
     );
