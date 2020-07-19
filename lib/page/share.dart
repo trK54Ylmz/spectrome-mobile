@@ -30,22 +30,24 @@ class _ShareState extends State<SharePage> {
 
     return Scaffold(
       backgroundColor: ColorConst.white,
-      body: new Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          new Container(
-            width: w,
-            height: w,
-            child: _camera,
-          ),
-          new Padding(padding: EdgeInsets.only(top: 1.0)),
-          new Container(
-            width: w,
-            height: h,
-            child: _gallery,
-          )
-        ],
+      body: new SafeArea(
+        child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            new Container(
+              width: w,
+              height: w,
+              child: _camera,
+            ),
+            new Padding(padding: EdgeInsets.only(top: 1.0)),
+            new Container(
+              width: w,
+              height: h,
+              child: _gallery,
+            ),
+          ],
+        ),
       ),
     );
   }
