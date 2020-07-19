@@ -19,7 +19,7 @@ class AppConst {
     if (loading) return AppConst.loading();
 
     // Get error page
-    if (error != null) return AppConst.error(context, error);
+    if (error != null) return AppConst.fatal(context, error);
 
     return callback.call();
   }
@@ -48,7 +48,7 @@ class AppConst {
   /// Get error page
   ///
   /// Build context is required for re-routing
-  static Widget error(BuildContext context, ErrorMessage e) {
+  static Widget fatal(BuildContext context, ErrorMessage e) {
     final ts = new TextStyle(
       fontFamily: FontConst.primary,
       fontSize: 14.0,
@@ -96,6 +96,22 @@ class AppConst {
         message,
         button,
       ],
+    );
+  }
+
+  /// Get error widget
+  static Widget error(String message) {
+    return SizedBox.expand(
+      child: new Center(
+        child: new Text(
+          message,
+          style: new TextStyle(
+            fontFamily: FontConst.primary,
+            fontSize: 14.0,
+            letterSpacing: 0.33,
+          ),
+        ),
+      ),
     );
   }
 }

@@ -43,5 +43,9 @@
 	<false/>
 	<key>NSPhotoLibraryUsageDescription</key>
     <string>Application need to access your photos and videos to share that you will select.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Application need to access cameras to share photos or videos.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Application need to access microphone to record audio in videos.</string>
 </dict>
 </plist>

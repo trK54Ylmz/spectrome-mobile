@@ -23,6 +23,7 @@ class _ViewState extends State<ViewPage> {
       backgroundColor: ColorConst.white,
       body: new PageView(
         controller: _pc,
+        physics: const ClampingScrollPhysics(),
         children: <Widget>[
           new SharePage(),
           new HomePage(),
