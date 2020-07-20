@@ -77,6 +77,7 @@ class _ShareState extends State<SharePage> {
       padding: EdgeInsets.only(top: 1.0),
     );
 
+    // Next button
     final b = new Button(
       text: 'Next',
       color: ColorConst.dark,

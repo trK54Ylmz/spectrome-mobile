@@ -114,6 +114,7 @@ class _CameraState extends State<Camera> {
       padding: EdgeInsets.only(top: 16.0),
     );
 
+    // Video time progress counter
     final tc = new Container(
       child: new Text(
         _time.toString().padLeft(2, '0'),
@@ -132,6 +133,7 @@ class _CameraState extends State<Camera> {
       ),
     );
 
+    // Camera clipped container
     final c = new Container(
       width: width,
       height: ratio * 1280.0,
@@ -247,6 +249,7 @@ class _CameraState extends State<Camera> {
       ),
     );
 
+    // Photo and video selection buttons
     final s = new Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -256,6 +259,7 @@ class _CameraState extends State<Camera> {
       ],
     );
 
+    // Camera widget group
     final r = new Container(
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -272,6 +276,7 @@ class _CameraState extends State<Camera> {
       ),
     );
 
+    // Camera and camera controller widgets stack
     final items = <Widget>[
       c,
       r,
