@@ -10,7 +10,7 @@ import 'package:spectrome/page/activation.dart';
 import 'package:spectrome/page/forgot.dart';
 import 'package:spectrome/page/invite.dart';
 import 'package:spectrome/page/sign_up.dart';
-import 'package:spectrome/page/waterfall.dart';
+import 'package:spectrome/page/view.dart';
 import 'package:spectrome/service/account/sign_in.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
@@ -238,7 +238,7 @@ class _SignInState extends State<SignInPage> {
     final sub = new Button(
       text: 'Sign Up',
       disabled: _loading,
-      color: ColorConst.grayColor,
+      background: ColorConst.grayColor,
       onPressed: () => Navigator.of(context).pushReplacementNamed(SignUpPage.tag),
     );
 
@@ -324,7 +324,7 @@ class _SignInState extends State<SignInPage> {
       // Show invitation control
       final ac = _sp.getBool('_ac');
 
-      final tag = ac == true ? InvitePage.tag : WaterFallPage.tag;
+      final tag = ac == true ? InvitePage.tag : ViewPage.tag;
 
       await Navigator.of(context).pushReplacementNamed(tag);
     };

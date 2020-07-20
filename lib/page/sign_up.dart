@@ -276,7 +276,6 @@ class _SignUpState extends State<SignUpPage> {
 
     // Create sign-up submit button
     final sub = new Button(
-      color: ColorConst.buttonColor,
       text: 'Sign Up',
       disabled: _loading,
       onPressed: _signUp,

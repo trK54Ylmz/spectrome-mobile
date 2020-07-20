@@ -13,7 +13,7 @@ class Gallery extends StatefulWidget {
   _GalleryState createState() => currentState;
 }
 
-class _GalleryState extends State<Gallery> with AutomaticKeepAliveClientMixin {
+class _GalleryState extends State<Gallery> {
   // Gallery scroll controller
   final _sc = ScrollController();
 
@@ -26,14 +26,17 @@ class _GalleryState extends State<Gallery> with AutomaticKeepAliveClientMixin {
   // Selected item indexes
   final _selected = <int>[];
 
+  // Where any item selected or not
+  final active = ValueNotifier<bool>(false);
+
   // Loading indicator
   bool _loading = true;
 
-  // Gallery related message
-  String _message;
-
   // Gallery page
   int _page = 0;
+
+  // Gallery related message
+  String _message;
 
   @override
   void initState() {
@@ -101,8 +104,6 @@ class _GalleryState extends State<Gallery> with AutomaticKeepAliveClientMixin {
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-
     // Show loading
     if (_loading) return AppConst.loading();
 
@@ -112,9 +113,6 @@ class _GalleryState extends State<Gallery> with AutomaticKeepAliveClientMixin {
     // Get gallery widget
     return _getGallery();
   }
-
-  @override
-  bool get wantKeepAlive => true;
 
   /// Get gallery widget
   Widget _getGallery() {
@@ -260,9 +258,11 @@ class _GalleryState extends State<Gallery> with AutomaticKeepAliveClientMixin {
   void _tap(int index) {
     // Add or remove according to existence of index
     if (_selected.contains(index)) {
-      setState(() => _selected.remove(index));
+      _selected.remove(index);
     } else {
-      setState(() => _selected.add(index));
+      _selected.add(index);
     }
+
+    setState(() => active.value = _selected.length > 0);
   }
 }

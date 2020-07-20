@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:spectrome/item/button.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
@@ -72,18 +73,10 @@ class AppConst {
     // Add re-try button
     final button = new Padding(
       padding: EdgeInsets.only(top: 16.0),
-      child: new CupertinoButton(
-        color: ColorConst.grayColor,
+      child: new Button(
+        background: ColorConst.grayColor,
         onPressed: () => Navigator.of(context).pushReplacementNamed(SignInPage.tag),
-        child: new Text(
-          'Try again',
-          style: new TextStyle(
-            color: ColorConst.white,
-            fontFamily: FontConst.primary,
-            fontSize: 14.0,
-            letterSpacing: 0.33,
-          ),
-        ),
+        text: 'Try again',
       ),
     );
 

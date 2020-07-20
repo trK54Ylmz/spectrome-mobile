@@ -96,7 +96,6 @@ class _SignUpDoneState extends State<SignUpDonePage> {
 
     // Sign in button
     final sib = new Button(
-      color: ColorConst.buttonColor,
       text: 'Sign In',
       onPressed: () => Navigator.of(context).pushReplacementNamed(SignInPage.tag),
     );

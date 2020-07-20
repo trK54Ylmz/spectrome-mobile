@@ -281,7 +281,7 @@ class _ResetState extends State<ResetPage> {
     final sib = new Button(
       text: 'Sign In',
       disabled: _loading,
-      color: ColorConst.grayColor,
+      background: ColorConst.grayColor,
       onPressed: () => Navigator.of(context).pushReplacementNamed(SignInPage.tag),
     );
 

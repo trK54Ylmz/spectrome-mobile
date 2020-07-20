@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 class ColorConst {
   static const white = const Color(0xffffffff);
 
+  static const yellow = const Color(0xffffcc00);
+
   static const dark = const Color(0xff333333);
 
   static const transparent = const Color(0x00ffffff);

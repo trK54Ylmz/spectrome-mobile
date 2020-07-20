@@ -1,6 +1,7 @@
 import 'dart:developer' as dev;
 
 import 'package:spectrome/service/base.dart';
+import 'package:spectrome/service/post/post.dart';
 import 'package:spectrome/service/response.dart';
 import 'package:spectrome/util/http.dart';
 
@@ -41,27 +42,6 @@ class WaterFallService extends Service {
   }
 }
 
-class Post {
-  final String username;
-
-  final String photoUrl;
-
-  final List<String> tags;
-
-  final int width;
-
-  final int height;
-
-  /// Create post object
-  const Post({
-    this.username,
-    this.photoUrl,
-    this.tags,
-    this.width,
-    this.height,
-  });
-}
-
 class WaterFallResponse extends BasicResponse {
   List<Post> posts;
 
@@ -83,11 +63,22 @@ class WaterFallResponse extends BasicResponse {
     } else {
       final p = json['posts'] as List<Map<String, dynamic>>;
 
+      // Post assets callback
+      final a = (Map<String, dynamic> a) {
+        return new PostAsset(
+          name: a['name'] as String,
+          duration: a['duration'] ?? null,
+          type: PostAssetType.from(a['type']),
+        );
+      };
+
       // Post creator callback
       final c = (Map<String, dynamic> p) {
+        final assets = p['assets'] as List<Map<String, dynamic>>;
+
         return new Post(
           username: p['username'] as String,
-          photoUrl: p['photo_url'] as String,
+          assets: assets.map(a),
           tags: p['tags'] as List<String>,
           width: p['width'] as int,
           height: p['height'] as int,

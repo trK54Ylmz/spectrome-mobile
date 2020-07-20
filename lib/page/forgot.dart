@@ -216,7 +216,7 @@ class _ForgotState extends State<ForgotPage> {
     final sib = new Button(
       text: 'Sign In',
       disabled: _loading,
-      color: ColorConst.grayColor,
+      background: ColorConst.grayColor,
       onPressed: () => Navigator.of(context).pushReplacementNamed(SignInPage.tag),
     );
 
