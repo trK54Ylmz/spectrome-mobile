@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:spectrome/page/home.dart';
-import 'package:spectrome/page/share.dart';
+import 'package:spectrome/page/select.dart';
 import 'package:spectrome/theme/color.dart';
 
 class ViewPage extends StatefulWidget {
@@ -25,7 +25,7 @@ class _ViewState extends State<ViewPage> {
         controller: _pc,
         physics: const ClampingScrollPhysics(),
         children: <Widget>[
-          new SharePage(),
+          new SelectPage(),
           new HomePage(),
         ],
       ),

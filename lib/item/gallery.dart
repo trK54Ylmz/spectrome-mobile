@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
@@ -21,13 +23,16 @@ class _GalleryState extends State<Gallery> {
   final _items = <AssetEntity>[];
 
   // Thumb data of photos and videos according to ID
-  final _thumbs = Map<String, Uint8List>();
+  final _thumbs = List<MapEntry<String, Uint8List>>();
 
   // Selected item indexes
   final _selected = <int>[];
 
   // Where any item selected or not
   final active = ValueNotifier<bool>(false);
+
+  // Temporary directory
+  Directory _temp;
 
   // Loading indicator
   bool _loading = true;
@@ -52,13 +57,23 @@ class _GalleryState extends State<Gallery> {
 
         var uniques = <AssetEntity>[];
         for (var i = 0; i < items.length; i++) {
+          bool exists = false;
+          for (int j = 0; j < _thumbs.length; j++) {
+            // ID must be unique
+            if (_thumbs[j].key == items[i].id) {
+              exists = true;
+              break;
+            }
+          }
+
           // ID must be unique
-          if (_thumbs.containsKey(items[i].id)) {
+          if (exists) {
             continue;
           }
 
           // Load thumbnail data
-          _thumbs[items[i].id] = await items[i].thumbData;
+          final entry = new MapEntry(items[i].id, await items[i].thumbData);
+          _thumbs.add(entry);
 
           // Unique items according to ID
           uniques.add(items[i]);
@@ -92,6 +107,26 @@ class _GalleryState extends State<Gallery> {
     };
 
     PhotoManager.requestPermission().then(c).catchError(e).whenComplete(cc);
+
+    // Directory callback
+    final dc = (Directory d) {
+      // Remove temporary directory if exists
+      if (d.existsSync()) {
+        // Delete and create if there are files in the directory
+        if (d.listSync().length > 0) {
+          // Remove temporary directory
+          d.deleteSync(recursive: true);
+
+          // Create temporary directory
+          d.createSync();
+        }
+      }
+
+      setState(() => _temp = d);
+    };
+
+    // Get temporary directory
+    getTemporaryDirectory().then(dc);
   }
 
   @override
@@ -124,7 +159,7 @@ class _GalleryState extends State<Gallery> {
       final size = width > height ? height : width;
 
       final img = new Image.memory(
-        _thumbs[_items[index].id],
+        _thumbs[index].value,
         width: size.toDouble(),
         height: size.toDouble(),
         fit: width > height ? BoxFit.fitHeight : BoxFit.fitWidth,
@@ -264,5 +299,41 @@ class _GalleryState extends State<Gallery> {
     }
 
     setState(() => active.value = _selected.length > 0);
+  }
+
+  /// Get files for sharing
+  Future<List<String>> getFiles() async {
+    final files = <String>[];
+
+    for (int i = 0; i < _selected.length; i++) {
+      for (int j = 0; j < _items.length; j++) {
+        // Get index of selected item
+        final index = _selected[i];
+
+        // Get asset data according to selected id
+        if (_thumbs[index].key != _items[j].id) {
+          continue;
+        }
+
+        final name = _items[j].type == AssetType.video ? 'video.$i.mp4' : 'photo.$i.jpg';
+        final f = new File('${_temp.path}/$name');
+
+        final of = await _items[j].file;
+
+        final rs = of.openRead();
+        final ws = f.openWrite(mode: FileMode.writeOnlyAppend);
+        try {
+          rs.map((s) => ws.write(s));
+        } finally {
+          // Close write strem
+          ws.close();
+        }
+
+        // Write to file
+        files.add(f.path);
+      }
+    }
+
+    return files;
   }
 }
