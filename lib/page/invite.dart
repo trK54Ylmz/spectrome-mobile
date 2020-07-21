@@ -247,7 +247,6 @@ class _InviteState extends State<InvitePage> {
 
     // Invite button
     final ib = new Button(
-      color: ColorConst.buttonColor,
       text: 'Invite',
       disabled: _loading,
       onPressed: _invite,

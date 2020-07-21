@@ -9,21 +9,41 @@ class Button extends StatefulWidget {
   // Minimum size of the button
   final double width;
 
-  // The color of the button's background
+  // The color of the button's text
   final Color color;
+
+  // The color of the button's background
+  final Color background;
+
+  // Border of the button
+  final Border border;
+
+  // Border radius
+  final BorderRadius radius;
+
+  // Button padding value
+  final EdgeInsets padding;
 
   // The callback that is called when the button is tapped or otherwise activated
   final VoidCallback onPressed;
 
+  // Button is disabled or not
   final bool disabled;
 
   const Button({
     Key key,
     this.text,
     this.onPressed,
+    this.border,
     this.disabled = false,
     this.width = double.infinity,
-    this.color = ColorConst.buttonColor,
+    this.color = ColorConst.white,
+    this.background = ColorConst.buttonColor,
+    this.padding = const EdgeInsets.all(12.0),
+    this.radius = const BorderRadius.vertical(
+      top: Radius.circular(8.0),
+      bottom: Radius.circular(8.0),
+    ),
   })  : assert(text != null),
         super(key: key);
 
@@ -60,17 +80,18 @@ class _ButtonState extends State<Button> {
             minWidth: widget.width,
           ),
           child: new Container(
-            padding: new EdgeInsets.all(12.0),
+            padding: widget.padding,
             decoration: BoxDecoration(
-              color: c ? widget.color.withOpacity(0.67) : widget.color,
-              borderRadius: BorderRadius.circular(8.0),
+              color: c ? widget.background.withOpacity(0.67) : widget.background,
+              border: widget.border,
+              borderRadius: widget.border == null ? widget.radius : null,
             ),
             child: new Text(
               widget.text,
               maxLines: 1,
               textAlign: TextAlign.center,
               style: new TextStyle(
-                color: c ? ColorConst.white.withOpacity(0.67) : ColorConst.white,
+                color: c ? widget.color.withOpacity(0.67) : widget.color,
                 fontFamily: FontConst.primary,
                 fontSize: 14.0,
               ),
