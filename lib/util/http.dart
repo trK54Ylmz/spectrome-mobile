@@ -134,8 +134,14 @@ class Http {
               // Get file name
               final name = file.path.split('/').last.replaceAll('"', '\\"');
 
+              final ft = name.split('.').last;
+
               // Only mp4 and jpg allowed
-              final type = name.endsWith('mp4') ? 'image/mp4' : 'image/jpeg';
+              if (!['mp4', 'jpg'].contains(ft)) {
+                continue;
+              }
+
+              final type = ft == 'mp4' ? 'image/mp4' : 'image/jpeg';
 
               r.write('Content-Disposition: form-data; name="$key"; filename="$name"\n');
               r.write('Content-Type: $type');
@@ -155,7 +161,7 @@ class Http {
             }
           }
 
-          // Write final ending header
+          // Write final ending boundry
           r.write(boundry + '--');
         } else {
           // Plain form data
