@@ -29,7 +29,12 @@ class MyProfileService extends Service {
       return Service.handleError<MyProfileResponse>(e, s, r);
     };
 
-    return Http.doGet(path, headers: headers).then(c).catchError(e);
+    final r = Http.doGet(
+      path: path,
+      headers: headers,
+    );
+
+    return r.then(c).catchError(e);
   }
 }
 

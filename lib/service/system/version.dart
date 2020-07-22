@@ -28,7 +28,12 @@ class VersionService extends Service {
       return Service.handleError<VersionResponse>(e, s, r);
     };
 
-    return Http.doGet(path, type: Http.JSON).then(c).catchError(e);
+    final r = Http.doGet(
+      path: path,
+      type: Http.JSON,
+    );
+
+    return r.then(c).catchError(e);
   }
 }
 

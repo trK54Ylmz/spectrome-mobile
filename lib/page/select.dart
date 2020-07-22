@@ -145,17 +145,17 @@ class _SelectState extends State<SelectPage> {
             icon: Icon(
               IconData(
                 0xf00d,
-                fontFamily: FontConst.fa,
+                fontFamily: FontConst.fal,
               ),
-              color: ColorConst.darkRed,
+              color: ColorConst.darkerGray,
               size: 20.0,
             ),
             activeIcon: Icon(
               IconData(
                 0xf00d,
-                fontFamily: FontConst.fa,
+                fontFamily: FontConst.fal,
               ),
-              color: ColorConst.darkRed,
+              color: ColorConst.darkerGray,
               size: 20.0,
             ),
           ),
@@ -163,7 +163,7 @@ class _SelectState extends State<SelectPage> {
             icon: Icon(
               IconData(
                 0xf00c,
-                fontFamily: FontConst.fa,
+                fontFamily: FontConst.fal,
               ),
               color: ColorConst.success,
               size: 20.0,
@@ -171,7 +171,7 @@ class _SelectState extends State<SelectPage> {
             activeIcon: Icon(
               IconData(
                 0xf00c,
-                fontFamily: FontConst.fa,
+                fontFamily: FontConst.fal,
               ),
               color: ColorConst.success,
               size: 20.0,

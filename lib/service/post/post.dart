@@ -1,8 +1,9 @@
 import 'package:spectrome/service/response.dart';
+import 'package:spectrome/util/const.dart';
 
 class PostAssetType {
-  static const PHOTO = 1;
-  static const VIDEO = 2;
+  static const PHOTO = AppConst.photo;
+  static const VIDEO = AppConst.video;
 
   /// Get asset type from int value
   static int from(int value) {

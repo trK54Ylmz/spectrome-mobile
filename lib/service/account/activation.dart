@@ -31,7 +31,13 @@ class ActivationService extends Service {
       return Service.handleError<ActivationResponse>(e, s, r);
     };
 
-    return Http.doPost(path, body: body, type: Http.FORM).then(c).catchError(e);
+    final r = Http.doPost(
+      path: path,
+      body: body,
+      type: Http.FORM,
+    );
+
+    return r.then(c).catchError(e);
   }
 }
 

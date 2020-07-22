@@ -8,7 +8,11 @@ class ResetService extends Service {
   /// Reset password by using code
   static Future<ResetResponse> call(String code, String password, String token) {
     final path = '/account/reset';
-    final body = {'code': code, 'password': password, 'token': token};
+    final body = {
+      'code': code,
+      'password': password,
+      'token': token,
+    };
 
     // Http response handle callback
     final c = (Response r) {
@@ -29,7 +33,13 @@ class ResetService extends Service {
       return Service.handleError<ResetResponse>(e, s, r);
     };
 
-    return Http.doPost(path, body: body, type: Http.FORM).then(c).catchError(e);
+    final r = Http.doPost(
+      path: path,
+      body: body,
+      type: Http.FORM,
+    );
+
+    return r.then(c).catchError(e);
   }
 }
 

@@ -13,25 +13,36 @@ class Http {
 
   static final client = new HttpClient();
 
+  static final gzip = new GZipCodec();
+
   static String domain;
 
   /// Make a GET request to the remote server
-  static Future<Response> doGet(
-    String path, {
+  static Future<Response> doGet({
+    String path,
     Map<String, String> params,
     Map<String, String> headers,
     String type,
     Duration timeout,
   }) {
+    assert(path != null);
+
     final Uri url = new Uri.https(domain, path, params);
+
+    // Add gzip header
+    if (headers == null) {
+      headers = {
+        Http.CONTENT_HEADER: 'gzip',
+      };
+    } else {
+      headers[Http.CONTENT_HEADER] = 'gzip';
+    }
 
     // Http request and response callback
     final c = (HttpClientRequest r) {
       // Update request headers if headers parameter is present
-      if (headers != null && headers.isNotEmpty) {
-        for (String k in headers.keys) {
-          r.headers.add(k, headers[k]);
-        }
+      for (String k in headers.keys) {
+        r.headers.add(k, headers[k]);
       }
 
       // Add http request content type header
@@ -52,23 +63,32 @@ class Http {
   }
 
   /// Make a POST request to the remote server
-  static Future<Response> doPost(
-    String path, {
+  static Future<Response> doPost({
+    String path,
     Map<String, String> params,
     Map<String, String> headers,
     Map<String, dynamic> body,
     String type,
     Duration timeout,
   }) {
+    assert(path != null);
+
     final Uri url = new Uri.https(domain, path, params);
+
+    // Add gzip header
+    if (headers == null) {
+      headers = {
+        Http.CONTENT_HEADER: 'gzip',
+      };
+    } else {
+      headers[Http.CONTENT_HEADER] = 'gzip';
+    }
 
     // Http request and response callback
     final c = (HttpClientRequest r) {
       // Update request headers if headers parameter is present
-      if (headers != null && headers.isNotEmpty) {
-        for (String k in headers.keys) {
-          r.headers.add(k, headers[k]);
-        }
+      for (String k in headers.keys) {
+        r.headers.add(k, headers[k]);
       }
 
       // Add http request content type header
@@ -117,9 +137,17 @@ class Http {
   static Future<Response> _toResponse(HttpClientResponse res) {
     final Map<String, String> headers = new Map();
 
-    res.headers.forEach((f, s) => headers[f] = s[0]);
+    res.headers.forEach((f, s) => headers[f.toLowerCase()] = s[0]);
 
-    return res.transform(utf8.decoder).join().then((content) {
+    bool gzip = false;
+    if (headers.containsKey('content-encoding')) {
+      gzip = headers['content-encoding'] == 'gzip';
+    }
+
+    // Decode gzip encoding
+    final t = gzip ? res.transform(Http.gzip.decoder) : res;
+
+    return t.transform(utf8.decoder).join().then((content) {
       return Response(res.statusCode, content, headers);
     });
   }
