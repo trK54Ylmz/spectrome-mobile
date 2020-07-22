@@ -7,15 +7,20 @@ import 'package:photo_manager/photo_manager.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
+import 'package:spectrome/util/error.dart';
 
-class Gallery extends StatefulWidget {
+class GalleryPage extends StatefulWidget {
+  static final tag = 'gallery';
+
   final currentState = new _GalleryState();
+
+  GalleryPage() : super();
 
   @override
   _GalleryState createState() => currentState;
 }
 
-class _GalleryState extends State<Gallery> {
+class _GalleryState extends State<GalleryPage> {
   // Gallery scroll controller
   final _sc = ScrollController();
 
@@ -43,6 +48,9 @@ class _GalleryState extends State<Gallery> {
   // Gallery related message
   String _message;
 
+  // Camera related error messages
+  ErrorMessage _error;
+
   @override
   void initState() {
     super.initState();
@@ -69,6 +77,13 @@ class _GalleryState extends State<Gallery> {
           // ID must be unique
           if (exists) {
             continue;
+          }
+
+          if (items[i].type == AssetType.video) {
+            // Video duration cannot be higher than 60 seconds
+            if (items[i].duration > 60) {
+              continue;
+            }
           }
 
           // Load thumbnail data
@@ -139,6 +154,9 @@ class _GalleryState extends State<Gallery> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+
     // Show loading
     if (_loading) return AppConst.loading();
 
@@ -146,7 +164,18 @@ class _GalleryState extends State<Gallery> {
     if (_message != null) return AppConst.error(_message);
 
     // Get gallery widget
-    return _getGallery();
+    return new Scaffold(
+      backgroundColor: ColorConst.white,
+      body: new SafeArea(
+        child: new SingleChildScrollView(
+          child: new Container(
+            width: width,
+            height: height,
+            child: AppConst.loader(context, _loading, _error, _getGallery),
+          ),
+        ),
+      ),
+    );
   }
 
   /// Get gallery widget
@@ -185,7 +214,7 @@ class _GalleryState extends State<Gallery> {
         ),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: ColorConst.buttonColor,
+          color: ColorConst.button,
         ),
       );
 
@@ -202,7 +231,7 @@ class _GalleryState extends State<Gallery> {
         ),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: ColorConst.buttonColor,
+          color: ColorConst.button,
         ),
       );
 
@@ -244,8 +273,8 @@ class _GalleryState extends State<Gallery> {
 
         return new Padding(
           padding: EdgeInsets.only(
-            bottom: index % 2 == 0 ? 1.0 : 0.0,
-            left: index > 1 ? 1.0 : 0.0,
+            bottom: index < _thumbs.length - 3 ? 1.0 : 0.0,
+            left: index % 3 > 0 ? 1.0 : 0.0,
           ),
           child: new GestureDetector(
             onTap: () => _tap(index),
@@ -262,8 +291,8 @@ class _GalleryState extends State<Gallery> {
       } else {
         return new Padding(
           padding: EdgeInsets.only(
-            bottom: index % 2 == 0 ? 1.0 : 0.0,
-            left: index > 1 ? 1.0 : 0.0,
+            bottom: index < _thumbs.length - 3 ? 1.0 : 0.0,
+            left: index % 3 > 0 ? 1.0 : 0.0,
           ),
           child: new GestureDetector(
             onTap: () => _tap(index),
@@ -281,9 +310,9 @@ class _GalleryState extends State<Gallery> {
 
     return new SizedBox.expand(
       child: GridView.count(
-        crossAxisCount: 2,
+        crossAxisCount: 3,
         controller: _sc,
-        scrollDirection: Axis.horizontal,
+        scrollDirection: Axis.vertical,
         children: List.generate(_items.length, b),
       ),
     );

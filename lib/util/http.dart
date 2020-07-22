@@ -21,6 +21,7 @@ class Http {
     Map<String, String> params,
     Map<String, String> headers,
     String type,
+    Duration timeout,
   }) {
     final Uri url = new Uri.https(domain, path, params);
 
@@ -46,7 +47,8 @@ class Http {
       return r.close();
     };
 
-    return client.getUrl(url).then(c).then((r) => _toResponse(r));
+    final t = timeout == null ? Duration(seconds: 10) : timeout;
+    return client.getUrl(url).timeout(t).then(c).then((r) => _toResponse(r));
   }
 
   /// Make a POST request to the remote server
@@ -56,6 +58,7 @@ class Http {
     Map<String, String> headers,
     Map<String, dynamic> body,
     String type,
+    Duration timeout,
   }) {
     final Uri url = new Uri.https(domain, path, params);
 
@@ -104,7 +107,8 @@ class Http {
       return r.close();
     };
 
-    return client.postUrl(url).then(c).then((r) => _toResponse(r));
+    final t = timeout == null ? Duration(seconds: 10) : timeout;
+    return client.postUrl(url).timeout(t).then(c).then((r) => _toResponse(r));
   }
 
   /// Convert [HttpClientResponse] to Spectrome [HttpResponse] object

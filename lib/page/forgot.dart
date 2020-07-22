@@ -108,7 +108,7 @@ class _ForgotState extends State<ForgotPage> {
       fontFamily: FontConst.primary,
       fontSize: 14.0,
       letterSpacing: 0.33,
-      color: ColorConst.grayColor,
+      color: ColorConst.gray,
     );
 
     final logo = new Image.asset(
@@ -123,7 +123,7 @@ class _ForgotState extends State<ForgotPage> {
         fontFamily: FontConst.primary,
         fontSize: 14.0,
         letterSpacing: 0.33,
-        color: ColorConst.grayColor,
+        color: ColorConst.gray,
       ),
     );
 
@@ -216,7 +216,7 @@ class _ForgotState extends State<ForgotPage> {
     final sib = new Button(
       text: 'Sign In',
       disabled: _loading,
-      background: ColorConst.grayColor,
+      background: ColorConst.gray,
       onPressed: () => Navigator.of(context).pushReplacementNamed(SignInPage.tag),
     );
 

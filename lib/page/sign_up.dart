@@ -120,7 +120,7 @@ class _SignUpState extends State<SignUpPage> {
       fontFamily: FontConst.primary,
       fontSize: 14.0,
       letterSpacing: 0.33,
-      color: ColorConst.grayColor,
+      color: ColorConst.gray,
     );
 
     final logo = new Image.asset(
@@ -292,7 +292,7 @@ class _SignUpState extends State<SignUpPage> {
             fontFamily: FontConst.primary,
             fontSize: 12.0,
             letterSpacing: 0.33,
-            color: ColorConst.grayColor,
+            color: ColorConst.gray,
           ),
         ),
         new GestureDetector(
@@ -311,7 +311,7 @@ class _SignUpState extends State<SignUpPage> {
                 fontSize: 12.0,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 0.33,
-                color: ColorConst.grayColor,
+                color: ColorConst.gray,
                 decoration: TextDecoration.underline,
               ),
             ),

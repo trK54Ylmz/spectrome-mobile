@@ -122,7 +122,7 @@ class TextInputState extends State<FormText> {
           padding: widget.padding,
           child: new Icon(
             IconData(icon, fontFamily: FontConst.fa),
-            color: ColorConst.grayColor,
+            color: ColorConst.gray,
             size: widget.style.fontSize,
           ),
         ),
@@ -147,7 +147,7 @@ class TextInputState extends State<FormText> {
       suffix: suffix,
       decoration: new BoxDecoration(
         borderRadius: new BorderRadius.circular(widget.radius),
-        color: widget.enabled ? ColorConst.white : ColorConst.grayColor.withOpacity(0.33),
+        color: widget.enabled ? ColorConst.white : ColorConst.gray.withOpacity(0.33),
         border: new Border.all(
           width: 1.0,
           color: widget.borderColor.withOpacity(0.67),
