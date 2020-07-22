@@ -9,6 +9,10 @@ import 'package:spectrome/util/error.dart';
 class AppConst {
   static const version = 0.1;
 
+  static const photo = 1;
+
+  static const video = 2;
+
   /// Get widget according to scenario
   static Widget loader(
     BuildContext context,

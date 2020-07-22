@@ -1,44 +1,60 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:crypto/crypto.dart';
 
 class Http {
   static const TOKEN_HEADER = 'x-authorization';
 
-  static const CONTENT_HEADER = 'accept-encoding';
+  static const ACCEPT_HEADER = 'accept-encoding';
+
+  static const CONTENT_HEADER = 'content-type';
 
   static const FORM = 'application/x-www-form-urlencoded; charset=utf-8';
+
+  static const MULTIPART = 'multipart/form-data';
 
   static const JSON = 'application/json; charset=utf-8';
 
   static final client = new HttpClient();
 
+  static final gzip = new GZipCodec();
+
   static String domain;
 
   /// Make a GET request to the remote server
-  static Future<Response> doGet(
-    String path, {
+  static Future<Response> doGet({
+    String path,
     Map<String, String> params,
     Map<String, String> headers,
     String type,
     Duration timeout,
   }) {
+    assert(path != null);
+
     final Uri url = new Uri.https(domain, path, params);
+
+    // Add gzip header
+    if (headers == null) {
+      headers = {
+        Http.ACCEPT_HEADER: 'gzip',
+      };
+    } else {
+      headers[Http.ACCEPT_HEADER] = 'gzip';
+    }
 
     // Http request and response callback
     final c = (HttpClientRequest r) {
       // Update request headers if headers parameter is present
-      if (headers != null && headers.isNotEmpty) {
-        for (String k in headers.keys) {
-          r.headers.add(k, headers[k]);
-        }
+      for (String k in headers.keys) {
+        r.headers.add(k, headers[k]);
       }
 
       // Add http request content type header
       if (type != null) {
         switch (type) {
           case JSON:
-            r.headers.add(HttpHeaders.contentTypeHeader, JSON);
+            r.headers.add(Http.CONTENT_HEADER, JSON);
             break;
         }
       }
@@ -52,55 +68,122 @@ class Http {
   }
 
   /// Make a POST request to the remote server
-  static Future<Response> doPost(
-    String path, {
+  static Future<Response> doPost({
+    String path,
     Map<String, String> params,
     Map<String, String> headers,
     Map<String, dynamic> body,
     String type,
     Duration timeout,
   }) {
+    assert(path != null);
+
     final Uri url = new Uri.https(domain, path, params);
+
+    // Add gzip header
+    if (headers == null) {
+      headers = {
+        Http.ACCEPT_HEADER: 'gzip',
+      };
+    } else {
+      headers[Http.ACCEPT_HEADER] = 'gzip';
+    }
 
     // Http request and response callback
     final c = (HttpClientRequest r) {
       // Update request headers if headers parameter is present
-      if (headers != null && headers.isNotEmpty) {
-        for (String k in headers.keys) {
-          r.headers.add(k, headers[k]);
-        }
+      for (String k in headers.keys) {
+        r.headers.add(k, headers[k]);
       }
 
       // Add http request content type header
       if (type != null) {
         switch (type) {
           case FORM:
-            r.headers.add(HttpHeaders.contentTypeHeader, FORM);
+            r.headers.add(Http.CONTENT_HEADER, FORM);
             break;
         }
       }
 
       // Add form data if body selected
       if (body != null) {
-        final form = <String>[];
-        for (var key in body.keys) {
-          final k = Uri.encodeQueryComponent(key);
-
-          if (body[key] is List) {
-            int i = 0;
-
-            // Iterate over list params
-            for (var v in body[key] as List) {
-              form.add('$k-$i=$v');
-              i++;
-            }
-          } else {
-            final v = Uri.encodeQueryComponent(body[key]);
-            form.add('$k=$v');
+        // Prepare multipart form
+        if (type == Http.MULTIPART) {
+          // Remove plain multipart header
+          if (headers.containsKey(Http.CONTENT_HEADER)) {
+            headers.remove(Http.CONTENT_HEADER);
           }
-        }
 
-        r.write(form.join('&'));
+          // Create boundry header
+          final a = new DateTime.now().toString();
+          final b = new DateTime.now().millisecondsSinceEpoch;
+          final hash = md5.convert(utf8.encode(a)).toString();
+          final boundry = '$hash-$b';
+          final header = '${Http.CONTENT_HEADER}; boundary=$boundry';
+
+          // Set multipart header
+          headers[Http.CONTENT_HEADER] = header;
+
+          for (var key in body.keys) {
+            // Write start header
+            r.write(boundry + '\n');
+
+            if (body[key] is File) {
+              final file = body[key] as File;
+
+              // Get file name
+              final name = file.path.split('/').last.replaceAll('"', '\\"');
+
+              // Only mp4 and jpg allowed
+              final type = name.endsWith('mp4') ? 'image/mp4' : 'image/jpeg';
+
+              r.write('Content-Disposition: form-data; name="$key"; filename="$name"\n');
+              r.write('Content-Type: $type');
+              r.write('\n');
+              
+              final s = file.openRead();
+
+              // Write file content
+              s.map((chunk) => r.add(chunk));
+
+              r.write('\n');
+            } else {
+              // Write plain text data
+              r.write('Content-Disposition: form-data; name="$key"\n');
+              r.write('\n');
+              r.write(body[key]);
+            }
+          }
+
+          // Write final ending header
+          r.write(boundry + '--');
+        } else {
+          // Plain form data
+          final form = <String>[];
+          for (var key in body.keys) {
+            // Ignore multipart file types
+            if (body[key] is File) {
+              continue;
+            }
+
+            final k = Uri.encodeQueryComponent(key);
+
+            if (body[key] is List) {
+              int i = 0;
+
+              // Iterate over list params
+              for (var v in body[key] as List) {
+                form.add('$k-$i=$v');
+                i++;
+              }
+            } else {
+              final v = Uri.encodeQueryComponent(body[key]);
+              form.add('$k=$v');
+            }
+          }
+
+          r.write(form.join('&'));
+        }
       }
 
       // Send request and close remote connection
@@ -117,9 +200,17 @@ class Http {
   static Future<Response> _toResponse(HttpClientResponse res) {
     final Map<String, String> headers = new Map();
 
-    res.headers.forEach((f, s) => headers[f] = s[0]);
+    res.headers.forEach((f, s) => headers[f.toLowerCase()] = s[0]);
 
-    return res.transform(utf8.decoder).join().then((content) {
+    bool gzip = false;
+    if (headers.containsKey('content-encoding')) {
+      gzip = headers['content-encoding'] == 'gzip';
+    }
+
+    // Decode gzip encoding
+    final t = gzip ? res.transform(Http.gzip.decoder) : res;
+
+    return t.transform(utf8.decoder).join().then((content) {
       return Response(res.statusCode, content, headers);
     });
   }

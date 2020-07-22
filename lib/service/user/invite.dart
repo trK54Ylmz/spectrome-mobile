@@ -30,7 +30,12 @@ class InviteService extends Service {
       return Service.handleError<InviteResponse>(e, s, r);
     };
 
-    final post = Http.doPost(path, body: body, headers: headers, type: Http.FORM);
+    final post = Http.doPost(
+      path: path,
+      body: body,
+      headers: headers,
+      type: Http.FORM,
+    );
 
     return post.then(c).catchError(e);
   }
