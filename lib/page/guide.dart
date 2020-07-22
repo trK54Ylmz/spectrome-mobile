@@ -136,7 +136,7 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
         style: new TextStyle(
           fontFamily: FontConst.primary,
           fontSize: 14.0,
-          color: ColorConst.darkGrayColor,
+          color: ColorConst.darkGray,
           letterSpacing: 0.0,
         ),
       ),
@@ -150,7 +150,7 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
           0xf111,
           fontFamily: FontConst.fa,
         ),
-        color: ColorConst.darkGrayColor,
+        color: ColorConst.darkGray,
         size: 6.0,
       ),
     );
@@ -163,7 +163,7 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
           0xf111,
           fontFamily: FontConst.fa,
         ),
-        color: ColorConst.grayColor,
+        color: ColorConst.gray,
         size: 6.0,
       ),
     );
@@ -188,7 +188,7 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
         'skip',
         style: new TextStyle(
           fontFamily: FontConst.primary,
-          color: ColorConst.grayColor,
+          color: ColorConst.gray,
           fontSize: 14.0,
           decoration: TextDecoration.underline,
         ),

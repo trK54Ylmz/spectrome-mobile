@@ -174,7 +174,7 @@ class _ActivationState extends State<ActivationPage> {
         fontFamily: FontConst.primary,
         fontSize: 14.0,
         letterSpacing: 0.33,
-        color: ColorConst.grayColor,
+        color: ColorConst.gray,
       ),
     );
 
@@ -245,7 +245,7 @@ class _ActivationState extends State<ActivationPage> {
     );
 
     // Send activation code button
-    final cl = _sending ? ColorConst.grayColor.withAlpha(100) : ColorConst.grayColor;
+    final cl = _sending ? ColorConst.gray.withOpacity(0.14) : ColorConst.gray;
     final art = new Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,

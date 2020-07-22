@@ -21,7 +21,7 @@ class _HomeState extends State<HomePage> {
         backgroundColor: ColorConst.white,
         border: Border(
           top: BorderSide(
-            color: ColorConst.grayColor.withOpacity(0.67),
+            color: ColorConst.gray.withOpacity(0.67),
             width: 0.5,
           ),
         ),
@@ -32,7 +32,7 @@ class _HomeState extends State<HomePage> {
                 0xf90d,
                 fontFamily: FontConst.fal,
               ),
-              color: ColorConst.grayColor,
+              color: ColorConst.gray,
               size: 20.0,
             ),
             activeIcon: Icon(
@@ -40,7 +40,7 @@ class _HomeState extends State<HomePage> {
                 0xf90d,
                 fontFamily: FontConst.fa,
               ),
-              color: ColorConst.darkerGrayColor,
+              color: ColorConst.darkerGray,
               size: 20.0,
             ),
           ),
@@ -50,7 +50,7 @@ class _HomeState extends State<HomePage> {
                 0xf086,
                 fontFamily: FontConst.fal,
               ),
-              color: ColorConst.grayColor,
+              color: ColorConst.gray,
               size: 20.0,
             ),
             activeIcon: Icon(
@@ -58,7 +58,7 @@ class _HomeState extends State<HomePage> {
                 0xf086,
                 fontFamily: FontConst.fa,
               ),
-              color: ColorConst.darkerGrayColor,
+              color: ColorConst.darkerGray,
               size: 20.0,
             ),
           ),
@@ -68,7 +68,7 @@ class _HomeState extends State<HomePage> {
                 0xf007,
                 fontFamily: FontConst.fal,
               ),
-              color: ColorConst.grayColor,
+              color: ColorConst.gray,
               size: 20.0,
             ),
             activeIcon: Icon(
@@ -76,7 +76,7 @@ class _HomeState extends State<HomePage> {
                 0xf007,
                 fontFamily: FontConst.fa,
               ),
-              color: ColorConst.darkerGrayColor,
+              color: ColorConst.darkerGray,
               size: 20.0,
             ),
           ),

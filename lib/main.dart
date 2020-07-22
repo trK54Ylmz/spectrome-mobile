@@ -166,7 +166,7 @@ class _MainState extends State<MainPage> {
         'Please select API domain',
         style: new TextStyle(
           fontFamily: FontConst.primary,
-          color: ColorConst.darkGrayColor,
+          color: ColorConst.darkGray,
           fontSize: 14.0,
           letterSpacing: 0.33,
         ),
@@ -205,9 +205,9 @@ class _MainState extends State<MainPage> {
           fontFamily: FontConst.primary,
           fontSize: 14.0,
           letterSpacing: 0.33,
-          color: ColorConst.grayColor,
+          color: ColorConst.gray,
         ),
-        borderColor: _error ? ColorConst.darkRed : ColorConst.grayColor,
+        borderColor: _error ? ColorConst.darkRed : ColorConst.gray,
       );
 
       // Default API domain button

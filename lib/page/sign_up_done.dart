@@ -80,7 +80,7 @@ class _SignUpDoneState extends State<SignUpDonePage> {
 
     final si = new Icon(
       new IconData(0xf00c, fontFamily: FontConst.fa),
-      color: ColorConst.successColor,
+      color: ColorConst.success,
       size: 48.0,
     );
 
@@ -90,7 +90,7 @@ class _SignUpDoneState extends State<SignUpDonePage> {
         fontFamily: FontConst.primary,
         fontSize: 14.0,
         letterSpacing: 0.33,
-        color: ColorConst.darkGrayColor,
+        color: ColorConst.darkGray,
       ),
     );
 

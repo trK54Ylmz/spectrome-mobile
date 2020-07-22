@@ -99,7 +99,7 @@ class _VersionState extends State<VersionPage> {
       fontFamily: FontConst.primary,
       fontSize: 14.0,
       letterSpacing: 0.33,
-      color: ColorConst.darkGrayColor,
+      color: ColorConst.darkGray,
     );
 
     final icon = new Icon(
@@ -107,7 +107,7 @@ class _VersionState extends State<VersionPage> {
         Platform.isAndroid ? 0xf3ab : 0xf370,
         fontFamily: FontConst.fab,
       ),
-      color: ColorConst.grayColor,
+      color: ColorConst.gray,
       size: 32.0,
     );
 

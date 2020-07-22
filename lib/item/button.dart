@@ -38,7 +38,7 @@ class Button extends StatefulWidget {
     this.disabled = false,
     this.width = double.infinity,
     this.color = ColorConst.white,
-    this.background = ColorConst.buttonColor,
+    this.background = ColorConst.button,
     this.padding = const EdgeInsets.all(12.0),
     this.radius = const BorderRadius.vertical(
       top: Radius.circular(8.0),

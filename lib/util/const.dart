@@ -61,7 +61,7 @@ class AppConst {
         e.icon,
         fontFamily: FontConst.fa,
       ),
-      color: ColorConst.grayColor,
+      color: ColorConst.gray,
       size: 32.0,
     );
 
@@ -74,7 +74,7 @@ class AppConst {
     final button = new Padding(
       padding: EdgeInsets.only(top: 16.0),
       child: new Button(
-        background: ColorConst.grayColor,
+        background: ColorConst.gray,
         onPressed: () => Navigator.of(context).pushReplacementNamed(SignInPage.tag),
         text: 'Try again',
       ),

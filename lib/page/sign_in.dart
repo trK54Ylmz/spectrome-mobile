@@ -115,7 +115,7 @@ class _SignInState extends State<SignInPage> {
       fontFamily: FontConst.primary,
       fontSize: 14.0,
       letterSpacing: 0.33,
-      color: ColorConst.grayColor,
+      color: ColorConst.gray,
     );
 
     Widget s;
@@ -208,7 +208,7 @@ class _SignInState extends State<SignInPage> {
             fontFamily: FontConst.primary,
             fontSize: 12.0,
             letterSpacing: 0.33,
-            color: ColorConst.grayColor,
+            color: ColorConst.gray,
           ),
         ),
         new GestureDetector(
@@ -225,7 +225,7 @@ class _SignInState extends State<SignInPage> {
                 fontSize: 12.0,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 0.33,
-                color: ColorConst.grayColor,
+                color: ColorConst.gray,
                 decoration: TextDecoration.underline,
               ),
             ),
@@ -238,7 +238,7 @@ class _SignInState extends State<SignInPage> {
     final sub = new Button(
       text: 'Sign Up',
       disabled: _loading,
-      background: ColorConst.grayColor,
+      background: ColorConst.gray,
       onPressed: () => Navigator.of(context).pushReplacementNamed(SignUpPage.tag),
     );
 

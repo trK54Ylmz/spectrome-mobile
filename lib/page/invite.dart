@@ -118,7 +118,7 @@ class _InviteState extends State<InvitePage> {
       fontFamily: FontConst.primary,
       fontSize: 14.0,
       letterSpacing: 0.33,
-      color: ColorConst.grayColor,
+      color: ColorConst.gray,
     );
 
     Widget s;
@@ -155,7 +155,7 @@ class _InviteState extends State<InvitePage> {
         fontFamily: FontConst.primary,
         fontSize: 14.0,
         letterSpacing: 0.33,
-        color: ColorConst.darkGrayColor,
+        color: ColorConst.darkGray,
       ),
     );
 
@@ -267,7 +267,7 @@ class _InviteState extends State<InvitePage> {
             fontSize: 12.0,
             fontWeight: FontWeight.bold,
             letterSpacing: 0.33,
-            color: ColorConst.grayColor,
+            color: ColorConst.gray,
             decoration: TextDecoration.underline,
           ),
         ),
