@@ -145,6 +145,8 @@ class Http {
 
               // Write file content
               s.map((chunk) => r.add(chunk));
+
+              r.write('\n');
             } else {
               // Write plain text data
               r.write('Content-Disposition: form-data; name="$key"\n');
