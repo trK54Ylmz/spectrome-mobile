@@ -1,6 +1,5 @@
 import 'dart:developer' as dev;
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:spectrome/service/base.dart';
 import 'package:spectrome/service/response.dart';
@@ -15,7 +14,7 @@ class ShareService extends Service {
     List<String> files,
   ) {
     final path = '/shares/post';
-    final body = {
+    final body = <String, dynamic>{
       'comment': comment,
     };
 
@@ -28,11 +27,7 @@ class ShareService extends Service {
       final type = files[i].endsWith('mp4') ? AppConst.video : AppConst.photo;
 
       body['type-$i'] = type.toString();
-
-      final file = new File(files[i]);
-      final sr = file.openRead();
-
-      body['file-$i'] = '';
+      body['file-$i'] = new File(files[i]);
     }
 
     // Http response handle callback

@@ -1,13 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:crypto/crypto.dart';
 
 class Http {
   static const TOKEN_HEADER = 'x-authorization';
 
-  static const CONTENT_HEADER = 'accept-encoding';
+  static const ACCEPT_HEADER = 'accept-encoding';
+
+  static const CONTENT_HEADER = 'content-type';
 
   static const FORM = 'application/x-www-form-urlencoded; charset=utf-8';
+
+  static const MULTIPART = 'multipart/form-data';
 
   static const JSON = 'application/json; charset=utf-8';
 
@@ -32,10 +37,10 @@ class Http {
     // Add gzip header
     if (headers == null) {
       headers = {
-        Http.CONTENT_HEADER: 'gzip',
+        Http.ACCEPT_HEADER: 'gzip',
       };
     } else {
-      headers[Http.CONTENT_HEADER] = 'gzip';
+      headers[Http.ACCEPT_HEADER] = 'gzip';
     }
 
     // Http request and response callback
@@ -49,7 +54,7 @@ class Http {
       if (type != null) {
         switch (type) {
           case JSON:
-            r.headers.add(HttpHeaders.contentTypeHeader, JSON);
+            r.headers.add(Http.CONTENT_HEADER, JSON);
             break;
         }
       }
@@ -78,10 +83,10 @@ class Http {
     // Add gzip header
     if (headers == null) {
       headers = {
-        Http.CONTENT_HEADER: 'gzip',
+        Http.ACCEPT_HEADER: 'gzip',
       };
     } else {
-      headers[Http.CONTENT_HEADER] = 'gzip';
+      headers[Http.ACCEPT_HEADER] = 'gzip';
     }
 
     // Http request and response callback
@@ -95,32 +100,88 @@ class Http {
       if (type != null) {
         switch (type) {
           case FORM:
-            r.headers.add(HttpHeaders.contentTypeHeader, FORM);
+            r.headers.add(Http.CONTENT_HEADER, FORM);
             break;
         }
       }
 
       // Add form data if body selected
       if (body != null) {
-        final form = <String>[];
-        for (var key in body.keys) {
-          final k = Uri.encodeQueryComponent(key);
-
-          if (body[key] is List) {
-            int i = 0;
-
-            // Iterate over list params
-            for (var v in body[key] as List) {
-              form.add('$k-$i=$v');
-              i++;
-            }
-          } else {
-            final v = Uri.encodeQueryComponent(body[key]);
-            form.add('$k=$v');
+        // Prepare multipart form
+        if (type == Http.MULTIPART) {
+          // Remove plain multipart header
+          if (headers.containsKey(Http.CONTENT_HEADER)) {
+            headers.remove(Http.CONTENT_HEADER);
           }
-        }
 
-        r.write(form.join('&'));
+          // Create boundry header
+          final a = new DateTime.now().toString();
+          final b = new DateTime.now().millisecondsSinceEpoch;
+          final hash = md5.convert(utf8.encode(a)).toString();
+          final boundry = '$hash-$b';
+          final header = '${Http.CONTENT_HEADER}; boundary=$boundry';
+
+          // Set multipart header
+          headers[Http.CONTENT_HEADER] = header;
+
+          for (var key in body.keys) {
+            // Write start header
+            r.write(boundry + '\n');
+
+            if (body[key] is File) {
+              final file = body[key] as File;
+
+              // Get file name
+              final name = file.path.split('/').last.replaceAll('"', '\\"');
+
+              // Only mp4 and jpg allowed
+              final type = name.endsWith('mp4') ? 'image/mp4' : 'image/jpeg';
+
+              r.write('Content-Disposition: form-data; name="$key"; filename="$name"\n');
+              r.write('Content-Type: $type');
+              r.write('\n');
+              
+              final s = file.openRead();
+
+              // Write file content
+              s.map((chunk) => r.add(chunk));
+            } else {
+              // Write plain text data
+              r.write('Content-Disposition: form-data; name="$key"\n');
+              r.write('\n');
+              r.write(body[key]);
+            }
+          }
+
+          // Write final ending header
+          r.write(boundry + '--');
+        } else {
+          // Plain form data
+          final form = <String>[];
+          for (var key in body.keys) {
+            // Ignore multipart file types
+            if (body[key] is File) {
+              continue;
+            }
+
+            final k = Uri.encodeQueryComponent(key);
+
+            if (body[key] is List) {
+              int i = 0;
+
+              // Iterate over list params
+              for (var v in body[key] as List) {
+                form.add('$k-$i=$v');
+                i++;
+              }
+            } else {
+              final v = Uri.encodeQueryComponent(body[key]);
+              form.add('$k=$v');
+            }
+          }
+
+          r.write(form.join('&'));
+        }
       }
 
       // Send request and close remote connection
