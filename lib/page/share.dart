@@ -58,9 +58,7 @@ class _ShareState extends State<SharePage> {
         onTap: (index) async {
           if (index == 0) {
             await Navigator.of(context).pushReplacementNamed(ViewPage.tag);
-          } else {
-
-          }
+          } else {}
         },
         items: [
           BottomNavigationBarItem(
@@ -91,6 +89,18 @@ class _ShareState extends State<SharePage> {
         final c = new Container(
           width: width,
           height: width,
+          decoration: new BoxDecoration(
+            border: Border(
+              top: BorderSide(
+                color: ColorConst.gray.withOpacity(0.67),
+                width: 0.5,
+              ),
+              bottom: BorderSide(
+                color: ColorConst.gray.withOpacity(0.67),
+                width: 0.5,
+              ),
+            ),
+          ),
           child: new ClipRect(
             child: OverflowBox(
               alignment: Alignment.center,
@@ -117,6 +127,18 @@ class _ShareState extends State<SharePage> {
       w = new Container(
         width: width,
         height: width,
+        decoration: new BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              color: ColorConst.gray.withOpacity(0.67),
+              width: 0.5,
+            ),
+            bottom: BorderSide(
+              color: ColorConst.gray.withOpacity(0.67),
+              width: 0.5,
+            ),
+          ),
+        ),
         child: new ClipRect(
           child: OverflowBox(
             alignment: Alignment.center,

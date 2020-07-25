@@ -20,7 +20,7 @@ class SelectPage extends StatefulWidget {
 class _SelectState extends State<SelectPage> {
   // Camera widget global key
   final _ck = new GlobalKey<CameraState>();
-  
+
   // Gallery widget global key
   final _gk = new GlobalKey<GalleryState>();
 
@@ -46,18 +46,38 @@ class _SelectState extends State<SelectPage> {
     // Create gallery page
     _gallery = new GalleryPage(key: _gk);
 
-    final ac = (_) {
-      // Camera value listener
-    _ck.currentState.active.addListener(() {
-      setState(() => _ca = _ck.currentState.active.value);
-    });
+    // Gallery value listener
+    final gc = (_) {
+      // Skip if gallery state is empty
+      if (_gk.currentState == null) {
+        return;
+      }
 
-      // Gallery value listener
       _gk.currentState.active.addListener(() {
-                setState(() => _ga = _gk.currentState.active.value);
+        setState(() => _ga = _gk.currentState.active.value);
       });
     };
 
+    // Camera value listener
+    final cc = (_) {
+      // Skip if camera state is empty
+      if (_ck.currentState == null) {
+        return;
+      }
+
+      _ck.currentState.active.addListener(() {
+        setState(() => _ca = _ck.currentState.active.value);
+      });
+    };
+
+    // Camera and gallery active listeners
+    final ac = (_) {
+      _gallery.ready(gc);
+
+      _camera.ready(cc);
+    };
+
+    // Run after page build
     WidgetsBinding.instance.addPostFrameCallback(ac);
   }
 
@@ -77,6 +97,27 @@ class _SelectState extends State<SelectPage> {
             width: 0.5,
           ),
         ),
+        onTap: (index) {
+          if (index == 1) {
+            // Camera value listener
+            final cc = (_) {
+              _ck.currentState.active.addListener(() {
+                setState(() => _ca = _ck.currentState.active.value);
+              });
+            };
+
+            _camera.ready(cc);
+          } else {
+            // Gallery value listener
+            final gc = (_) {
+              _gk.currentState.active.addListener(() {
+                setState(() => _ga = _gk.currentState.active.value);
+              });
+            };
+
+            _gallery.ready(gc);
+          }
+        },
         items: [
           BottomNavigationBarItem(
             icon: Icon(
@@ -142,10 +183,14 @@ class _SelectState extends State<SelectPage> {
       child: new GestureDetector(
         onTap: () {
           // Reset selection on camera
-          _ck.currentState.active.value = false;
+          if (_ck.currentState != null) {
+            _ck.currentState.active.value = false;
+          }
 
           // Reset selection on gallery
-          _gk.currentState.active.value = false;
+          if (_gk.currentState != null) {
+            _gk.currentState.active.value = false;
+          }
         },
         child: new Container(
           child: new Center(
@@ -168,10 +213,14 @@ class _SelectState extends State<SelectPage> {
       child: new GestureDetector(
         onTap: () async {
           // Lock selection on camera
-          _ck.currentState.done.value = true;
+          if (_ck.currentState != null) {
+            _ck.currentState.done.value = true;
+          }
 
           // Lock selection on gallery
-          _gk.currentState.done.value = true;
+          if (_gk.currentState != null) {
+            _gk.currentState.done.value = true;
+          }
 
           // Go to share page
           await _next();

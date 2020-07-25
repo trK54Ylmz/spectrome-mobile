@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
@@ -16,6 +17,11 @@ class CameraPage extends StatefulWidget {
 
   @override
   CameraState createState() => new CameraState();
+
+  /// Run callback when widget built
+  void ready(FrameCallback callback) {
+    WidgetsBinding.instance.addPostFrameCallback(callback);
+  }
 }
 
 class CameraState extends State<CameraPage> {
@@ -262,7 +268,7 @@ class CameraState extends State<CameraPage> {
         ),
         child: new Center(
           child: new Padding(
-            padding: EdgeInsets.only(bottom: 0.5),
+            padding: EdgeInsets.only(bottom: 1.5),
             child: new Icon(
               IconData(
                 _recording ? 0xf0c8 : 0xf111,

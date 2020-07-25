@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
@@ -15,6 +16,11 @@ class GalleryPage extends StatefulWidget {
 
   @override
   GalleryState createState() => new GalleryState();
+
+  /// Run callback when widget built
+  void ready(FrameCallback callback) {
+    WidgetsBinding.instance.addPostFrameCallback(callback);
+  }
 }
 
 class GalleryState extends State<GalleryPage> {
