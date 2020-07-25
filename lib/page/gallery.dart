@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
@@ -12,15 +12,24 @@ import 'package:spectrome/util/error.dart';
 class GalleryPage extends StatefulWidget {
   static final tag = 'gallery';
 
-  final currentState = new _GalleryState();
-
-  GalleryPage() : super();
+  GalleryPage({@required Key key}) : super(key: key);
 
   @override
-  _GalleryState createState() => currentState;
+  GalleryState createState() => new GalleryState();
+
+  /// Run callback when widget built
+  void ready(FrameCallback callback) {
+    WidgetsBinding.instance.addPostFrameCallback(callback);
+  }
 }
 
-class _GalleryState extends State<GalleryPage> {
+class GalleryState extends State<GalleryPage> {
+    // Where any item selected or not
+  final active = ValueNotifier<bool>(false);
+
+  // Actions are locked or not
+  final done = ValueNotifier<bool>(false);
+
   // Gallery scroll controller
   final _sc = ScrollController();
 
@@ -32,12 +41,6 @@ class _GalleryState extends State<GalleryPage> {
 
   // Selected item indexes
   final _selected = <int>[];
-
-  // Where any item selected or not
-  final active = ValueNotifier<bool>(false);
-
-  // Temporary directory
-  Directory _temp;
 
   // Loading indicator
   bool _loading = true;
@@ -122,26 +125,6 @@ class _GalleryState extends State<GalleryPage> {
     };
 
     PhotoManager.requestPermission().then(c).catchError(e).whenComplete(cc);
-
-    // Directory callback
-    final dc = (Directory d) {
-      // Remove temporary directory if exists
-      if (d.existsSync()) {
-        // Delete and create if there are files in the directory
-        if (d.listSync().length > 0) {
-          // Remove temporary directory
-          d.deleteSync(recursive: true);
-
-          // Create temporary directory
-          d.createSync();
-        }
-      }
-
-      setState(() => _temp = d);
-    };
-
-    // Get temporary directory
-    getTemporaryDirectory().then(dc);
   }
 
   @override
@@ -320,6 +303,11 @@ class _GalleryState extends State<GalleryPage> {
 
   /// Select image or video
   void _tap(int index) {
+    // All selections has been made
+    if (done.value) {
+      return;
+    }
+
     // Add or remove according to existence of index
     if (_selected.contains(index)) {
       _selected.remove(index);
@@ -331,8 +319,8 @@ class _GalleryState extends State<GalleryPage> {
   }
 
   /// Get files for sharing
-  Future<List<String>> getFiles() async {
-    final files = <String>[];
+  Future<List<File>> getFiles() async {
+    final files = <File>[];
 
     for (int i = 0; i < _selected.length; i++) {
       for (int j = 0; j < _items.length; j++) {
@@ -344,22 +332,11 @@ class _GalleryState extends State<GalleryPage> {
           continue;
         }
 
-        final name = _items[j].type == AssetType.video ? 'video.$i.mp4' : 'photo.$i.jpg';
-        final f = new File('${_temp.path}/$name');
-
+        // Get origin of the file
         final of = await _items[j].file;
 
-        final rs = of.openRead();
-        final ws = f.openWrite(mode: FileMode.writeOnlyAppend);
-        try {
-          rs.map((s) => ws.write(s));
-        } finally {
-          // Close write strem
-          ws.close();
-        }
-
         // Write to file
-        files.add(f.path);
+        files.add(of);
       }
     }
 
