@@ -12,17 +12,18 @@ import 'package:spectrome/util/error.dart';
 class CameraPage extends StatefulWidget {
   static final tag = 'camera';
 
-  CameraPage() : super();
-
-  final currentState = new _CameraState();
+  CameraPage({@required Key key}) : super(key: key);
 
   @override
-  _CameraState createState() => currentState;
+  CameraState createState() => new CameraState();
 }
 
-class _CameraState extends State<CameraPage> {
+class CameraState extends State<CameraPage> {
   // Where any item selected or not
   final active = ValueNotifier<bool>(false);
+
+  // Actions are locked or not
+  final done = ValueNotifier<bool>(false);
 
   // Loading indicator
   bool _loading = true;
@@ -32,9 +33,6 @@ class _CameraState extends State<CameraPage> {
 
   // Video recording status
   bool _recording = false;
-
-  // Recording or taking is completed
-  bool _done = false;
 
   // Recording time
   int _time = 0;
@@ -57,11 +55,6 @@ class _CameraState extends State<CameraPage> {
   @override
   void initState() {
     super.initState();
-
-    // Dispose camera controller if camera controller is initalized
-    if (_cc != null) {
-      _cc.dispose();
-    }
 
     // Camera initialize callback
     final _ic = (_) {
@@ -234,7 +227,7 @@ class _CameraState extends State<CameraPage> {
         }
 
         // Disable recording videa or taking picture
-        if (_done) {
+        if (done.value) {
           return;
         }
 
@@ -412,7 +405,8 @@ class _CameraState extends State<CameraPage> {
     final c = (_) {
       _recording = false;
 
-      setState(() => _done = true);
+      // Lock recording
+      done.value = true;
 
       // Reset timer
       _time = 0;
@@ -442,7 +436,7 @@ class _CameraState extends State<CameraPage> {
 
     // Take picture callback
     final c = (_) {
-      setState(() => _done = true);
+      done.value = true;
     };
 
     // Take picture and save
@@ -450,13 +444,13 @@ class _CameraState extends State<CameraPage> {
   }
 
   /// Get files for sharing
-  Future<List<String>> getFiles() async {
+  Future<List<File>> getFiles() async {
     if (_cc.value.isRecordingVideo) {
       await _stopRecord();
     }
 
-    return <String>[
-      _isVideo ? '${_temp.path}/video.mp4' : '${_temp.path}/photo.jpg',
-    ];
+    final path = _isVideo ? '${_temp.path}/video.mp4' : '${_temp.path}/photo.jpg';
+
+    return <File>[new File(path)];
   }
 }

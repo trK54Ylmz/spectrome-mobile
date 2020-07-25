@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:spectrome/page/camera.dart';
@@ -16,6 +18,12 @@ class SelectPage extends StatefulWidget {
 }
 
 class _SelectState extends State<SelectPage> {
+  // Camera widget global key
+  final _ck = new GlobalKey<CameraState>();
+  
+  // Gallery widget global key
+  final _gk = new GlobalKey<GalleryState>();
+
   // Camera page
   CameraPage _camera;
 
@@ -33,20 +41,24 @@ class _SelectState extends State<SelectPage> {
     super.initState();
 
     // Create camera page
-    _camera = new CameraPage();
+    _camera = new CameraPage(key: _ck);
 
     // Create gallery page
-    _gallery = new GalleryPage();
+    _gallery = new GalleryPage(key: _gk);
 
-    // Camera value listener
-    _camera.currentState.active.addListener(() {
-      setState(() => _ca = _camera.currentState.active.value);
+    final ac = (_) {
+      // Camera value listener
+    _ck.currentState.active.addListener(() {
+      setState(() => _ca = _ck.currentState.active.value);
     });
 
-    // Gallery value listener
-    _gallery.currentState.active.addListener(() {
-      setState(() => _ga = _gallery.currentState.active.value);
-    });
+      // Gallery value listener
+      _gk.currentState.active.addListener(() {
+                setState(() => _ga = _gk.currentState.active.value);
+      });
+    };
+
+    WidgetsBinding.instance.addPostFrameCallback(ac);
   }
 
   @override
@@ -56,7 +68,7 @@ class _SelectState extends State<SelectPage> {
 
   /// Get default tab selector widget
   Widget _getSelector() {
-    return CupertinoTabScaffold(
+    return new CupertinoTabScaffold(
       tabBar: CupertinoTabBar(
         backgroundColor: ColorConst.white,
         border: Border(
@@ -119,91 +131,108 @@ class _SelectState extends State<SelectPage> {
 
   /// Get ready widget after made selection from gallery or recording from camera
   Widget _getReady() {
-    return CupertinoTabScaffold(
-      tabBar: CupertinoTabBar(
-        backgroundColor: ColorConst.white,
+    final width = MediaQuery.of(context).size.width;
+    final ch = MediaQuery.of(context).padding.bottom + 50.0;
+
+    final w = _ca ? _camera : _gallery;
+
+    // Cancel button
+    final cb = new Expanded(
+      flex: 1,
+      child: new GestureDetector(
+        onTap: () {
+          // Reset selection on camera
+          _ck.currentState.active.value = false;
+
+          // Reset selection on gallery
+          _gk.currentState.active.value = false;
+        },
+        child: new Container(
+          child: new Center(
+            child: new Icon(
+              IconData(
+                0xf00d,
+                fontFamily: FontConst.fal,
+              ),
+              color: ColorConst.darkerGray,
+              size: 20.0,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // Next button
+    final nb = new Expanded(
+      flex: 1,
+      child: new GestureDetector(
+        onTap: () async {
+          // Lock selection on camera
+          _ck.currentState.done.value = true;
+
+          // Lock selection on gallery
+          _gk.currentState.done.value = true;
+
+          // Go to share page
+          await _next();
+        },
+        child: new Center(
+          child: new Icon(
+            IconData(
+              0xf00c,
+              fontFamily: FontConst.fal,
+            ),
+            color: ColorConst.success,
+            size: 20.0,
+          ),
+        ),
+      ),
+    );
+
+    // Controllers
+    final c = new Container(
+      width: width,
+      height: ch,
+      decoration: new BoxDecoration(
+        color: ColorConst.white,
         border: Border(
           top: BorderSide(
             color: ColorConst.gray.withOpacity(0.67),
             width: 0.5,
           ),
         ),
-        onTap: (index) async {
-          if (index == 1) {
-            // Go to share page
-            await _next();
-          } else {
-            // Reset selection on camera
-            _camera.currentState.active.value = false;
-
-            // Reset selection on gallery
-            _gallery.currentState.active.value = false;
-          }
-        },
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(
-              IconData(
-                0xf00d,
-                fontFamily: FontConst.fal,
-              ),
-              color: ColorConst.darkerGray,
-              size: 20.0,
-            ),
-            activeIcon: Icon(
-              IconData(
-                0xf00d,
-                fontFamily: FontConst.fal,
-              ),
-              color: ColorConst.darkerGray,
-              size: 20.0,
-            ),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              IconData(
-                0xf00c,
-                fontFamily: FontConst.fal,
-              ),
-              color: ColorConst.success,
-              size: 20.0,
-            ),
-            activeIcon: Icon(
-              IconData(
-                0xf00c,
-                fontFamily: FontConst.fal,
-              ),
-              color: ColorConst.success,
-              size: 20.0,
-            ),
-          ),
+      ),
+      child: new Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          cb,
+          nb,
         ],
       ),
-      tabBuilder: (context, index) {
-        switch (index) {
-          case 1:
-            return _ca ? _camera : _gallery;
-            break;
-          default:
-            return _ga ? _gallery : _camera;
-            break;
-        }
-      },
+    );
+
+    return new Stack(
+      alignment: AlignmentDirectional.bottomCenter,
+      children: <Widget>[
+        w,
+        c,
+      ],
     );
   }
 
   /// Move to next stop on share
   Future<void> _next() async {
-    final c = (List<String> files) async {
+    final c = (List<File> files) async {
       await Navigator.of(context).pushReplacementNamed(SharePage.tag, arguments: files);
     };
 
     if (_ca) {
-      await _camera.currentState.getFiles().then(c);
+      await _ck.currentState.getFiles().then(c);
     }
 
     if (_ga) {
-      await _gallery.currentState.getFiles().then(c);
+      await _gk.currentState.getFiles().then(c);
     }
   }
 }

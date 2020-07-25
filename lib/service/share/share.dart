@@ -26,7 +26,7 @@ class ShareService extends Service {
     for (int i = 0; i < files.length; i++) {
       final type = files[i].endsWith('mp4') ? AppConst.video : AppConst.photo;
 
-      body['type-$i'] = type.toString();
+      body['type-$i'] = type;
       body['file-$i'] = new File(files[i]);
     }
 
