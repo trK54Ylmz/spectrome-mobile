@@ -126,7 +126,7 @@ class _SelectState extends State<SelectPage> {
                 fontFamily: FontConst.fal,
               ),
               color: ColorConst.gray,
-              size: 20.0,
+              size: 18.0,
             ),
             activeIcon: Icon(
               IconData(
@@ -134,7 +134,7 @@ class _SelectState extends State<SelectPage> {
                 fontFamily: FontConst.fa,
               ),
               color: ColorConst.darkerGray,
-              size: 20.0,
+              size: 18.0,
             ),
           ),
           BottomNavigationBarItem(
@@ -144,7 +144,7 @@ class _SelectState extends State<SelectPage> {
                 fontFamily: FontConst.fal,
               ),
               color: ColorConst.gray,
-              size: 20.0,
+              size: 18.0,
             ),
             activeIcon: Icon(
               IconData(
@@ -152,7 +152,7 @@ class _SelectState extends State<SelectPage> {
                 fontFamily: FontConst.fa,
               ),
               color: ColorConst.darkerGray,
-              size: 20.0,
+              size: 18.0,
             ),
           ),
         ],
@@ -200,7 +200,7 @@ class _SelectState extends State<SelectPage> {
                 fontFamily: FontConst.fal,
               ),
               color: ColorConst.darkerGray,
-              size: 20.0,
+              size: 18.0,
             ),
           ),
         ),
@@ -212,6 +212,7 @@ class _SelectState extends State<SelectPage> {
       flex: 1,
       child: new GestureDetector(
         onTap: () async {
+          print(111);
           // Lock selection on camera
           if (_ck.currentState != null) {
             _ck.currentState.done.value = true;
@@ -232,7 +233,7 @@ class _SelectState extends State<SelectPage> {
               fontFamily: FontConst.fal,
             ),
             color: ColorConst.success,
-            size: 20.0,
+            size: 18.0,
           ),
         ),
       ),
