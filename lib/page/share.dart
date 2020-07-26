@@ -22,8 +22,6 @@ class _ShareState extends State<SharePage> {
   Widget build(BuildContext context) {
     final List<File> files = ModalRoute.of(context).settings.arguments;
 
-    print(files);
-
     final _cb = new Padding(
       padding: EdgeInsets.only(top: 7.0),
       child: new Text(

@@ -212,7 +212,6 @@ class _SelectState extends State<SelectPage> {
       flex: 1,
       child: new GestureDetector(
         onTap: () async {
-          print(111);
           // Lock selection on camera
           if (_ck.currentState != null) {
             _ck.currentState.done.value = true;
