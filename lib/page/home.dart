@@ -33,7 +33,7 @@ class _HomeState extends State<HomePage> {
                 fontFamily: FontConst.fal,
               ),
               color: ColorConst.gray,
-              size: 20.0,
+              size: 18.0,
             ),
             activeIcon: Icon(
               IconData(
@@ -41,7 +41,7 @@ class _HomeState extends State<HomePage> {
                 fontFamily: FontConst.fa,
               ),
               color: ColorConst.darkerGray,
-              size: 20.0,
+              size: 18.0,
             ),
           ),
           BottomNavigationBarItem(
@@ -51,7 +51,7 @@ class _HomeState extends State<HomePage> {
                 fontFamily: FontConst.fal,
               ),
               color: ColorConst.gray,
-              size: 20.0,
+              size: 18.0,
             ),
             activeIcon: Icon(
               IconData(
@@ -59,7 +59,7 @@ class _HomeState extends State<HomePage> {
                 fontFamily: FontConst.fa,
               ),
               color: ColorConst.darkerGray,
-              size: 20.0,
+              size: 18.0,
             ),
           ),
           BottomNavigationBarItem(
@@ -69,7 +69,7 @@ class _HomeState extends State<HomePage> {
                 fontFamily: FontConst.fal,
               ),
               color: ColorConst.gray,
-              size: 20.0,
+              size: 18.0,
             ),
             activeIcon: Icon(
               IconData(
@@ -77,7 +77,7 @@ class _HomeState extends State<HomePage> {
                 fontFamily: FontConst.fa,
               ),
               color: ColorConst.darkerGray,
-              size: 20.0,
+              size: 18.0,
             ),
           ),
         ],

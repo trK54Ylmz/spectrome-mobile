@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:spectrome/item/video.dart';
 import 'package:spectrome/page/view.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
+import 'package:spectrome/util/const.dart';
 
 class SharePage extends StatefulWidget {
   static final tag = 'share';
@@ -106,7 +108,7 @@ class _ShareState extends State<SharePage> {
               alignment: Alignment.center,
               child: FittedBox(
                 fit: BoxFit.fitWidth,
-                child: new Image.file(files[i]),
+                child: _getItem(files[i]),
               ),
             ),
           ),
@@ -144,7 +146,7 @@ class _ShareState extends State<SharePage> {
             alignment: Alignment.center,
             child: FittedBox(
               fit: BoxFit.fitWidth,
-              child: new Image.file(files[0]),
+              child: _getItem(files[0]),
             ),
           ),
         ),
@@ -160,5 +162,16 @@ class _ShareState extends State<SharePage> {
         ],
       ),
     );
+  }
+
+  /// Get file widget according to it's type
+  Widget _getItem(File file) {
+    final type = file.path.split('.').last == 'jpg' ? AppConst.photo : AppConst.video;
+
+    if (type == AppConst.video) {
+      return new Video(path: file.path, type: VideoType.FILE);
+    } else {
+      return new Image.file(file);
+    }
   }
 }
