@@ -10,24 +10,19 @@ class ShareService extends Service {
   /// Create new post
   static Future<SharePostResponse> call(
     String comment,
-    List<String> tags,
-    List<String> files,
+    List<File> files,
   ) {
     final path = '/shares/post';
     final body = <String, dynamic>{
       'comment': comment,
     };
 
-    // Add tags as list
-    for (int i = 0; i < tags.length; i++) {
-      body['tag-$i'] = tags[i];
-    }
-
     for (int i = 0; i < files.length; i++) {
-      final type = files[i].endsWith('mp4') ? AppConst.video : AppConst.photo;
+      final ext = files[i].path.split('.').last;
+      final type = ext == 'mp4' ? AppConst.video : AppConst.photo;
 
       body['type-$i'] = type;
-      body['file-$i'] = new File(files[i]);
+      body['file-$i'] = files[i];
     }
 
     // Http response handle callback
