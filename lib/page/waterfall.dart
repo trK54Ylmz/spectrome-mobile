@@ -94,7 +94,7 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
   @override
   bool get wantKeepAlive => true;
 
-  // Show error when error not empty
+  /// Show error when error not empty
   void _showSnackBar(String message, {isError = true}) {
     final snackBar = SnackBar(
       content: Text(message),
