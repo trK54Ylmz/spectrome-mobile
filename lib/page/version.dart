@@ -3,12 +3,14 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:spectrome/main.dart';
 import 'package:spectrome/page/session.dart';
 import 'package:spectrome/service/system/version.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
 import 'package:spectrome/util/error.dart';
+import 'package:spectrome/util/route.dart';
 
 class VersionPage extends StatefulWidget {
   static final tag = 'version';
@@ -46,7 +48,8 @@ class _VersionState extends State<VersionPage> {
 
       // Move to home page
       if (v.version == AppConst.version) {
-        await Navigator.of(context).pushReplacementNamed(SessionPage.tag);
+        final route = new DefaultRoute(routes[SessionPage.tag](context));
+        await Navigator.of(context).pushReplacement(route);
       }
     };
 
@@ -85,7 +88,12 @@ class _VersionState extends State<VersionPage> {
           child: new Padding(
             padding: EdgeInsets.symmetric(horizontal: pv),
             child: new Center(
-              child: AppConst.loader(context, _loading, _error, _getPage),
+              child: AppConst.loader(
+                page: VersionPage.tag,
+                argument: _loading,
+                error: _error,
+                callback: _getPage,
+              ),
             ),
           ),
         ),

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/button.dart';
+import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
@@ -55,13 +56,7 @@ class _SignUpDoneState extends State<SignUpDonePage> {
   // Get page widget
   Widget _getPage() {
     if (_loading) {
-      return new Center(
-        child: new Image.asset(
-          'assets/images/loading.gif',
-          width: 40.0,
-          height: 40.0,
-        ),
-      );
+      return new Loading(iconWidth: 40.0, iconHeight: 40.0);
     }
 
     final width = MediaQuery.of(context).size.width;

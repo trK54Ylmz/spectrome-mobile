@@ -8,15 +8,36 @@ import 'package:spectrome/util/http.dart';
 
 class ShareService extends Service {
   /// Create new post
-  static Future<SharePostResponse> call(
+  static Future<SharePostResponse> call({
+    String session,
+    bool disposible,
+    bool restricted,
     String comment,
     List<File> files,
-  ) {
+    List<double> scales,
+    List<String> users,
+  }) {
     final path = '/shares/post';
+    final headers = {
+      Http.TOKEN_HEADER: session,
+    };
     final body = <String, dynamic>{
+      'disposible': disposible,
+      'resticted': restricted,
       'comment': comment,
     };
 
+    // Create users list
+    for (int i = 0; i < users.length; i++) {
+      body['user-$i'] = users[i];
+    }
+
+    // Create scales for photo and video resize
+    for (int i = 0; i < scales.length; i++) {
+      body['scale-$i'] = scales[i];
+    }
+
+    // Create post files which are photos and videos
     for (int i = 0; i < files.length; i++) {
       final ext = files[i].path.split('.').last;
       final type = ext == 'mp4' ? AppConst.video : AppConst.photo;
@@ -47,7 +68,8 @@ class ShareService extends Service {
     final r = Http.doPost(
       path: path,
       body: body,
-      type: Http.FORM,
+      headers: headers,
+      type: Http.MULTIPART,
     );
 
     return r.then(c).catchError(e);

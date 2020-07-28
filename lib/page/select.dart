@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:spectrome/page/camera.dart';
 import 'package:spectrome/page/gallery.dart';
 import 'package:spectrome/page/share.dart';
+import 'package:spectrome/page/view.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 
@@ -88,6 +89,62 @@ class _SelectState extends State<SelectPage> {
 
   /// Get default tab selector widget
   Widget _getSelector() {
+    // Gallery passive button
+    final gb = new Padding(
+      padding: EdgeInsets.only(top: 7.0),
+      child: new Text(
+        'Gallery',
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          fontSize: 14.0,
+          letterSpacing: 0.33,
+          color: ColorConst.gray,
+        ),
+      ),
+    );
+
+    // Gallery active button
+    final gba = new Padding(
+      padding: EdgeInsets.only(top: 7.0),
+      child: new Text(
+        'Gallery',
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          fontSize: 14.0,
+          letterSpacing: 0.33,
+          color: ColorConst.darkerGray,
+        ),
+      ),
+    );
+
+    // Camera passive button
+    final cb = new Padding(
+      padding: EdgeInsets.only(top: 7.0),
+      child: new Text(
+        'Camera',
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          fontSize: 14.0,
+          letterSpacing: 0.33,
+          color: ColorConst.gray,
+        ),
+      ),
+    );
+
+    // Camera active button
+    final cba = new Padding(
+      padding: EdgeInsets.only(top: 7.0),
+      child: new Text(
+        'Camera',
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          fontSize: 14.0,
+          letterSpacing: 0.33,
+          color: ColorConst.darkerGray,
+        ),
+      ),
+    );
+
     return new CupertinoTabScaffold(
       tabBar: CupertinoTabBar(
         backgroundColor: ColorConst.white,
@@ -120,40 +177,12 @@ class _SelectState extends State<SelectPage> {
         },
         items: [
           BottomNavigationBarItem(
-            icon: Icon(
-              IconData(
-                0xf87c,
-                fontFamily: FontConst.fal,
-              ),
-              color: ColorConst.gray,
-              size: 18.0,
-            ),
-            activeIcon: Icon(
-              IconData(
-                0xf87c,
-                fontFamily: FontConst.fa,
-              ),
-              color: ColorConst.darkerGray,
-              size: 18.0,
-            ),
+            icon: gb,
+            activeIcon: gba,
           ),
           BottomNavigationBarItem(
-            icon: Icon(
-              IconData(
-                0xf030,
-                fontFamily: FontConst.fal,
-              ),
-              color: ColorConst.gray,
-              size: 18.0,
-            ),
-            activeIcon: Icon(
-              IconData(
-                0xf030,
-                fontFamily: FontConst.fa,
-              ),
-              color: ColorConst.darkerGray,
-              size: 18.0,
-            ),
+            icon: cb,
+            activeIcon: cba,
           ),
         ],
       ),
@@ -178,30 +207,44 @@ class _SelectState extends State<SelectPage> {
     final w = _ca ? _camera : _gallery;
 
     // Cancel button
+    final cbt = new Padding(
+      padding: EdgeInsets.only(top: 7.0),
+      child: new Text(
+        'Cancel',
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          fontSize: 14.0,
+          letterSpacing: 0.33,
+          color: ColorConst.darkRed,
+        ),
+      ),
+    );
+    
+    // Next button
+    final nbt = new Padding(
+      padding: EdgeInsets.only(top: 7.0),
+      child: new Text(
+        'Next',
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          fontSize: 14.0,
+          letterSpacing: 0.33,
+          color: ColorConst.darkerGray,
+        ),
+      ),
+    );
+
+    // Cancel button
     final cb = new Expanded(
       flex: 1,
-      child: new GestureDetector(
-        onTap: () {
-          // Reset selection on camera
-          if (_ck.currentState != null) {
-            _ck.currentState.active.value = false;
-          }
-
-          // Reset selection on gallery
-          if (_gk.currentState != null) {
-            _gk.currentState.active.value = false;
-          }
-        },
-        child: new Container(
+      child: new Semantics(
+        child: new GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () async {
+            await Navigator.of(context).pushReplacementNamed(ViewPage.tag);
+          },
           child: new Center(
-            child: new Icon(
-              IconData(
-                0xf00d,
-                fontFamily: FontConst.fal,
-              ),
-              color: ColorConst.darkerGray,
-              size: 18.0,
-            ),
+            child: cbt,
           ),
         ),
       ),
@@ -211,6 +254,7 @@ class _SelectState extends State<SelectPage> {
     final nb = new Expanded(
       flex: 1,
       child: new GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: () async {
           // Lock selection on camera
           if (_ck.currentState != null) {
@@ -226,14 +270,7 @@ class _SelectState extends State<SelectPage> {
           await _next();
         },
         child: new Center(
-          child: new Icon(
-            IconData(
-              0xf00c,
-              fontFamily: FontConst.fal,
-            ),
-            color: ColorConst.success,
-            size: 18.0,
-          ),
+          child: nbt,
         ),
       ),
     );

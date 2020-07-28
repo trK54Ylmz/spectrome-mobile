@@ -116,7 +116,12 @@ class _SessionState extends State<SessionPage> {
       height: height,
       child: new Padding(
         padding: EdgeInsets.symmetric(horizontal: pv),
-        child: AppConst.loader(context, _loading, _error, _getPage),
+        child: AppConst.loader(
+          page: SessionPage.tag,
+          argument: _loading,
+          error: _error,
+          callback: _getPage,
+        ),
       ),
     );
   }

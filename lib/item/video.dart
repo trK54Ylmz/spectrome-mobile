@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:chewie/chewie.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:spectrome/util/const.dart';
+import 'package:spectrome/item/loading.dart';
 import 'package:video_player/video_player.dart';
 
 enum VideoType { FILE, NETWORK }
@@ -113,7 +113,7 @@ class _VideoState extends State<Video> {
       return new Container(
         width: width,
         height: width,
-        child: AppConst.loading(),
+        child: const Loading(),
       );
     }
 

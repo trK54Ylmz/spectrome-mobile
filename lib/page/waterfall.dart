@@ -4,10 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/post.dart';
+import 'package:spectrome/item/shimmer.dart';
 import 'package:spectrome/service/post/post.dart';
 import 'package:spectrome/service/post/waterfall.dart';
 import 'package:spectrome/theme/color.dart';
-import 'package:spectrome/util/const.dart';
 import 'package:spectrome/util/storage.dart';
 
 class WaterFallPage extends StatefulWidget {
@@ -75,7 +75,7 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
 
     // Add shimmer in case of loading state
     if (_loading) {
-      items.add(AppConst.shimmer());
+      items.add(new Shimmer());
     }
 
     return new Scaffold(

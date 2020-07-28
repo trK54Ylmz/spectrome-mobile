@@ -5,6 +5,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
@@ -132,10 +133,23 @@ class CameraState extends State<CameraPage> {
     final height = MediaQuery.of(context).size.height;
 
     // Show loading
-    if (_loading) return AppConst.loading();
+    if (_loading) return const Loading();
 
     // Get error widget
-    if (_message != null) return AppConst.error(_message);
+    if (_message != null) {
+      return SizedBox.expand(
+        child: new Center(
+          child: new Text(
+            _message,
+            style: new TextStyle(
+              fontFamily: FontConst.primary,
+              fontSize: 14.0,
+              letterSpacing: 0.33,
+            ),
+          ),
+        ),
+      );
+    }
 
     // Get camera widget
     return new Scaffold(
@@ -145,7 +159,12 @@ class CameraState extends State<CameraPage> {
           child: new Container(
             width: width,
             height: height,
-            child: AppConst.loader(context, _loading, _error, _getCamera),
+            child: AppConst.loader(
+              page: CameraPage.tag,
+              argument: _loading,
+              error: _error,
+              callback: _getCamera,
+            ),
           ),
         ),
       ),
