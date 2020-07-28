@@ -5,8 +5,6 @@ class Shimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Container(
-      child: new Center()
-    );
+    return new Container(child: new Center());
   }
 }

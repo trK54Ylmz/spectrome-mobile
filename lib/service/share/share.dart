@@ -47,7 +47,7 @@ class ShareService extends Service {
     }
 
     // Http response handle callback
-    final c = (Response r) {      
+    final c = (Response r) {
       if (r.code != 200) {
         final m = 'An error occurred';
         return SharePostResponse.bind(status: false, message: m);
