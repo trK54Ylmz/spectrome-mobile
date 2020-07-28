@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:spectrome/item/button.dart';
+import 'package:spectrome/main.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/error.dart';
+import 'package:spectrome/util/route.dart';
 
 class Fatal extends StatelessWidget {
   final ErrorMessage error;
@@ -37,12 +39,15 @@ class Fatal extends StatelessWidget {
       child: new Text(this.error.error, style: ts),
     );
 
+    // Create route
+    final route = new DefaultRoute(routes[this.page](context));
+
     // Add re-try button
     final button = new Padding(
       padding: EdgeInsets.only(top: 16.0),
       child: new Button(
         background: ColorConst.gray,
-        onPressed: () => Navigator.of(context).pushReplacementNamed(page),
+        onPressed: () => Navigator.of(context).pushReplacement(route),
         text: 'Try again',
       ),
     );
