@@ -2,6 +2,7 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/page/sign_up_done.dart';
 import 'package:spectrome/item/form.dart';
 import 'package:spectrome/item/input.dart';
@@ -113,7 +114,12 @@ class _ActivationState extends State<ActivationPage> {
           height: height,
           child: new Padding(
             padding: EdgeInsets.symmetric(horizontal: pv),
-            child: AppConst.loader(context, _sp == null, _error, _getForm),
+            child: AppConst.loader(
+              page: ActivationPage.tag,
+              argument: _sp == null,
+              error: _error,
+              callback: _getForm,
+            ),
           ),
         ),
       ),
@@ -141,11 +147,7 @@ class _ActivationState extends State<ActivationPage> {
     // Loading indicator for API requests
     Widget s;
     if (_loading) {
-      s = new Image.asset(
-        'assets/images/loading.gif',
-        width: 40.0,
-        height: 40.0,
-      );
+      s = new Loading(iconWidth: 40.0, iconHeight: 40.0);
     } else if (_message != null) {
       s = new Padding(
         padding: EdgeInsets.only(

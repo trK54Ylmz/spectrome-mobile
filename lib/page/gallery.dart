@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
@@ -24,7 +25,7 @@ class GalleryPage extends StatefulWidget {
 }
 
 class GalleryState extends State<GalleryPage> {
-    // Where any item selected or not
+  // Where any item selected or not
   final active = ValueNotifier<bool>(false);
 
   // Actions are locked or not
@@ -141,10 +142,23 @@ class GalleryState extends State<GalleryPage> {
     final height = MediaQuery.of(context).size.height;
 
     // Show loading
-    if (_loading) return AppConst.loading();
+    if (_loading) return const Loading();
 
     // Get error widget
-    if (_message != null) return AppConst.error(_message);
+    if (_message != null) {
+      return SizedBox.expand(
+        child: new Center(
+          child: new Text(
+            _message,
+            style: new TextStyle(
+              fontFamily: FontConst.primary,
+              fontSize: 14.0,
+              letterSpacing: 0.33,
+            ),
+          ),
+        ),
+      );
+    }
 
     // Get gallery widget
     return new Scaffold(
@@ -154,7 +168,12 @@ class GalleryState extends State<GalleryPage> {
           child: new Container(
             width: width,
             height: height,
-            child: AppConst.loader(context, _loading, _error, _getGallery),
+            child: AppConst.loader(
+              page: GalleryPage.tag,
+              argument: _loading,
+              error: _error,
+              callback: _getGallery,
+            ),
           ),
         ),
       ),

@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/form.dart';
 import 'package:spectrome/item/input.dart';
+import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/page/waterfall.dart';
 import 'package:spectrome/service/user/invite.dart';
 import 'package:spectrome/theme/color.dart';
@@ -83,7 +84,12 @@ class _InviteState extends State<InvitePage> {
           height: height,
           child: new Padding(
             padding: EdgeInsets.symmetric(horizontal: pv),
-            child: AppConst.loader(context, _session == null, _error, _getForm),
+            child: AppConst.loader(
+              page: InvitePage.tag,
+              argument: _session == null,
+              error: _error,
+              callback: _getForm,
+            ),
           ),
         ),
       ),
@@ -123,11 +129,7 @@ class _InviteState extends State<InvitePage> {
 
     Widget s;
     if (_loading) {
-      s = new Image.asset(
-        'assets/images/loading.gif',
-        width: 40.0,
-        height: 40.0,
-      );
+      s = new Loading(iconWidth: 40.0, iconHeight: 40.0);
     } else if (_message != null) {
       s = new Padding(
         padding: EdgeInsets.only(

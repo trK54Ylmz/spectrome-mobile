@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/item/video.dart';
 import 'package:spectrome/page/view.dart';
 import 'package:spectrome/service/share/share.dart';
@@ -10,6 +12,7 @@ import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
 import 'package:spectrome/util/error.dart';
+import 'package:spectrome/util/storage.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 class SharePage extends StatefulWidget {
@@ -30,28 +33,41 @@ class _ShareState extends State<SharePage> {
   // Scale group of items
   final _scales = <double>[];
 
+  // List of shared users
+  final _users = <String>[];
+
+  // Session value
+  String _session;
+
   // Is page view scrollable
   bool _scrollable = true;
 
   // Loading indicator
-  bool _loading = false;
+  bool _loading = true;
 
-  // Error message
-  ErrorMessage _error;
+  // Post is disposible
+  bool _disposible = false;
+
+  // Post is resticted for users
+  bool _restricted = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Shared preferences callback
+    final c = (SharedPreferences sp) {
+      _session = sp.getString('_session');
+
+      setState(() => _loading = false);
+    };
+
+    // Get shared preferences
+    Storage.load().then(c);
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
-      return new Container(
-        color: ColorConst.white,
-        child: AppConst.loading(),
-      );
-    }
-
-    if (_error != null) {
-      return AppConst.fatal(context, _error);
-    }
-
     final List<File> files = ModalRoute.of(context).settings.arguments;
     if (_scales.isEmpty) {
       final l = new List<double>.generate(files.length, (_) => 1);
@@ -71,11 +87,12 @@ class _ShareState extends State<SharePage> {
           fontFamily: FontConst.primary,
           fontSize: 14.0,
           letterSpacing: 0.33,
-          color: ColorConst.darkRed,
+          color: _loading ? ColorConst.darkRed.withOpacity(0.33) : ColorConst.darkRed,
         ),
       ),
     );
 
+    final clr = ColorConst.darkerGray;
     final _sb = new Padding(
       padding: EdgeInsets.only(top: 7.0),
       child: new Text(
@@ -84,45 +101,69 @@ class _ShareState extends State<SharePage> {
           fontFamily: FontConst.primary,
           fontSize: 14.0,
           letterSpacing: 0.33,
-          color: ColorConst.darkerGray,
+          color: _loading ? clr.withOpacity(0.33) : clr,
         ),
       ),
     );
 
-    return CupertinoTabScaffold(
-      key: _sk,
-      tabBar: CupertinoTabBar(
-        backgroundColor: ColorConst.white,
-        border: Border(
-          top: BorderSide(
-            color: ColorConst.gray.withOpacity(0.67),
-            width: 0.5,
-          ),
+    List<BottomNavigationBarItem> items;
+    if (_loading) {
+      items = [
+        BottomNavigationBarItem(
+          icon: new Container(),
         ),
-        onTap: (index) async {
-          if (index == 0) {
-            await Navigator.of(context).pushReplacementNamed(ViewPage.tag);
-          } else {
-            setState(() => _loading = true);
+        BottomNavigationBarItem(
+          icon: new Loading(iconWidth: 40.0, iconHeight: 40.0),
+        ),
+        BottomNavigationBarItem(
+          icon: new Container(),
+        )
+      ];
+    } else {
+      items = [
+        BottomNavigationBarItem(
+          icon: _cb,
+          activeIcon: _cb,
+        ),
+        BottomNavigationBarItem(
+          icon: _sb,
+          activeIcon: _sb,
+        ),
+      ];
+    }
 
-            // Create post
-            await _share(files);
-          }
+    return new Scaffold(
+      key: _sk,
+      body: new CupertinoTabScaffold(
+        tabBar: CupertinoTabBar(
+          backgroundColor: ColorConst.white,
+          border: Border(
+            top: BorderSide(
+              color: ColorConst.gray.withOpacity(0.67),
+              width: 0.5,
+            ),
+          ),
+          onTap: (index) async {
+            // Disable click while loading
+            if (_loading) {
+              return;
+            }
+
+            if (index == 0) {
+              await Navigator.of(context).pushReplacementNamed(ViewPage.tag);
+            } else {
+              setState(() => _loading = true);
+
+              // Create post
+              await _share(files);
+            }
+          },
+          items: items,
+        ),
+        tabBuilder: (context, index) {
+          return _getForm(files);
         },
-        items: [
-          BottomNavigationBarItem(
-            icon: _cb,
-            activeIcon: _cb,
-          ),
-          BottomNavigationBarItem(
-            icon: _sb,
-            activeIcon: _sb,
-          ),
-        ],
       ),
-      tabBuilder: (context, index) {
-        return _getForm(files);
-      },
     );
   }
 
@@ -255,7 +296,16 @@ class _ShareState extends State<SharePage> {
   /// Show error when error not empty
   void _showSnackBar(String message, {isError = true}) {
     final snackBar = SnackBar(
-      content: Text(message),
+      content: new Padding(
+        padding: EdgeInsets.symmetric(vertical: 4.0),
+        child: new Text(
+          message,
+          style: new TextStyle(
+            fontFamily: FontConst.primary,
+            letterSpacing: 0.33,
+          ),
+        ),
+      ),
       backgroundColor: isError ? ColorConst.darkRed : ColorConst.dark,
     );
 
@@ -290,11 +340,17 @@ class _ShareState extends State<SharePage> {
 
   /// Create new post
   Future<void> _share(List<File> files) async {
+    dev.log('Share button clicked.');
+
     final c = (SharePostResponse r) async {
+      dev.log('Share post request sent.');
+
       if (!r.status) {
         if (r.isNetErr ?? false) {
           // Create network error
-          _error = ErrorMessage.network();
+          final msg = ErrorMessage.network().error;
+
+          _showSnackBar(msg, isError: true);
         } else {
           // Show error
           _showSnackBar(r.message, isError: true);
@@ -311,12 +367,32 @@ class _ShareState extends State<SharePage> {
 
     // Error callback
     final e = (e, s) {
+      print(e);
       final msg = 'Unknown error. Please try again later.';
 
       // Create unknown error message
-      _error = ErrorMessage.custom(msg);
+      _showSnackBar(msg, isError: true);
     };
 
-    return ShareService.call(_cc.text, files).then(c).catchError(e);
+    final cc = () {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() => _loading = false);
+    };
+
+    // Create http request
+    final r = ShareService.call(
+      session: _session,
+      disposible: _disposible,
+      restricted: _restricted,
+      comment: _cc.text,
+      files: files,
+      scales: _scales,
+      users: _users,
+    );
+
+    return r.then(c).catchError(e).whenComplete(cc);
   }
 }

@@ -157,7 +157,7 @@ class Http {
               // Write plain text data
               r.write('Content-Disposition: form-data; name="$key"\n');
               r.write('\n');
-              r.write(body[key]);
+              r.write(body[key].toString());
             }
           }
 
@@ -183,7 +183,7 @@ class Http {
                 i++;
               }
             } else {
-              final v = Uri.encodeQueryComponent(body[key]);
+              final v = Uri.encodeQueryComponent(body[key].toString());
               form.add('$k=$v');
             }
           }
