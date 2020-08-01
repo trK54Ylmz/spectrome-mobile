@@ -23,18 +23,18 @@ class ShareService extends Service {
     };
     final body = <String, dynamic>{
       'disposible': disposible,
-      'resticted': restricted,
+      'restricted': restricted,
       'comment': comment,
     };
 
     // Create users list
     for (int i = 0; i < users.length; i++) {
-      body['user-$i'] = users[i];
+      body['users-$i'] = users[i];
     }
 
     // Create scales for photo and video resize
     for (int i = 0; i < scales.length; i++) {
-      body['scale-$i'] = scales[i];
+      body['scales-$i'] = scales[i];
     }
 
     // Create post files which are photos and videos
@@ -42,8 +42,8 @@ class ShareService extends Service {
       final ext = files[i].path.split('.').last;
       final type = ext == 'mp4' ? AppConst.video : AppConst.photo;
 
-      body['type-$i'] = type;
-      body['file-$i'] = files[i];
+      body['types-$i'] = type;
+      body['files-$i'] = files[i];
     }
 
     // Http response handle callback
@@ -70,6 +70,7 @@ class ShareService extends Service {
       body: body,
       headers: headers,
       type: Http.MULTIPART,
+      timeout: Duration(seconds: 60),
     );
 
     return r.then(c).catchError(e);

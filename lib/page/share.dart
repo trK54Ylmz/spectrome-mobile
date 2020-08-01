@@ -48,7 +48,7 @@ class _ShareState extends State<SharePage> {
   // Post is disposible
   bool _disposible = false;
 
-  // Post is resticted for users
+  // Post is restricted for users
   bool _restricted = false;
 
   @override

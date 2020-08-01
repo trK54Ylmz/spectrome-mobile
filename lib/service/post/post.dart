@@ -23,14 +23,11 @@ class PostAsset {
 
   final int type;
 
-  final int duration;
-
   final String url;
 
   const PostAsset({
     this.name,
     this.type,
-    this.duration,
     this.url,
   });
 }
@@ -40,8 +37,6 @@ class Post {
 
   final List<PostAsset> assets;
 
-  final List<String> tags;
-
   final int width;
 
   final int height;
@@ -50,7 +45,6 @@ class Post {
   const Post({
     this.username,
     this.assets,
-    this.tags,
     this.width,
     this.height,
   });
@@ -76,7 +70,6 @@ class PostResponse extends BasicResponse {
     final a = (Map<String, dynamic> a) {
       return new PostAsset(
         name: a['name'] as String,
-        duration: a['duration'] ?? null,
         type: PostAssetType.from(a['type']),
       );
     };
@@ -87,7 +80,6 @@ class PostResponse extends BasicResponse {
     post = new Post(
       username: p['username'] as String,
       assets: assets.map(a),
-      tags: p['tags'] as List<String>,
       width: p['width'] as int,
       height: p['height'] as int,
     );
