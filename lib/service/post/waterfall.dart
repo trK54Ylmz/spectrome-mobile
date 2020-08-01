@@ -72,7 +72,6 @@ class WaterFallResponse extends BasicResponse {
       final a = (Map<String, dynamic> a) {
         return new PostAsset(
           name: a['name'] as String,
-          duration: a['duration'] ?? null,
           type: PostAssetType.from(a['type']),
         );
       };
@@ -84,7 +83,6 @@ class WaterFallResponse extends BasicResponse {
         return new Post(
           username: p['username'] as String,
           assets: assets.map(a),
-          tags: p['tags'] as List<String>,
           width: p['width'] as int,
           height: p['height'] as int,
         );

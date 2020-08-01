@@ -102,6 +102,9 @@ class Http {
           case FORM:
             r.headers.add(Http.CONTENT_HEADER, FORM);
             break;
+          case MULTIPART:
+            r.headers.add(Http.CONTENT_HEADER, MULTIPART);
+            break;
         }
       }
 
@@ -110,23 +113,21 @@ class Http {
         // Prepare multipart form
         if (type == Http.MULTIPART) {
           // Remove plain multipart header
-          if (headers.containsKey(Http.CONTENT_HEADER)) {
-            headers.remove(Http.CONTENT_HEADER);
-          }
+          r.headers.removeAll(Http.CONTENT_HEADER);
 
           // Create boundry header
           final a = new DateTime.now().toString();
           final b = new DateTime.now().millisecondsSinceEpoch;
           final hash = md5.convert(utf8.encode(a)).toString();
           final boundry = '$hash-$b';
-          final header = '${Http.CONTENT_HEADER}; boundary=$boundry';
+          final header = '${Http.MULTIPART}; boundary=$boundry';
 
           // Set multipart header
-          headers[Http.CONTENT_HEADER] = header;
+          r.headers.add(Http.CONTENT_HEADER, header);
 
           for (var key in body.keys) {
             // Write start header
-            r.write(boundry + '\n');
+            r.write('--$boundry\n');
 
             if (body[key] is File) {
               final file = body[key] as File;
@@ -144,13 +145,10 @@ class Http {
               final type = ft == 'mp4' ? 'image/mp4' : 'image/jpeg';
 
               r.write('Content-Disposition: form-data; name="$key"; filename="$name"\n');
-              r.write('Content-Type: $type');
+              r.write('Content-Type: $type\n');
               r.write('\n');
-              
-              final s = file.openRead();
 
-              // Write file content
-              s.map((chunk) => r.add(chunk));
+              r.add(file.readAsBytesSync());
 
               r.write('\n');
             } else {
@@ -158,11 +156,12 @@ class Http {
               r.write('Content-Disposition: form-data; name="$key"\n');
               r.write('\n');
               r.write(body[key].toString());
+              r.write('\n');
             }
           }
 
           // Write final ending boundry
-          r.write(boundry + '--');
+          r.write('--$boundry--');
         } else {
           // Plain form data
           final form = <String>[];
