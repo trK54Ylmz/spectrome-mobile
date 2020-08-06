@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spectrome/item/button.dart';
+import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/item/video.dart';
 import 'package:spectrome/page/view.dart';
@@ -25,7 +27,11 @@ class SharePage extends StatefulWidget {
 }
 
 class _ShareState extends State<SharePage> {
-  final _sk = GlobalKey<ScaffoldState>();
+  // Scaffold key
+  final _sk = new GlobalKey<ScaffoldState>();
+
+  // Page view controller
+  final _pc = new PageController();
 
   // Comment input controller
   final _cc = new TextEditingController();
@@ -36,11 +42,11 @@ class _ShareState extends State<SharePage> {
   // List of shared users
   final _users = <String>[];
 
-  // Session value
-  String _session;
+  // Post screen size
+  int _size = 2;
 
-  // Is page view scrollable
-  bool _scrollable = true;
+  // Scale operation is active or not
+  bool _scale = false;
 
   // Loading indicator
   bool _loading = true;
@@ -51,9 +57,22 @@ class _ShareState extends State<SharePage> {
   // Post is restricted for users
   bool _restricted = false;
 
+  // Current post index
+  int _ci = 0;
+
+  // Session value
+  String _session;
+
   @override
   void initState() {
     super.initState();
+
+    // Add page controller listener
+    _pc.addListener(() {
+      if (_pc.page.round() != _ci) {
+        setState(() => _ci = _pc.page.round());
+      }
+    });
 
     // Shared preferences callback
     final c = (SharedPreferences sp) {
@@ -79,7 +98,7 @@ class _ShareState extends State<SharePage> {
 
   /// Get page widget
   Widget _getPage(List<File> files) {
-    final _cb = new Padding(
+    final cb = new Padding(
       padding: EdgeInsets.only(top: 7.0),
       child: new Text(
         'Cancel',
@@ -93,7 +112,7 @@ class _ShareState extends State<SharePage> {
     );
 
     final clr = ColorConst.darkerGray;
-    final _sb = new Padding(
+    final sb = new Padding(
       padding: EdgeInsets.only(top: 7.0),
       child: new Text(
         'Share',
@@ -101,7 +120,7 @@ class _ShareState extends State<SharePage> {
           fontFamily: FontConst.primary,
           fontSize: 14.0,
           letterSpacing: 0.33,
-          color: _loading ? clr.withOpacity(0.33) : clr,
+          color: _loading || _scale ? clr.withOpacity(0.33) : clr,
         ),
       ),
     );
@@ -113,7 +132,12 @@ class _ShareState extends State<SharePage> {
           icon: new Container(),
         ),
         BottomNavigationBarItem(
-          icon: new Loading(iconWidth: 40.0, iconHeight: 40.0),
+          icon: new Center(
+            child: new Loading(
+              iconWidth: 40.0,
+              iconHeight: 40.0,
+            ),
+          ),
         ),
         BottomNavigationBarItem(
           icon: new Container(),
@@ -122,12 +146,12 @@ class _ShareState extends State<SharePage> {
     } else {
       items = [
         BottomNavigationBarItem(
-          icon: _cb,
-          activeIcon: _cb,
+          icon: cb,
+          activeIcon: cb,
         ),
         BottomNavigationBarItem(
-          icon: _sb,
-          activeIcon: _sb,
+          icon: sb,
+          activeIcon: sb,
         ),
       ];
     }
@@ -146,6 +170,11 @@ class _ShareState extends State<SharePage> {
           onTap: (index) async {
             // Disable click while loading
             if (_loading) {
+              return;
+            }
+
+            // Disable click while post scaling
+            if (_scale) {
               return;
             }
 
@@ -170,125 +199,599 @@ class _ShareState extends State<SharePage> {
   /// Get share form
   Widget _getForm(List<File> files) {
     final width = MediaQuery.of(context).size.width;
+    final hp = width > 400.0 ? 32.0 : 16.0;
 
-    Widget w;
-    if (files.length > 1) {
-      final items = <Widget>[];
+    final pt = new Padding(
+      padding: EdgeInsets.only(top: 8.0),
+    );
 
-      for (int i = 0; i < files.length; i++) {
-        // Create resizable photo or video widget
-        Widget b;
-        if (_scales.elementAt(i) == 1.0) {
-          b = new FittedBox(
-            fit: BoxFit.cover,
-            child: _getItem(files[i]),
-          );
-        } else {
-          b = new Transform(
-            transform: new Matrix4.diagonal3(
-              new Vector3(
-                _scales[i],
-                _scales[i],
-                _scales[i],
-              ),
-            ),
-            alignment: AlignmentDirectional.center,
-            child: _getItem(files[i]),
-          );
+    final ptl = new Padding(
+      padding: EdgeInsets.only(top: 16.0),
+    );
+
+    // Get post item by number of files
+    final i = (files.length > 1) ? _getCarousel(files) : _getSingle(files);
+
+    // Disposibility text
+    final dt = new Padding(
+      padding: EdgeInsets.all(8.0),
+      child: new Text(
+        'Make this post disappear in 24 hours?',
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          color: ColorConst.darkGray,
+          fontSize: 14.0,
+          letterSpacing: 0.33,
+        ),
+      ),
+    );
+
+    // Disposible button
+    final db = new Button(
+      text: _disposible ? 'Yes'.toUpperCase() : 'No'.toUpperCase(),
+      width: 64.0,
+      onPressed: () {
+        if (_loading) {
+          return;
         }
 
-        final c = new GestureDetector(
-          onScaleStart: _scaleStart,
-          onScaleEnd: _scaleEnd,
-          onScaleUpdate: (d) => _scaleUpdate(d, i),
-          child: new Container(
-            width: width,
-            height: width,
-            decoration: new BoxDecoration(
-              border: Border(
-                top: BorderSide(
-                  color: ColorConst.gray.withOpacity(0.67),
-                  width: 0.5,
-                ),
-                bottom: BorderSide(
-                  color: ColorConst.gray.withOpacity(0.67),
-                  width: 0.5,
-                ),
-              ),
-            ),
-            child: new ClipRect(
-              child: OverflowBox(
-                alignment: Alignment.center,
-                child: b,
-              ),
-            ),
-          ),
-        );
+        // Update disposibility
+        setState(() => _disposible = !_disposible);
+      },
+      padding: EdgeInsets.all(6.0),
+      color: _disposible ? ColorConst.white : ColorConst.gray,
+      background: _disposible ? ColorConst.button : ColorConst.white,
+      border: Border.all(
+        color: _disposible ? ColorConst.button : ColorConst.gray,
+      ),
+    );
 
-        items.add(c);
+    // Disposibility row
+    final ds = new Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: hp,
+        vertical: 8.0,
+      ),
+      child: new Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          dt,
+          db,
+        ],
+      ),
+    );
+
+    // Share with friends text
+    final st = new Padding(
+      padding: EdgeInsets.all(8.0),
+      child: new Text(
+        'Share post with only few followers?',
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          color: ColorConst.darkGray,
+          fontSize: 14.0,
+          letterSpacing: 0.33,
+        ),
+      ),
+    );
+
+    // Share with friends button
+    final sb = new Button(
+      text: _restricted ? 'Yes'.toUpperCase() : 'No'.toUpperCase(),
+      width: 64.0,
+      onPressed: () {
+        if (_loading) {
+          return;
+        }
+
+        // Update restriction
+        setState(() => _restricted = !_restricted);
+      },
+      padding: EdgeInsets.all(6.0),
+      color: _restricted ? ColorConst.white : ColorConst.gray,
+      background: _restricted ? ColorConst.button : ColorConst.white,
+      border: Border.all(
+        color: _restricted ? ColorConst.button : ColorConst.gray,
+      ),
+    );
+
+    // Share with friends row
+    final sf = new Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: hp,
+        vertical: 8.0,
+      ),
+      child: new Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          st,
+          sb,
+        ],
+      ),
+    );
+
+    final ts = new TextStyle(
+      fontFamily: FontConst.primary,
+      fontSize: 14.0,
+      letterSpacing: 0.33,
+    );
+
+    final hs = new TextStyle(
+      fontFamily: FontConst.primary,
+      fontSize: 14.0,
+      letterSpacing: 0.33,
+      color: ColorConst.gray,
+    );
+
+    // Comment text field hint value
+    String cm;
+    if (_restricted) {
+      String um;
+      if (_users.length > 2) {
+        um = _users.sublist(0, 2).join(', ') + ' and others.';
+      } else {
+        um = _users.join(' and ');
       }
 
-      w = new Container(
-        width: width,
-        height: width,
-        child: new PageView(
-          physics: _scrollable ? ClampingScrollPhysics() : NeverScrollableScrollPhysics(),
-          children: items,
-        ),
-      );
+      cm = 'message $um';
     } else {
+      cm = 'share message with your friends';
+    }
+
+    // Comment text field
+    final ct = new Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: hp,
+        vertical: 8.0,
+      ),
+      child: new FormText(
+        hint: cm,
+        style: ts,
+        hintStyle: hs,
+      ),
+    );
+
+    return new SafeArea(
+      child: new SingleChildScrollView(
+        physics: ClampingScrollPhysics(),
+        child: new Container(
+          child: new Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              pt,
+              ds,
+              ptl,
+              i,
+              ptl,
+              sf,
+              pt,
+              ct,
+              pt,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Get carousel post widget
+  Widget _getCarousel(List<File> files) {
+    final size = ScreenConst.fromValue(_size);
+
+    final width = MediaQuery.of(context).size.width;
+    final height = (width / size.first) * size.last;
+
+    final ptl = new Padding(
+      padding: EdgeInsets.only(top: 16.0),
+    );
+
+    final items = <Widget>[];
+
+    for (int i = 0; i < files.length; i++) {
       // Create resizable photo or video widget
       Widget b;
-      if (_scales.elementAt(0) == 1.0) {
+      if (_scales.elementAt(i) == 1.0) {
         b = new FittedBox(
           fit: BoxFit.cover,
-          child: _getItem(files[0]),
+          child: _getItem(files[i]),
         );
       } else {
         b = new Transform(
           transform: new Matrix4.diagonal3(
             new Vector3(
-              _scales[0],
-              _scales[0],
-              _scales[0],
+              _scales[i],
+              _scales[i],
+              _scales[i],
             ),
           ),
           alignment: AlignmentDirectional.center,
-          child: _getItem(files[0]),
+          child: _getItem(files[i]),
         );
       }
 
-      w = new Container(
-        width: width,
-        height: width,
+      // Scaleable gesture widget that contains post item
+      final c = new GestureDetector(
+        onScaleStart: _scaleStart,
+        onScaleEnd: _scaleEnd,
+        onScaleUpdate: (d) => _scaleUpdate(d, i),
+        child: new Container(
+          width: width,
+          height: height,
+          decoration: new BoxDecoration(
+            border: Border(
+              top: BorderSide(
+                color: ColorConst.gray.withOpacity(0.67),
+                width: 0.5,
+              ),
+              bottom: BorderSide(
+                color: ColorConst.gray.withOpacity(0.67),
+                width: 0.5,
+              ),
+            ),
+          ),
+          child: new ClipRect(
+            child: OverflowBox(
+              alignment: Alignment.center,
+              child: b,
+            ),
+          ),
+        ),
+      );
+
+      items.add(c);
+    }
+
+    // Wide post button
+    final wb = new Expanded(
+      flex: 1,
+      child: new Semantics(
+        button: true,
+        child: new GestureDetector(
+          onTap: () {
+            if (_loading) {
+              return;
+            }
+
+            setState(() => _size = 1);
+          },
+          child: new Container(
+            decoration: new BoxDecoration(
+              color: _size == 1 ? ColorConst.white : ColorConst.gray.withOpacity(0.33),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(8.0),
+                bottomLeft: Radius.circular(8.0),
+              ),
+            ),
+            child: new Padding(
+              padding: EdgeInsets.all(8.0),
+              child: new Text(
+                'Wide'.toUpperCase(),
+                style: new TextStyle(
+                  fontFamily: FontConst.primary,
+                  fontSize: 12.0,
+                  color: _size == 1 ? ColorConst.darkerGray : ColorConst.gray,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // Square post button
+    final sb = new Expanded(
+      flex: 1,
+      child: new Semantics(
+        button: true,
+        child: new GestureDetector(
+          onTap: () {
+            if (_loading) {
+              return;
+            }
+
+            setState(() => _size = 2);
+          },
+          child: new Container(
+            decoration: new BoxDecoration(
+              color: _size == 2 ? ColorConst.white : ColorConst.gray.withOpacity(0.33),
+              border: Border(
+                left: new BorderSide(
+                  color: ColorConst.gray.withOpacity(0.67),
+                ),
+                right: new BorderSide(
+                  color: ColorConst.gray.withOpacity(0.67),
+                ),
+              ),
+            ),
+            child: new Padding(
+              padding: EdgeInsets.all(8.0),
+              child: new Text(
+                'Square'.toUpperCase(),
+                style: new TextStyle(
+                  fontFamily: FontConst.primary,
+                  fontSize: 12.0,
+                  color: _size == 2 ? ColorConst.darkerGray : ColorConst.gray,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // Tall post button
+    final tb = new Expanded(
+      flex: 1,
+      child: new Semantics(
+        button: true,
+        child: new GestureDetector(
+          onTap: () {
+            if (_loading) {
+              return;
+            }
+
+            setState(() => _size = 3);
+          },
+          child: new Container(
+            decoration: new BoxDecoration(
+              color: _size == 3 ? ColorConst.white : ColorConst.gray.withOpacity(0.33),
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(8.0),
+                bottomRight: Radius.circular(8.0),
+              ),
+            ),
+            child: new Padding(
+              padding: EdgeInsets.all(8.0),
+              child: new Text(
+                'Tall'.toUpperCase(),
+                style: new TextStyle(
+                  fontFamily: FontConst.primary,
+                  fontSize: 12.0,
+                  color: _size == 3 ? ColorConst.darkerGray : ColorConst.gray,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // Post size row
+    final w = new Center(
+      child: new Container(
+        width: 220.0,
         decoration: new BoxDecoration(
-          border: Border(
-            top: BorderSide(
-              color: ColorConst.gray.withOpacity(0.67),
-              width: 0.5,
+          borderRadius: BorderRadius.all(Radius.circular(8.0)),
+          border: new Border.all(
+            color: ColorConst.gray.withOpacity(0.67),
+          ),
+        ),
+        child: new Row(
+          children: <Widget>[
+            wb,
+            sb,
+            tb,
+          ],
+        ),
+      ),
+    );
+
+    // Post items container
+    final c = new Container(
+      width: width,
+      height: height,
+      child: new PageView(
+        controller: _pc,
+        physics: NeverScrollableScrollPhysics(),
+        children: items,
+      ),
+    );
+
+    // Active dot icon
+    final ad = new Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 2.0,
+        vertical: 4.0,
+      ),
+      child: new Icon(
+        const IconData(
+          0xf111,
+          fontFamily: FontConst.fa,
+        ),
+        color: const Color(0xff666666),
+        size: 6.0,
+      ),
+    );
+
+    // Passive dot icon
+    final pd = new Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 2.0,
+        vertical: 4.0,
+      ),
+      child: new Icon(
+        const IconData(
+          0xf111,
+          fontFamily: FontConst.fa,
+        ),
+        color: const Color(0xffcccccc),
+        size: 6.0,
+      ),
+    );
+
+    // Previous button
+    final pb = new Expanded(
+      flex: 2,
+      child: new Semantics(
+        button: true,
+        child: new GestureDetector(
+          onTap: () {
+            // Stop for out of bounds
+            if (_ci == 0) {
+              return;
+            }
+
+            // Go to previous page
+            _pc.animateToPage(
+              _ci - 1,
+              duration: Duration(seconds: 1),
+              curve: Curves.ease,
+            );
+          },
+          child: new Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 32.0,
+              vertical: 16.0,
             ),
-            bottom: BorderSide(
-              color: ColorConst.gray.withOpacity(0.67),
-              width: 0.5,
+            child: new Text(
+              'Previous',
+              style: new TextStyle(
+                fontFamily: FontConst.primary,
+                fontSize: 14.0,
+                letterSpacing: 0.33,
+                color: _ci == 0 ? ColorConst.gray : ColorConst.darkGray,
+              ),
+              textAlign: TextAlign.center,
             ),
           ),
         ),
-        child: new ClipRect(
-          child: OverflowBox(
-            alignment: Alignment.center,
-            child: b,
+      ),
+    );
+
+    // Next button
+    final nb = new Expanded(
+      flex: 2,
+      child: new Semantics(
+        button: true,
+        child: new GestureDetector(
+          onTap: () {
+            // Stop for out of bounds
+            if (_ci + 1 == files.length) {
+              return;
+            }
+
+            // Go to next page
+            _pc.animateToPage(
+              _ci + 1,
+              duration: Duration(seconds: 1),
+              curve: Curves.easeInOut,
+            );
+          },
+          child: new Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 32.0,
+              vertical: 16.0,
+            ),
+            child: new Text(
+              'Next',
+              style: new TextStyle(
+                fontFamily: FontConst.primary,
+                fontSize: 14.0,
+                letterSpacing: 0.33,
+                color: _ci + 1 == files.length ? ColorConst.gray : ColorConst.darkGray,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
+      ),
+    );
+
+    final ici = <Widget>[];
+    for (int i = 0; i < files.length; i++) {
+      ici.add(_ci == i ? ad : pd);
+    }
+
+    // Post index indicator
+    final ic = new Expanded(
+      flex: 1,
+      child: new Center(
+        child: new Padding(
+          padding: EdgeInsets.all(16.0),
+          child: new Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: ici,
+          ),
+        ),
+      ),
+    );
+
+    // Next and previous buttons
+    final b = new Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        pb,
+        ic,
+        nb,
+      ],
+    );
+
+    return new Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        w,
+        ptl,
+        c,
+        ptl,
+        b,
+      ],
+    );
+  }
+
+  /// Get single item post widget
+  Widget _getSingle(List<File> files) {
+    final width = MediaQuery.of(context).size.width;
+
+    // Create resizable photo or video widget
+    Widget b;
+    if (_scales.elementAt(0) == 1.0) {
+      b = new FittedBox(
+        fit: BoxFit.cover,
+        child: _getItem(files[0]),
+      );
+    } else {
+      b = new Transform(
+        transform: new Matrix4.diagonal3(
+          new Vector3(
+            _scales[0],
+            _scales[0],
+            _scales[0],
+          ),
+        ),
+        alignment: AlignmentDirectional.center,
+        child: _getItem(files[0]),
       );
     }
 
     return new Container(
-      child: new Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          w,
-        ],
+      width: width,
+      height: width,
+      decoration: new BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: ColorConst.gray.withOpacity(0.67),
+            width: 0.5,
+          ),
+          bottom: BorderSide(
+            color: ColorConst.gray.withOpacity(0.67),
+            width: 0.5,
+          ),
+        ),
+      ),
+      child: new ClipRect(
+        child: OverflowBox(
+          alignment: Alignment.center,
+          child: b,
+        ),
       ),
     );
   }
@@ -312,9 +815,9 @@ class _ShareState extends State<SharePage> {
     _sk.currentState.showSnackBar(snackBar);
   }
 
-  /// Stop scrollability when scale start
+  /// Start scroll operation, stops if video plays etc.
   void _scaleStart(ScaleStartDetails details) {
-    setState(() => _scrollable = false);
+    setState(() => _scale = true);
   }
 
   /// Update scale value when scale operation on going
@@ -322,9 +825,9 @@ class _ShareState extends State<SharePage> {
     setState(() => _scales[index] = details.scale);
   }
 
-  /// Start scrollability when scale stop
+  /// Stop scroll operation, starts video play etc.
   void _scaleEnd(ScaleEndDetails details) {
-    setState(() => _scrollable = true);
+    setState(() => _scale = false);
   }
 
   /// Get file widget according to it's type
@@ -367,7 +870,6 @@ class _ShareState extends State<SharePage> {
 
     // Error callback
     final e = (e, s) {
-      print(e);
       final msg = 'Unknown error. Please try again later.';
 
       // Create unknown error message

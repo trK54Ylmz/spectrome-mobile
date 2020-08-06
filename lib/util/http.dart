@@ -148,7 +148,24 @@ class Http {
               r.write('Content-Type: $type\n');
               r.write('\n');
 
-              r.add(file.readAsBytesSync());
+              // Open file for read
+              final fr = file.openSync();
+
+              final bs = 4096;
+              final size = file.lengthSync();
+
+              int position = 0;
+
+              // Iterate through the file write to response stream
+              while (position < size) {
+                final bytes = fr.readSync(bs);
+                r.add(bytes);
+
+                // Update current position of the reader
+                position = fr.positionSync();
+              }
+
+              fr.closeSync();
 
               r.write('\n');
             } else {

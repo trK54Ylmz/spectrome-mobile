@@ -84,7 +84,7 @@ class _ButtonState extends State<Button> {
             decoration: BoxDecoration(
               color: c ? widget.background.withOpacity(0.67) : widget.background,
               border: widget.border,
-              borderRadius: widget.border == null ? widget.radius : null,
+              borderRadius: widget.radius,
             ),
             child: new Text(
               widget.text,
