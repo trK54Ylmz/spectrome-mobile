@@ -8,6 +8,7 @@ import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/item/video.dart';
+import 'package:spectrome/page/restriction.dart';
 import 'package:spectrome/page/view.dart';
 import 'package:spectrome/service/share/share.dart';
 import 'package:spectrome/theme/color.dart';
@@ -280,13 +281,26 @@ class _ShareState extends State<SharePage> {
     final sb = new Button(
       text: _restricted ? 'Yes'.toUpperCase() : 'No'.toUpperCase(),
       width: 64.0,
-      onPressed: () {
+      onPressed: () async {
         if (_loading) {
           return;
         }
 
-        // Update restriction
-        setState(() => _restricted = !_restricted);
+        if (_restricted) {
+          _users.clear();
+
+          setState(() => _restricted = false);
+        } else {
+          // Open new screen to add or remove users from restriction
+          final u = await Navigator.of(context).pushNamed(RestrictionPage.tag);
+
+          // Clear users and populate new selection
+          _users.clear();
+          _users.addAll(u as List<String>);
+
+          // Update restriction
+          setState(() => _restricted = _users.isEmpty ? false : true);
+        }
       },
       padding: EdgeInsets.all(6.0),
       color: _restricted ? ColorConst.white : ColorConst.gray,
@@ -347,15 +361,20 @@ class _ShareState extends State<SharePage> {
         vertical: 8.0,
       ),
       child: new FormText(
+        controller: _cc,
         hint: cm,
         style: ts,
         hintStyle: hs,
+        expands: true,
+        maxLines: null,
+        minLines: null,
+        size: 4000,
       ),
     );
 
     return new SafeArea(
       child: new SingleChildScrollView(
-        physics: ClampingScrollPhysics(),
+        physics: const ClampingScrollPhysics(),
         child: new Container(
           child: new Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -749,7 +768,10 @@ class _ShareState extends State<SharePage> {
 
   /// Get single item post widget
   Widget _getSingle(List<File> files) {
+    final size = ScreenConst.fromValue(_size);
+
     final width = MediaQuery.of(context).size.width;
+    final height = (width / size.first) * size.last;
 
     // Create resizable photo or video widget
     Widget b;
@@ -772,25 +794,30 @@ class _ShareState extends State<SharePage> {
       );
     }
 
-    return new Container(
-      width: width,
-      height: width,
-      decoration: new BoxDecoration(
-        border: Border(
-          top: BorderSide(
-            color: ColorConst.gray.withOpacity(0.67),
-            width: 0.5,
-          ),
-          bottom: BorderSide(
-            color: ColorConst.gray.withOpacity(0.67),
-            width: 0.5,
+    return new GestureDetector(
+      onScaleStart: _scaleStart,
+      onScaleEnd: _scaleEnd,
+      onScaleUpdate: (d) => _scaleUpdate(d, 0),
+      child: new Container(
+        width: width,
+        height: height,
+        decoration: new BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              color: ColorConst.gray.withOpacity(0.67),
+              width: 0.5,
+            ),
+            bottom: BorderSide(
+              color: ColorConst.gray.withOpacity(0.67),
+              width: 0.5,
+            ),
           ),
         ),
-      ),
-      child: new ClipRect(
-        child: OverflowBox(
-          alignment: Alignment.center,
-          child: b,
+        child: new ClipRect(
+          child: OverflowBox(
+            alignment: Alignment.center,
+            child: b,
+          ),
         ),
       ),
     );

@@ -156,6 +156,7 @@ class CameraState extends State<CameraPage> {
       backgroundColor: ColorConst.white,
       body: new SafeArea(
         child: new SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
           child: new Container(
             width: width,
             height: height,

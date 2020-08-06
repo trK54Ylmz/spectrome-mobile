@@ -9,7 +9,7 @@ class ScreenConst {
 
   static const square = [720, 720];
 
-  static const tall = [720, 920];
+  static const tall = [720, 960];
 
   /// Get screen size from identifier
   static List<int> fromValue(int value) {
