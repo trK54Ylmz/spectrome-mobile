@@ -24,3 +24,8 @@ Screens for the application
     <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/5.jpg" width="264"></kbd>
     <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/6.jpg" width="264"></kbd>
 </p>
+<p align="center">
+    <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/8.jpg" width="264"></kbd>
+    <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/9.jpg" width="264"></kbd>
+    <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/10.jpg" width="264"></kbd>
+</p>

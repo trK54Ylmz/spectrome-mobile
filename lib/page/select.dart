@@ -208,7 +208,7 @@ class _SelectState extends State<SelectPage> {
 
     // Cancel button
     final cbt = new Padding(
-      padding: EdgeInsets.only(top: 7.0),
+      padding: EdgeInsets.only(top: 2.0),
       child: new Text(
         'Cancel',
         style: new TextStyle(
@@ -222,7 +222,7 @@ class _SelectState extends State<SelectPage> {
     
     // Next button
     final nbt = new Padding(
-      padding: EdgeInsets.only(top: 7.0),
+      padding: EdgeInsets.only(top: 2.0),
       child: new Text(
         'Next',
         style: new TextStyle(

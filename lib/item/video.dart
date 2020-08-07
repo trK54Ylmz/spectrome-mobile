@@ -69,13 +69,11 @@ class _VideoState extends State<Video> {
 
         _vol = _cc.videoPlayerController.value.volume;
 
-        setState(() => _loading = false);
+        _loading = false;
       };
 
       _vc.initialize().then(c);
     } else {
-      _loading = false;
-
       // Create chewie controller
       _cc = new ChewieController(
         videoPlayerController: _vc,
@@ -89,6 +87,8 @@ class _VideoState extends State<Video> {
       );
 
       _vol = _cc.videoPlayerController.value.volume;
+
+      _loading = false;
     }
   }
 

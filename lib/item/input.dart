@@ -9,6 +9,8 @@ typedef CallbackFunc<T> = T Function(T value);
 class FormText extends StatefulWidget {
   final TextEditingController controller;
 
+  final ScrollController scrollController;
+
   final String initialValue;
 
   final FocusNode focusNode;
@@ -47,9 +49,16 @@ class FormText extends StatefulWidget {
 
   final int size;
 
+  final int maxLines;
+
+  final int minLines;
+
+  final bool expands;
+
   FormText({
     Key key,
     this.controller,
+    this.scrollController,
     this.initialValue,
     this.focusNode,
     this.onSaved,
@@ -60,11 +69,14 @@ class FormText extends StatefulWidget {
     this.hintStyle,
     this.inputType = TextInputType.text,
     this.onChange,
+    this.maxLines,
+    this.minLines,
     this.size = 1000,
     this.radius = 8.0,
     this.cursorWidth = 1.0,
     this.enabled = true,
     this.obscure = false,
+    this.expands = false,
     this.showObscure = false,
     this.textAlign = TextAlign.start,
     this.borderColor = const Color(0xffcccccc),
@@ -143,6 +155,9 @@ class TextInputState extends State<FormText> {
       maxLength: widget.size,
       cursorWidth: widget.cursorWidth,
       textAlign: widget.textAlign,
+      maxLines: widget.maxLines,
+      expands: widget.expands,
+      scrollController: widget.scrollController,
       obscureText: obscure,
       suffix: suffix,
       decoration: new BoxDecoration(
