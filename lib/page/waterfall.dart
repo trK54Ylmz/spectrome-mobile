@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/post.dart';
 import 'package:spectrome/item/shimmer.dart';
-import 'package:spectrome/service/post/post.dart';
+import 'package:spectrome/model/post/post.dart';
 import 'package:spectrome/service/post/waterfall.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/util/storage.dart';
@@ -48,8 +48,8 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
     });
 
     // Shared preferences callback
-    final c = (SharedPreferences sp) {
-      final session = sp.getString('_session');
+    final c = (SharedPreferences s) {
+      final session = s.getString('_session');
 
       setState(() => _session = session);
     };
@@ -95,7 +95,7 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
   bool get wantKeepAlive => true;
 
   /// Show error when error not empty
-  void _showSnackBar(String message, {isError = true}) {
+  void _showSnackBar(String message, {bool isError = true}) {
     final snackBar = SnackBar(
       content: Text(message),
       backgroundColor: isError ? ColorConst.darkRed : ColorConst.dark,

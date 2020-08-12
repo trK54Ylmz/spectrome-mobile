@@ -1,7 +1,7 @@
 import 'dart:developer' as dev;
 
+import 'package:spectrome/model/post/post.dart';
 import 'package:spectrome/service/base.dart';
-import 'package:spectrome/service/post/post.dart';
 import 'package:spectrome/service/response.dart';
 import 'package:spectrome/util/http.dart';
 
