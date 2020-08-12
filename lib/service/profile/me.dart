@@ -1,5 +1,6 @@
 import 'dart:developer' as dev;
 
+import 'package:spectrome/model/profile/me.dart';
 import 'package:spectrome/service/base.dart';
 import 'package:spectrome/service/response.dart';
 import 'package:spectrome/util/http.dart';
@@ -36,27 +37,6 @@ class MyProfileService extends Service {
 
     return r.then(c).catchError(e);
   }
-}
-
-class MyProfile {
-  final String username;
-
-  final String name;
-
-  final String photoUrl;
-
-  final int followers;
-
-  final int followings;
-
-  /// Create my profile object
-  const MyProfile({
-    this.username,
-    this.name,
-    this.photoUrl,
-    this.followers,
-    this.followings,
-  });
 }
 
 class MyProfileResponse extends BasicResponse {

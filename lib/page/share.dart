@@ -824,7 +824,7 @@ class _ShareState extends State<SharePage> {
   }
 
   /// Show error when error not empty
-  void _showSnackBar(String message, {isError = true}) {
+  void _showSnackBar(String message, {bool isError = true}) {
     final snackBar = SnackBar(
       content: new Padding(
         padding: EdgeInsets.symmetric(vertical: 4.0),

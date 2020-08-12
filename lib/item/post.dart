@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:spectrome/service/post/post.dart';
+import 'package:spectrome/model/post/post.dart';
 
 class PostCard extends StatefulWidget {
   // Post item
