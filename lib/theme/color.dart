@@ -21,5 +21,7 @@ class ColorConst {
 
   static const gray = const Color(0xffcccccc);
 
+  static const lightGray = const Color(0xffeeeeee);
+
   static const success = const Color(0xff2c974b);
 }

@@ -30,6 +30,8 @@ flutter:
     - assets/images/logo.png
     - assets/images/logo@2x.png
     - assets/images/loading.gif
+    - assets/images/default.1.webp
+    - assets/images/default.2.webp
   
   fonts:
     - family: Primary Regular

@@ -57,7 +57,14 @@ class _ButtonState extends State<Button> {
 
   @override
   Widget build(BuildContext context) {
-    final c = _active || widget.disabled;
+    bool b, c;
+    if (widget.background == ColorConst.transparent) {
+      b = false;
+      c = _active || widget.disabled;
+    } else {
+      b = _active || widget.disabled;
+      c = true;
+    }
 
     return new GestureDetector(
       onTapDown: (_) {
@@ -82,7 +89,7 @@ class _ButtonState extends State<Button> {
           child: new Container(
             padding: widget.padding,
             decoration: BoxDecoration(
-              color: c ? widget.background.withOpacity(0.67) : widget.background,
+              color: b ? widget.background.withOpacity(0.67) : widget.background,
               border: widget.border,
               borderRadius: widget.radius,
             ),
