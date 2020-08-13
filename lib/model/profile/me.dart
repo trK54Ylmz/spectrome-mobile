@@ -7,6 +7,8 @@ class MyProfile {
 
   final String photoUrl;
 
+  final int posts;
+
   final int followers;
 
   final int followings;
@@ -16,6 +18,7 @@ class MyProfile {
     this.username,
     this.name,
     this.photoUrl,
+    this.posts,
     this.followers,
     this.followings,
   });
@@ -25,7 +28,8 @@ class MyProfile {
     final items = {
       'u': username,
       'n': name,
-      'p': photoUrl,
+      'i': photoUrl,
+      'p': posts,
       'f': followings,
       't': followers,
     };
@@ -40,7 +44,8 @@ class MyProfile {
     return MyProfile(
       username: items.containsKey('u') ? items['u'] : null,
       name: items.containsKey('n') ? items['n'] : null,
-      photoUrl: items.containsKey('p') ? items['p'] : null,
+      photoUrl: items.containsKey('i') ? items['i'] : null,
+      posts: items.containsKey('p') ? items['p'] : null,
       followings: items.containsKey('f') ? items['f'] : null,
       followers: items.containsKey('t') ? items['t'] : null,
     );
