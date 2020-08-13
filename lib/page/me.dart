@@ -4,9 +4,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spectrome/item/button.dart';
 import 'package:spectrome/model/profile/me.dart';
 import 'package:spectrome/page/sign_in.dart';
+import 'package:spectrome/service/account/sign_out.dart';
 import 'package:spectrome/service/profile/me.dart';
+import 'package:spectrome/service/response.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
@@ -41,6 +44,9 @@ class _MeState extends State<MePage> {
 
   // Profile object
   MyProfile _profile;
+
+  // Settings overlay entry
+  OverlayEntry _oe;
 
   @override
   void initState() {
@@ -83,28 +89,51 @@ class _MeState extends State<MePage> {
   /// Get page widget
   Widget _getPage() {
     final width = MediaQuery.of(context).size.width;
+    final hp = width > 400.0 ? 64.0 : 32.0;
+
+    final pt = const Padding(
+      padding: EdgeInsets.only(top: 8.0),
+    );
 
     // Http headers for image request
     final h = {Http.CONTENT_HEADER: _session};
 
     // Profile picture
     final p = new Padding(
-      padding: EdgeInsets.all(10.0),
+      padding: EdgeInsets.all(hp),
       child: new Container(
-        width: 40,
-        height: 40,
-        child: new CachedNetworkImage(
-          imageUrl: _profile.photoUrl,
-          httpHeaders: h,
+        decoration: new BoxDecoration(
+          border: new Border.all(
+            width: 0.5,
+            color: ColorConst.gray.withOpacity(0.5),
+          ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(30.0),
+          ),
+        ),
+        child: new ClipRRect(
+          borderRadius: BorderRadius.circular(30.0),
+          child: new Container(
+            width: 60.0,
+            height: 60.0,
+            child: new CachedNetworkImage(
+              width: 60.0,
+              height: 60.0,
+              imageUrl: _profile.photoUrl,
+              httpHeaders: h,
+              errorWidget: (c, u, e) => new Image.asset('assets/images/default.1.webp'),
+            ),
+          ),
         ),
       ),
     );
 
+    // Profile details
     final i = new Padding(
-      padding: EdgeInsets.all(10.0),
+      padding: EdgeInsets.all(hp),
       child: new Container(
-        width: width - 40.0,
-        height: 40.0,
+        width: width - ((hp * 4) + 60.0 + 1.0),
+        height: 60.0,
       ),
     );
 
@@ -117,11 +146,92 @@ class _MeState extends State<MePage> {
       ],
     );
 
+    final ts = new TextStyle(
+      fontFamily: FontConst.primary,
+      fontSize: 24.0,
+      letterSpacing: 0.33,
+      color: ColorConst.darkerGray,
+      fontWeight: FontWeight.bold,
+    );
+
+    final sts = new TextStyle(
+      fontFamily: FontConst.primary,
+      fontSize: 14.0,
+      letterSpacing: 0.33,
+      color: ColorConst.gray,
+    );
+
+    final frs = (_profile.followings >= 1e2) ? '1k' : _profile.followings.toString();
+
+    final fr = new Expanded(
+      flex: 2,
+      child: new Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          new Text(frs, style: ts),
+          new Text('following', style: sts),
+        ],
+      ),
+    );
+
+    final to = new Expanded(
+      flex: 2,
+      child: new Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          new Text(frs, style: ts),
+          new Text('followers', style: sts),
+        ],
+      ),
+    );
+
+    // Settings button
+    final st = new Expanded(
+      flex: 1,
+      child: new Semantics(
+        button: true,
+        child: new GestureDetector(
+          onTap: _showSettings,
+          child: new Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 6.0,
+              vertical: 12.0,
+            ),
+            child: new Icon(
+              IconData(
+                0xf141,
+                fontFamily: FontConst.fal,
+              ),
+              color: ColorConst.darkGray,
+              size: 36.0,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // Following, followers and settings
+    final d = new Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        fr,
+        to,
+        st,
+      ],
+    );
+
     return new Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        pt,
         f,
+        pt,
+        d,
+        pt,
       ],
     );
   }
@@ -143,6 +253,91 @@ class _MeState extends State<MePage> {
     );
 
     _sk.currentState.showSnackBar(snackBar);
+  }
+
+  /// Show settings overlay
+  void _showSettings() {
+    _oe = OverlayEntry(builder: (BuildContext context) {
+      final width = MediaQuery.of(context).size.width;
+      final height = MediaQuery.of(context).size.height;
+
+      final hr = new Divider(
+        color: ColorConst.gray,
+        height: 1.0,
+      );
+
+      final eb = new Button(
+        color: ColorConst.button,
+        background: ColorConst.transparent,
+        radius: BorderRadius.zero,
+        text: 'Edit profile',
+        onPressed: _editProfile,
+      );
+
+      final sb = new Button(
+        color: ColorConst.darkRed,
+        background: ColorConst.transparent,
+        radius: BorderRadius.zero,
+        text: 'Sign Out',
+        onPressed: _signOut,
+      );
+
+      final cb = new Button(
+        color: ColorConst.darkGray,
+        background: ColorConst.transparent,
+        radius: BorderRadius.zero,
+        text: 'Close',
+        onPressed: _closeSettings,
+      );
+
+      // List of buttons
+      final it = new Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          eb,
+          hr,
+          sb,
+          hr,
+          cb,
+        ],
+      );
+
+      return new Container(
+        width: width,
+        height: height,
+        color: ColorConst.darkerGray.withOpacity(0.67),
+        child: new Center(
+          child: new FittedBox(
+            child: new Container(
+              width: width - 120,
+              decoration: new BoxDecoration(
+                borderRadius: BorderRadius.circular(16.0),
+                color: ColorConst.lightGray,
+              ),
+              child: new Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.0),
+                child: it,
+              ),
+            ),
+          ),
+        ),
+      );
+    });
+
+    // Show overlay
+    Overlay.of(context).insert(_oe);
+  }
+
+  /// Close settings
+  void _closeSettings() {
+    if (_oe == null) {
+      return;
+    }
+
+    // Remove overlay from page
+    _oe.remove();
+    _oe = null;
   }
 
   /// Load profile data from cache
@@ -210,5 +405,53 @@ class _MeState extends State<MePage> {
     };
 
     MyProfileService.call(_session).then(sc).catchError(e).whenComplete(cc);
+  }
+
+  /// Go to profile edit page
+  void _editProfile() async {
+    await Navigator.of(context).pushNamed(MePage.tag);
+  }
+
+  /// Sign out from current session
+  void _signOut() {
+    // Handle HTTP response
+    final sc = (BasicResponse r) async {
+      dev.log('Sign in request sent.');
+
+      if (!r.status) {
+        if (r.isNetErr ?? false) {
+          // Create network error
+          _error = ErrorMessage.network();
+        } else {
+          // Create custom error
+          _showSnackBar(r.message, isError: true);
+        }
+
+        return;
+      }
+
+      // Create new auth key
+      _sp.remove('_session');
+    };
+
+    // Error callback
+    final e = (e, s) {
+      final msg = 'Unknown error. Please try again later.';
+
+      // Create unknown error message
+      _error = ErrorMessage.custom(msg);
+    };
+
+    // Complete callback
+    final cc = () async {
+      // Skip if dispose method called from application
+      if (!this.mounted) {
+        return;
+      }
+      
+      await Navigator.of(context).pushReplacementNamed(SignInPage.tag);
+    };
+  
+    SignOutService.call().then(sc).catchError(e).whenComplete(cc);
   }
 }
