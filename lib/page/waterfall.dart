@@ -75,7 +75,16 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
 
     // Add shimmer in case of loading state
     if (_loading) {
-      items.add(new Shimmer());
+      final s = new Shimmer(
+        duration: Duration(seconds: 1),
+        child: new Container(
+          width: 300,
+          height: 300,
+          color: ColorConst.gray,
+        ),
+      );
+
+      items.add(s);
     }
 
     return new Scaffold(

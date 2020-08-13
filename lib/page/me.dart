@@ -402,15 +402,20 @@ class _MeState extends State<MePage> {
         color: ColorConst.darkerGray.withOpacity(0.67),
         child: new Center(
           child: new FittedBox(
-            child: new Container(
-              width: width - 120,
-              decoration: new BoxDecoration(
-                borderRadius: BorderRadius.circular(16.0),
-                color: ColorConst.lightGray,
-              ),
-              child: new Padding(
-                padding: EdgeInsets.symmetric(vertical: 8.0),
-                child: it,
+            child: new GestureDetector(
+              onTapUp: (_) => _closeSettings(),
+              child: new Container(
+                width: width - 120,
+                decoration: new BoxDecoration(
+                  borderRadius: BorderRadius.circular(16.0),
+                  color: ColorConst.lightGray,
+                ),
+                child: new Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 8.0,
+                  ),
+                  child: it,
+                ),
               ),
             ),
           ),
@@ -509,7 +514,7 @@ class _MeState extends State<MePage> {
   }
 
   /// Sign out from current session
-  void _signOut() {
+  void _signOut() async {
     // Handle HTTP response
     final sc = (BasicResponse r) async {
       dev.log('Sign in request sent.');
@@ -548,6 +553,6 @@ class _MeState extends State<MePage> {
       await Navigator.of(context).pushReplacementNamed(SignInPage.tag);
     };
 
-    SignOutService.call().then(sc).catchError(e).whenComplete(cc);
+    await SignOutService.call().then(sc).catchError(e).whenComplete(cc);
   }
 }
