@@ -20,11 +20,13 @@ class WaterFallPage extends StatefulWidget {
 }
 
 class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClientMixin {
+  // Scaffold key
   final _sk = GlobalKey<ScaffoldState>();
 
   // Post items
   final _posts = <Post>[];
 
+  // Scroll controller
   final _sc = new ScrollController();
 
   // Loading indicator

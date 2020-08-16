@@ -17,6 +17,8 @@ dependencies:
   path_provider: ^1.6.11
   chewie: ^0.9.10
   video_player: ^0.10.11+2
+  flutter_local_notifications: ^1.4.4+2
+
 
 dev_dependencies:
   flutter_test:
