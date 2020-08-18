@@ -20,11 +20,13 @@ class WaterFallPage extends StatefulWidget {
 }
 
 class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClientMixin {
+  // Scaffold key
   final _sk = GlobalKey<ScaffoldState>();
 
   // Post items
   final _posts = <Post>[];
 
+  // Scroll controller
   final _sc = new ScrollController();
 
   // Loading indicator
@@ -158,6 +160,19 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
       _showSnackBar(msg);
     };
 
-    WaterFallService.call(_session, _timestamp).then(c).catchError(e);
+    // Complete callback
+    final cc = () {
+      // Skip if dispose method called from application
+      if (!this.mounted) {
+        return;
+      }
+
+      setState(() => _loading = false);
+    };
+
+    // Prepare request
+    final s = WaterFallService.call(_session, _timestamp);
+
+    s.then(c).catchError(e).whenComplete(cc);
   }
 }
