@@ -6,8 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/post.dart';
 import 'package:spectrome/item/shimmer.dart';
 import 'package:spectrome/model/post/post.dart';
+import 'package:spectrome/page/search.dart';
 import 'package:spectrome/service/post/waterfall.dart';
 import 'package:spectrome/theme/color.dart';
+import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/storage.dart';
 
 class WaterFallPage extends StatefulWidget {
@@ -92,6 +94,26 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
     return new Scaffold(
       key: _sk,
       backgroundColor: ColorConst.white,
+      appBar: new CupertinoNavigationBar(
+        backgroundColor: ColorConst.white,
+        border: Border(
+          bottom: BorderSide.none,
+        ),
+        trailing: new Semantics(
+          button: true,
+          child: new GestureDetector(
+            onTap: () => Navigator.of(context).pushNamed(SearchPage.tag),
+            child: new Padding(
+              padding: EdgeInsets.all(4.0),
+              child: new Icon(
+                IconData(0xf002, fontFamily: FontConst.fal),
+                color: ColorConst.darkGray,
+                size: 20.0,
+              ),
+            ),
+          ),
+        ),
+      ),
       body: new SingleChildScrollView(
         child: new Column(
           mainAxisAlignment: MainAxisAlignment.center,

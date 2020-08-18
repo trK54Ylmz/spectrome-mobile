@@ -67,7 +67,7 @@ class _SessionState extends State<SessionPage> {
 
         // Detect location and send by using session code
         final language = ui.window.locale.languageCode;
-        final country = ui.window.locale.countryCode.toLowerCase();
+        final country = ui.window.locale.countryCode?.toLowerCase();
 
         dev.log('Location request sent.');
 

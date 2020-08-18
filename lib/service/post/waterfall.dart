@@ -66,7 +66,7 @@ class WaterFallResponse extends BasicResponse {
     if (json['posts'] == null) {
       posts = [];
     } else {
-      final p = json['posts'] as List<Map<String, dynamic>>;
+      final p = json['posts'] as List<dynamic>;
 
       // Post assets callback
       final a = (Map<String, dynamic> a) {
@@ -78,18 +78,18 @@ class WaterFallResponse extends BasicResponse {
 
       // Post creator callback
       final c = (Map<String, dynamic> p) {
-        final assets = p['assets'] as List<Map<String, dynamic>>;
+        final assets = p['assets'] as List<dynamic>;
 
         return new Post(
           username: p['username'] as String,
-          assets: assets.map(a),
+          assets: assets.map((i) => a(i as Map<String, dynamic>)).toList(),
           width: p['width'] as int,
           height: p['height'] as int,
         );
       };
 
       // Create posts
-      posts = p.map(c);
+      posts = p.map((i) => c(i as Map<String, dynamic>)).toList();
     }
   }
 }

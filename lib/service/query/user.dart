@@ -5,9 +5,9 @@ import 'package:spectrome/service/base.dart';
 import 'package:spectrome/service/response.dart';
 import 'package:spectrome/util/http.dart';
 
-class FollowingQueryService extends Service {
-  static Future<FollowingQueryResponse> call(String session, String query) {
-    final path = '/query/following';
+class UserQueryService extends Service {
+  static Future<UserQueryResponse> call(String session, String query) {
+    final path = '/query/user';
     final headers = {Http.TOKEN_HEADER: session};
     final params = {'query': query};
 
@@ -15,19 +15,19 @@ class FollowingQueryService extends Service {
     final c = (Response r) {
       if (r.code != 200) {
         final m = 'An error occurred';
-        return FollowingQueryResponse.bind(status: false, message: m);
+        return UserQueryResponse.bind(status: false, message: m);
       }
 
-      return FollowingQueryResponse.fromJson(r.body);
+      return UserQueryResponse.fromJson(r.body);
     };
 
     // Handle error case
     final e = (e, StackTrace s) {
-      final r = FollowingQueryResponse.empty();
+      final r = UserQueryResponse.empty();
 
-      dev.log('Following query error.', error: e, stackTrace: s);
+      dev.log('User query error.', error: e, stackTrace: s);
 
-      return Service.handleError<FollowingQueryResponse>(e, s, r);
+      return Service.handleError<UserQueryResponse>(e, s, r);
     };
 
     final r = Http.doGet(
@@ -40,21 +40,21 @@ class FollowingQueryService extends Service {
   }
 }
 
-class FollowingQueryResponse extends BasicResponse {
+class UserQueryResponse extends BasicResponse {
   // List of suggested users
   List<SimpleProfile> users;
 
   /// Create empty object
-  FollowingQueryResponse.empty() : super.empty();
+  UserQueryResponse.empty() : super.empty();
 
   /// Create only status and message
-  FollowingQueryResponse.bind({
+  UserQueryResponse.bind({
     status,
     message,
   }) : super.bind(status: status, message: message);
 
   /// Create response by using JSON input
-  FollowingQueryResponse.fromJson(String input) {
+  UserQueryResponse.fromJson(String input) {
     final json = super.fromJson(input);
 
     if (json['users'] == null) {
