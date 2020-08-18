@@ -3,8 +3,8 @@ import 'dart:developer' as dev;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/input.dart';
-import 'package:spectrome/model/profile/me.dart';
 import 'package:spectrome/model/profile/simple.dart';
 import 'package:spectrome/service/query/following.dart';
 import 'package:spectrome/theme/color.dart';
@@ -44,7 +44,7 @@ class _RestrictionState extends State<RestrictionPage> {
   bool _loaded = false;
 
   // Loading indicator
-  bool _loading = true;
+  bool _loading = false;
 
   // Account session key
   String _session;
@@ -59,19 +59,22 @@ class _RestrictionState extends State<RestrictionPage> {
     // User typing listener callback
     final lc = () {
       final d = Duration(seconds: 1);
-      final c = Curves.easeIn;
+      final c = Curves.ease;
 
       // Move between pages according value
       if (_typing.value) {
-        _pc.animateToPage(1, duration: d, curve: c);
+        _pc.animateToPage(2, duration: d, curve: c);
       } else {
-        _pc.animateToPage(0, duration: d, curve: c);
+        _pc.animateToPage(1, duration: d, curve: c);
       }
     };
 
     // Shared preferences callback
     final sc = (SharedPreferences sp) {
-      _session = sp.getString('_session');
+      final session = sp.getString('_session');
+
+      // Update session
+      setState(() => _session = session);
     };
 
     _typing.addListener(lc);
@@ -95,7 +98,7 @@ class _RestrictionState extends State<RestrictionPage> {
       body: new SafeArea(
         child: AppConst.loader(
           page: RestrictionPage.tag,
-          argument: _loading,
+          argument: _session == null,
           error: _error,
           callback: _getPage,
         ),
@@ -128,6 +131,7 @@ class _RestrictionState extends State<RestrictionPage> {
     // Selected users
     final l = new Container(
       child: new ListView.builder(
+        itemCount: _users.length,
         itemBuilder: lb,
       ),
     );
@@ -135,14 +139,43 @@ class _RestrictionState extends State<RestrictionPage> {
     // User suggestions
     final s = new Container(
       child: new ListView.builder(
+        itemCount: _suggests.length,
         itemBuilder: sb,
       ),
     );
 
+    // Trailing callback
+    final tc = () {
+      if (_typing.value) {
+        // Clear text value
+        _sc.clear();
+
+        setState(() => _typing.value = false);
+      } else {
+        setState(() => _typing.value = true);
+      }
+    };
+
+    // Trailing button
+    final b = new Button(
+      background: ColorConst.transparent,
+      color: _typing.value ? ColorConst.darkGray : ColorConst.button,
+      width: 60.0,
+      padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 4.0),
+      text: _typing.value ? 'Clear' : 'Edit',
+      onPressed: tc,
+    );
+
+    // Empty container
+    final bc = new Container(width: 60.0);
+
     return new CupertinoPageScaffold(
       backgroundColor: ColorConst.white,
       navigationBar: new CupertinoNavigationBar(
-        padding: EdgeInsetsDirectional.only(top: 4.0, bottom: 4.0),
+        padding: EdgeInsetsDirectional.only(
+          top: 4.0,
+          bottom: 4.0,
+        ),
         backgroundColor: ColorConst.white,
         leading: new GestureDetector(
           onTap: () => Navigator.of(context).pop(_users),
@@ -152,7 +185,7 @@ class _RestrictionState extends State<RestrictionPage> {
           ),
         ),
         middle: new FormText(
-          hint: 'Type username',
+          hint: 'Type something',
           hintStyle: hs,
           style: ts,
           controller: _sc,
@@ -173,8 +206,10 @@ class _RestrictionState extends State<RestrictionPage> {
           },
           borderColor: ColorConst.gray,
         ),
+        trailing: _sc.text.length == 0 ? bc : b,
       ),
       child: new PageView(
+        controller: _pc,
         physics: const ClampingScrollPhysics(),
         children: [
           l,
@@ -192,9 +227,7 @@ class _RestrictionState extends State<RestrictionPage> {
       return;
     }
 
-    final t = _sc.text;
-
-    dev.log('User search request sending for "$t".');
+    dev.log('User search request sending for "${_sc.text}".');
 
     // Set loading true
     setState(() => _loading = true);
@@ -240,6 +273,9 @@ class _RestrictionState extends State<RestrictionPage> {
       setState(() => _loading = false);
     };
 
-    FollowingQueryService.call(_session, t).then(c).catchError(e).whenComplete(cc);
+    // Prepare request
+    final s = FollowingQueryService.call(_session, _sc.text);
+
+    s.then(c).catchError(e).whenComplete(cc);
   }
 }
