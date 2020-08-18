@@ -26,11 +26,11 @@ class PostResponse extends BasicResponse {
     };
 
     final p = json['p'] as Map<String, dynamic>;
-    final assets = p['assets'] as List<Map<String, dynamic>>;
+    final assets = p['assets'] as List<dynamic>;
 
     post = new Post(
       username: p['username'] as String,
-      assets: assets.map(a),
+      assets: assets.map((i) => a(i as Map<String, dynamic>)).toList(),
       width: p['width'] as int,
       height: p['height'] as int,
     );

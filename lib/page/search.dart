@@ -1,47 +1,40 @@
 import 'dart:developer' as dev;
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/input.dart';
+import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/model/profile/simple.dart';
-import 'package:spectrome/service/query/following.dart';
+import 'package:spectrome/page/profile.dart';
+import 'package:spectrome/service/query/user.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
 import 'package:spectrome/util/error.dart';
+import 'package:spectrome/util/http.dart';
 import 'package:spectrome/util/storage.dart';
 
-class RestrictionPage extends StatefulWidget {
-  static final tag = 'restriction';
+class SearchPage extends StatefulWidget {
+  static final tag = 'search';
 
-  RestrictionPage() : super();
+  SearchPage() : super();
 
-  _RestrictionState createState() => new _RestrictionState();
+  @override
+  _SearchState createState() => new _SearchState();
 }
 
-class _RestrictionState extends State<RestrictionPage> {
+class _SearchState extends State<SearchPage> {
   // Scaffold key
   final _sk = new GlobalKey<ScaffoldState>();
-
-  // Page view controller
-  final _pc = new PageController();
 
   // Search input controller
   final _sc = new TextEditingController();
 
-  // User typing or not
-  final _typing = new ValueNotifier<bool>(false);
-
-  // List of selected users
-  final _users = <SimpleProfile>[];
-
   // List of suggestions
   final _suggests = <SimpleProfile>[];
-
-  // Check if argument is loaded
-  bool _loaded = false;
 
   // Loading indicator
   bool _loading = false;
@@ -56,19 +49,6 @@ class _RestrictionState extends State<RestrictionPage> {
   void initState() {
     super.initState();
 
-    // User typing listener callback
-    final lc = () {
-      final d = Duration(seconds: 1);
-      final c = Curves.ease;
-
-      // Move between pages according value
-      if (_typing.value) {
-        _pc.animateToPage(2, duration: d, curve: c);
-      } else {
-        _pc.animateToPage(1, duration: d, curve: c);
-      }
-    };
-
     // Shared preferences callback
     final sc = (SharedPreferences sp) {
       final session = sp.getString('_session');
@@ -77,27 +57,17 @@ class _RestrictionState extends State<RestrictionPage> {
       setState(() => _session = session);
     };
 
-    _typing.addListener(lc);
-
     Storage.load().then(sc);
   }
 
   @override
   Widget build(BuildContext context) {
-    final users = ModalRoute.of(context).settings.arguments;
-
-    // Load route arguments if specified
-    if (!_loaded && users != null) {
-      _loaded = true;
-      _users.addAll(users);
-    }
-
     return Scaffold(
       key: _sk,
       backgroundColor: ColorConst.white,
       body: new SafeArea(
         child: AppConst.loader(
-          page: RestrictionPage.tag,
+          page: SearchPage.tag,
           argument: _session == null,
           error: _error,
           callback: _getPage,
@@ -122,48 +92,17 @@ class _RestrictionState extends State<RestrictionPage> {
       fontWeight: FontWeight.normal,
     );
 
-    // Selected users list builder
-    final lb = (BuildContext context, int i) {};
-
-    // Suggested users list builder
-    final sb = (BuildContext context, int i) {};
-
-    // Selected users
-    final l = new Container(
-      child: new ListView.builder(
-        itemCount: _users.length,
-        itemBuilder: lb,
-      ),
-    );
-
-    // User suggestions
-    final s = new Container(
-      child: new ListView.builder(
-        itemCount: _suggests.length,
-        itemBuilder: sb,
-      ),
-    );
-
-    // Trailing callback
-    final tc = () {
-      if (_typing.value) {
-        // Clear text value
-        _sc.clear();
-
-        setState(() => _typing.value = false);
-      } else {
-        setState(() => _typing.value = true);
-      }
-    };
-
     // Trailing button
     final b = new Button(
       background: ColorConst.transparent,
-      color: _typing.value ? ColorConst.darkGray : ColorConst.button,
+      color: ColorConst.darkGray,
       width: 60.0,
-      padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 4.0),
-      text: _typing.value ? 'Clear' : 'Edit',
-      onPressed: tc,
+      text: 'Clear',
+      padding: EdgeInsets.symmetric(
+        vertical: 10.0,
+        horizontal: 4.0,
+      ),
+      onPressed: () => _sc.clear(),
     );
 
     // Empty container
@@ -178,7 +117,7 @@ class _RestrictionState extends State<RestrictionPage> {
         ),
         backgroundColor: ColorConst.white,
         leading: new GestureDetector(
-          onTap: () => Navigator.of(context).pop(_users),
+          onTap: () => Navigator.of(context).pop(),
           child: new Icon(
             IconData(0xf104, fontFamily: FontConst.fal),
             color: ColorConst.darkerGray,
@@ -191,12 +130,10 @@ class _RestrictionState extends State<RestrictionPage> {
           controller: _sc,
           onChange: (t) {
             if (t.length < 2) {
-              return null;
-            }
+              // Clear current list
+              setState(() => _suggests.clear());
 
-            // Select typing
-            if (!_typing.value) {
-              setState(() => _typing.value = true);
+              return null;
             }
 
             // Send request and collect suggestions
@@ -208,13 +145,111 @@ class _RestrictionState extends State<RestrictionPage> {
         ),
         trailing: _sc.text.length == 0 ? bc : b,
       ),
-      child: new PageView(
-        controller: _pc,
-        physics: const ClampingScrollPhysics(),
+      child: new Container(
+        child: new Padding(
+          padding: EdgeInsets.symmetric(
+            vertical: 8.0,
+          ),
+          child: new ListView.builder(
+            itemCount: _suggests.length,
+            itemBuilder: _suggestBuilder,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Suggested users list builder
+  Widget _suggestBuilder(BuildContext context, int i) {
+    // Http headers for image request
+    final h = {Http.CONTENT_HEADER: _session};
+
+    // Request profile photo from server
+    final p = new ClipRRect(
+      borderRadius: BorderRadius.circular(20.0),
+      child: new Container(
+        width: 40.0,
+        height: 40.0,
+        child: new CachedNetworkImage(
+          width: 40.0,
+          height: 40.0,
+          imageUrl: _suggests[i].photoUrl,
+          httpHeaders: h,
+          fadeInDuration: Duration.zero,
+          placeholder: (c, u) => new Loading(width: 40.0, height: 40.0),
+          errorWidget: (c, u, e) => new Image.asset('assets/images/default.1.webp'),
+        ),
+      ),
+    );
+
+    final pt = new Padding(
+      padding: EdgeInsets.only(top: 2.0),
+    );
+
+    // Username text
+    final un = new Text(
+      _suggests[i].username,
+      style: new TextStyle(
+        fontFamily: FontConst.primary,
+        color: ColorConst.black,
+        fontSize: 16.0,
+        letterSpacing: 0.33,
+      ),
+    );
+
+    // Real name text
+    final nm = new Text(
+      _suggests[i].name,
+      style: new TextStyle(
+        fontFamily: FontConst.primary,
+        color: ColorConst.darkGray,
+        fontSize: 12.0,
+        letterSpacing: 0.33,
+      ),
+    );
+
+    // Information container
+    final d = new Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 12.0,
+        vertical: 2.0,
+      ),
+      child: new Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          l,
-          s,
+          un,
+          pt,
+          nm,
         ],
+      ),
+    );
+
+    return new Semantics(
+      focusable: true,
+      button: true,
+      child: new GestureDetector(
+        onTap: () async {
+          dev.log('User "${_suggests[i].username}" selected.');
+
+          await Navigator.of(context).pushNamed(ProfilePage.tag, arguments: _suggests[i]);
+        },
+        child: new Container(
+          child: new Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
+            child: new Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                p,
+                d,
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -233,7 +268,7 @@ class _RestrictionState extends State<RestrictionPage> {
     setState(() => _loading = true);
 
     // Handle HTTP response
-    final c = (FollowingQueryResponse r) async {
+    final c = (UserQueryResponse r) async {
       dev.log('User search request sent.');
 
       if (!r.status) {
@@ -274,7 +309,7 @@ class _RestrictionState extends State<RestrictionPage> {
     };
 
     // Prepare request
-    final s = FollowingQueryService.call(_session, _sc.text);
+    final s = UserQueryService.call(_session, _sc.text);
 
     s.then(c).catchError(e).whenComplete(cc);
   }

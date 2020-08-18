@@ -14,6 +14,7 @@ import 'package:spectrome/page/home.dart';
 import 'package:spectrome/page/me.dart';
 import 'package:spectrome/page/profile.dart';
 import 'package:spectrome/page/restriction.dart';
+import 'package:spectrome/page/search.dart';
 import 'package:spectrome/page/session.dart';
 import 'package:spectrome/page/invite.dart';
 import 'package:spectrome/page/reset.dart';
@@ -42,6 +43,7 @@ final routes = <String, WidgetBuilder>{
   ProfilePage.tag: (c) => new ProfilePage(),
   ResetPage.tag: (c) => new ResetPage(),
   RestrictionPage.tag: (c) => new RestrictionPage(),
+  SearchPage.tag: (c) => new SearchPage(),
   SessionPage.tag: (c) => new SessionPage(),
   SelectPage.tag: (c) => new SelectPage(),
   SharePage.tag: (c) => new SharePage(),
