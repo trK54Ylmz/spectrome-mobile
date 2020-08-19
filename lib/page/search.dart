@@ -232,7 +232,10 @@ class _SearchState extends State<SearchPage> {
         onTap: () async {
           dev.log('User "${_suggests[i].username}" selected.');
 
-          await Navigator.of(context).pushNamed(ProfilePage.tag, arguments: _suggests[i]);
+          final u = _suggests[i].username;
+
+          // Route to profile page
+          await Navigator.of(context).pushNamed(ProfilePage.tag, arguments: u);
         },
         child: new Container(
           child: new Padding(

@@ -37,6 +37,9 @@ class _ShareState extends State<SharePage> {
   // Comment input controller
   final _cc = new TextEditingController();
 
+  // List of selected files
+  final _files = <File>[];
+
   // Scale group of items
   final _scales = <double>[];
 
@@ -50,7 +53,7 @@ class _ShareState extends State<SharePage> {
   bool _scale = false;
 
   // Loading indicator
-  bool _loading = true;
+  bool _loading = false;
 
   // Post is disposible
   bool _disposible = false;
@@ -76,29 +79,45 @@ class _ShareState extends State<SharePage> {
     });
 
     // Shared preferences callback
-    final c = (SharedPreferences sp) {
-      _session = sp.getString('_session');
+    final spc = (SharedPreferences sp) {
+      final session = sp.getString('_session');
 
-      setState(() => _loading = false);
+      setState(() => _session = session);
     };
 
-    // Get shared preferences
-    Storage.load().then(c);
+    // Username argument callback
+    final ac = (_) {
+      final List<File> files = ModalRoute.of(context).settings.arguments;
+
+      // Add files to parameter
+      _files.addAll(files);
+
+      final l = new List<double>.generate(files.length, (_) => 1);
+
+      // Add scales to parameter
+      _scales.addAll(l);
+
+      // Get storage kv
+      Storage.load().then(spc);
+    };
+
+    // Add callback for argument
+    WidgetsBinding.instance.addPostFrameCallback(ac);
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<File> files = ModalRoute.of(context).settings.arguments;
-    if (_scales.isEmpty) {
-      final l = new List<double>.generate(files.length, (_) => 1);
-      _scales.addAll(l);
-    }
-
-    return _getPage(files);
+    return Scaffold(
+      key: _sk,
+      backgroundColor: ColorConst.white,
+      body: new SafeArea(
+        child: _session == null ? new Loading() : _getPage(),
+      ),
+    );
   }
 
   /// Get page widget
-  Widget _getPage(List<File> files) {
+  Widget _getPage() {
     final cb = new Padding(
       padding: EdgeInsets.only(top: 7.0),
       child: new Text(
@@ -157,43 +176,40 @@ class _ShareState extends State<SharePage> {
       ];
     }
 
-    return new Scaffold(
-      key: _sk,
-      body: new CupertinoTabScaffold(
-        tabBar: CupertinoTabBar(
-          backgroundColor: ColorConst.white,
-          border: Border(
-            top: BorderSide(
-              color: ColorConst.gray.withOpacity(0.67),
-              width: 0.5,
-            ),
+    return new CupertinoTabScaffold(
+      tabBar: CupertinoTabBar(
+        backgroundColor: ColorConst.white,
+        border: Border(
+          top: BorderSide(
+            color: ColorConst.gray.withOpacity(0.67),
+            width: 0.5,
           ),
-          onTap: (index) async {
-            // Disable click while loading
-            if (_loading) {
-              return;
-            }
-
-            // Disable click while post scaling
-            if (_scale) {
-              return;
-            }
-
-            if (index == 0) {
-              await Navigator.of(context).pushReplacementNamed(ViewPage.tag);
-            } else {
-              setState(() => _loading = true);
-
-              // Create post
-              await _share(files);
-            }
-          },
-          items: items,
         ),
-        tabBuilder: (context, index) {
-          return _getForm(files);
+        onTap: (index) async {
+          // Disable click while loading
+          if (_loading) {
+            return;
+          }
+
+          // Disable click while post scaling
+          if (_scale) {
+            return;
+          }
+
+          if (index == 0) {
+            await Navigator.of(context).pushReplacementNamed(ViewPage.tag);
+          } else {
+            setState(() => _loading = true);
+
+            // Create post
+            await _share(_files);
+          }
         },
+        items: items,
       ),
+      tabBuilder: (context, index) {
+        return _getForm(_files);
+      },
     );
   }
 
