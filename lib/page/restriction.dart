@@ -40,9 +40,6 @@ class _RestrictionState extends State<RestrictionPage> {
   // List of suggestions
   final _suggests = <SimpleProfile>[];
 
-  // Check if argument is loaded
-  bool _loaded = false;
-
   // Loading indicator
   bool _loading = false;
 
@@ -79,19 +76,25 @@ class _RestrictionState extends State<RestrictionPage> {
 
     _typing.addListener(lc);
 
-    Storage.load().then(sc);
+    // Selected users callback
+    final ac = (_) {
+      final users = ModalRoute.of(context).settings.arguments as List<SimpleProfile>;
+
+      // Load route arguments if specified
+      if (_users.isNotEmpty) {
+        _users.addAll(users);
+      }
+
+      // Get storage kv
+      Storage.load().then(sc);
+    };
+
+    // Add callback for argument
+    WidgetsBinding.instance.addPostFrameCallback(ac);
   }
 
   @override
   Widget build(BuildContext context) {
-    final users = ModalRoute.of(context).settings.arguments;
-
-    // Load route arguments if specified
-    if (!_loaded && users != null) {
-      _loaded = true;
-      _users.addAll(users);
-    }
-
     return Scaffold(
       key: _sk,
       backgroundColor: ColorConst.white,
@@ -178,7 +181,12 @@ class _RestrictionState extends State<RestrictionPage> {
         ),
         backgroundColor: ColorConst.white,
         leading: new GestureDetector(
-          onTap: () => Navigator.of(context).pop(_users),
+          onTap: () {
+            final users = _users.map((e) => e.username).toList();
+
+            // Go back with usernames
+            Navigator.of(context).pop(users);
+          },
           child: new Icon(
             IconData(0xf104, fontFamily: FontConst.fal),
             color: ColorConst.darkerGray,
