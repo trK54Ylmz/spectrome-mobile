@@ -17,17 +17,8 @@ class GuidePage extends StatefulWidget {
 }
 
 class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
-  // Animation controller
-  AnimationController _ac;
-
-  // Animation side, 1 is right, -1 is left
-  int _side = 1;
-
-  // Active image ID
-  int _active = 1;
-
-  // Carousel drag is blocked or not
-  bool _blocked = false;
+  // Page view controller
+  final _pc = new PageController();
 
   // Carousel messages
   final _texts = <String>[
@@ -36,41 +27,19 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
     'Send to the friends.',
   ];
 
+  // Current index
+  int _ci = 0;
+
   @override
   void initState() {
     super.initState();
 
-    // Initiate animation controller
-    _ac = new AnimationController(
-      vsync: this,
-      lowerBound: 0.0,
-      upperBound: 100.0,
-      duration: const Duration(milliseconds: 200),
-    );
-
-    // Generate widget every tick
-    _ac.addListener(() => setState(() => null));
-
-    // Add animation listener to manage animation
-    _ac.addStatusListener((AnimationStatus status) {
-      if (status == AnimationStatus.completed) {
-        dev.log('Animation completed.');
-
-        // Reset animation
-        _ac.reset();
-
-        // Unlock lock
-        _blocked = false;
+    // Initiate page controller
+    _pc.addListener(() {
+      if (_pc.page.round() != _ci) {
+        setState(() => _ci = _pc.page.round());
       }
     });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-
-    // Dispose animation controller
-    _ac.dispose();
   }
 
   @override
@@ -83,7 +52,7 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
     final stp = const Padding(padding: EdgeInsets.only(top: 8.0));
 
     // Carousel image group
-    final images = <Widget>[
+    final i = <Widget>[
       new Container(
         width: width - (hp * 2),
         height: height - ((vp * 2) + 110),
@@ -101,44 +70,23 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
       ),
     ];
 
-    // Carousel offset value
-    double offset = ((width - (hp * 2)) * (_active - 1));
-    double difference = (_side * (width - (hp * 2)) * (_ac.value / 100.0));
-
     // Animated carousel with images
     final carousel = new Expanded(
-      child: new Opacity(
-        opacity: 1.0,
-        child: new GestureDetector(
-          onHorizontalDragEnd: _dragEnd,
-          child: new Stack(
-            children: <Widget>[
-              new Positioned(
-                bottom: 0.0,
-                left: -(offset + difference),
-                child: new Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: images,
-                ),
-              ),
-            ],
-          ),
-        ),
+      child: new PageView(
+        physics: const ClampingScrollPhysics(),
+        controller: _pc,
+        children: i,
       ),
     );
 
     // Guide message
-    final msg = new Opacity(
-      opacity: _ac.value >= 50 ? (_ac.value - 50) / 50 : (50 - _ac.value) / 50,
-      child: new Text(
-        _texts[_active - 1],
-        style: new TextStyle(
-          fontFamily: FontConst.primary,
-          fontSize: 14.0,
-          color: ColorConst.darkGray,
-          letterSpacing: 0.0,
-        ),
+    final msg = new Text(
+      _texts[_ci],
+      style: new TextStyle(
+        fontFamily: FontConst.primary,
+        fontSize: 14.0,
+        color: ColorConst.darkGray,
+        letterSpacing: 0.0,
       ),
     );
 
@@ -172,10 +120,10 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
     final dots = new Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        _active == 1 ? ad : pd,
-        _active == 2 ? ad : pd,
-        _active == 3 ? ad : pd,
+      children: [
+        _ci == 0 ? ad : pd,
+        _ci == 1 ? ad : pd,
+        _ci == 2 ? ad : pd,
       ],
     );
 
@@ -185,13 +133,13 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
       child: new Padding(
         padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
         child: new Text(
-        'skip',
-        style: new TextStyle(
-          fontFamily: FontConst.primary,
-          color: ColorConst.gray,
-          fontSize: 14.0,
-          decoration: TextDecoration.underline,
-        ),
+          'skip',
+          style: new TextStyle(
+            fontFamily: FontConst.primary,
+            color: ColorConst.gray,
+            fontSize: 14.0,
+            decoration: TextDecoration.underline,
+          ),
         ),
       ),
     );
@@ -209,7 +157,7 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
         child: new Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
+          children: [
             tp,
             carousel,
             tp,
@@ -224,59 +172,12 @@ class _GuideState extends State<GuidePage> with TickerProviderStateMixin {
     );
   }
 
-  /// Decide actiom after the horizontal drag operation
-  void _dragEnd(DragEndDetails details) {
-    // Do not do anything if animation running
-    if (_blocked) {
-      return;
-    }
-
-    _blocked = true;
-
-    // Side of the slide action
-    final dx = details.velocity.pixelsPerSecond.dx;
-
-    if (dx > 0) {
-      // App shows the first screen
-      if (_active <= 1) {
-        _blocked = false;
-        return;
-      }
-
-      // Move carousel to left
-      _side = -1;
-
-      final cb = (_) {
-        setState(() => _active -= 1);
-      };
-
-      // Start animation
-      _ac.forward().then(cb);
-    } else {
-      // App shows the last screen
-      if (_active >= 3) {
-        _blocked = false;
-        return;
-      }
-
-      // Move carousel to right
-      _side = 1;
-
-      final cb = (_) {
-        setState(() => _active += 1);
-      };
-
-      // Start animation
-      _ac.forward().then(cb);
-    }
-  }
-
   /// Complete the guide statement
   void _end(BuildContext context) {
     dev.log('Guide ended');
 
     final cb = (SharedPreferences sb) {
-      sb.setBool('guided', true);
+      sb.setBool('_guided', true);
 
       // Redirect to home page
       Navigator.of(context).pushReplacementNamed(SessionPage.tag);

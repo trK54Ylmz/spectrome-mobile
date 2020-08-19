@@ -291,7 +291,7 @@ class _SelectState extends State<SelectPage> {
       child: new Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
+        children: [
           cb,
           nb,
         ],
@@ -300,7 +300,7 @@ class _SelectState extends State<SelectPage> {
 
     return new Stack(
       alignment: AlignmentDirectional.bottomCenter,
-      children: <Widget>[
+      children: [
         w,
         c,
       ],

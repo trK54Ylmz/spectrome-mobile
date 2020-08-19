@@ -287,7 +287,7 @@ class _SignUpState extends State<SignUpPage> {
     final sit = new Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
+      children: [
         new Text(
           'already have an account? ',
           style: new TextStyle(
@@ -328,7 +328,7 @@ class _SignUpState extends State<SignUpPage> {
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
+        children: [
           pt,
           logo,
           s,

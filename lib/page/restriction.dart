@@ -175,6 +175,8 @@ class _RestrictionState extends State<RestrictionPage> {
     return new CupertinoPageScaffold(
       backgroundColor: ColorConst.white,
       navigationBar: new CupertinoNavigationBar(
+        heroTag: 1,
+        transitionBetweenRoutes: false,
         padding: EdgeInsetsDirectional.only(
           top: 4.0,
           bottom: 4.0,

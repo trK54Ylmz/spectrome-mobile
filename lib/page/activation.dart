@@ -251,7 +251,7 @@ class _ActivationState extends State<ActivationPage> {
     final art = new Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
+      children: [
         new Text(
           'you didn’t receive? ',
           style: new TextStyle(
@@ -311,7 +311,7 @@ class _ActivationState extends State<ActivationPage> {
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
+        children: [
           pt,
           logo,
           ptl,

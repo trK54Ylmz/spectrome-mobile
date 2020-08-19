@@ -133,7 +133,7 @@ class _VersionState extends State<VersionPage> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
+      children: [
         icon,
         pt,
         message,

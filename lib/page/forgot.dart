@@ -228,7 +228,7 @@ class _ForgotState extends State<ForgotPage> {
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
+        children: [
           pt,
           logo,
           ptl,

@@ -203,7 +203,7 @@ class _SignInState extends State<SignInPage> {
     final fpt = new Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
+      children: [
         new Text(
           'forgot password? ',
           style: new TextStyle(
@@ -250,7 +250,7 @@ class _SignInState extends State<SignInPage> {
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
+        children: [
           pt,
           logo,
           s,

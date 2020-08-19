@@ -103,7 +103,7 @@ class _SignUpDoneState extends State<SignUpDonePage> {
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
+        children: [
           logo,
           ptl,
           si,
