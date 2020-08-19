@@ -79,7 +79,7 @@ class _MainState extends State<MainPage> {
     // Shared preferences callback
     final cb = (SharedPreferences sp) {
       // Figure out the selected page
-      final t = sp.containsKey('guided') ? VersionPage.tag : GuidePage.tag;
+      final t = sp.containsKey('_guided') ? VersionPage.tag : GuidePage.tag;
 
       dev.log('Selected page is $t');
 
@@ -234,7 +234,7 @@ class _MainState extends State<MainPage> {
           child: new Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
+            children: [
               t,
               pt,
               b,

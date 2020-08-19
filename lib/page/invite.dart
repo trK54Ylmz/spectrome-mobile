@@ -282,7 +282,7 @@ class _InviteState extends State<InvitePage> {
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
+        children: [
           pt,
           logo,
           ptl,

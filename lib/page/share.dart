@@ -272,7 +272,7 @@ class _ShareState extends State<SharePage> {
       child: new Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
+        children: [
           dt,
           db,
         ],
@@ -310,9 +310,12 @@ class _ShareState extends State<SharePage> {
           // Open new screen to add or remove users from restriction
           final u = await Navigator.of(context).pushNamed(RestrictionPage.tag);
 
-          // Clear users and populate new selection
-          _users.clear();
-          _users.addAll(u as List<String>);
+          // Check if users is null because maybe users swipes by themselves
+          if (u != null) {
+            // Clear users and populate new selection
+            _users.clear();
+            _users.addAll(u as List<String>);
+          }
 
           // Update restriction
           setState(() => _restricted = _users.isEmpty ? false : true);
@@ -335,7 +338,7 @@ class _ShareState extends State<SharePage> {
       child: new Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
+        children: [
           st,
           sb,
         ],
@@ -395,7 +398,7 @@ class _ShareState extends State<SharePage> {
           child: new Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
+            children: [
               pt,
               ds,
               ptl,
@@ -608,7 +611,7 @@ class _ShareState extends State<SharePage> {
           ),
         ),
         child: new Row(
-          children: <Widget>[
+          children: [
             wb,
             sb,
             tb,
@@ -762,7 +765,7 @@ class _ShareState extends State<SharePage> {
     final b = new Row(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
+      children: [
         pb,
         ic,
         nb,
@@ -772,7 +775,7 @@ class _ShareState extends State<SharePage> {
     return new Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
+      children: [
         w,
         ptl,
         c,

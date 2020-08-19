@@ -283,7 +283,7 @@ class GalleryState extends State<GalleryPage> {
             onTap: () => _tap(index),
             child: Stack(
               alignment: Alignment.topRight,
-              children: <Widget>[
+              children: [
                 img,
                 vi,
                 _selected.contains(index) ? sc : ec,
@@ -301,7 +301,7 @@ class GalleryState extends State<GalleryPage> {
             onTap: () => _tap(index),
             child: Stack(
               alignment: Alignment.center,
-              children: <Widget>[
+              children: [
                 img,
                 _selected.contains(index) ? sc : ec,
               ],

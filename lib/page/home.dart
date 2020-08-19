@@ -16,7 +16,7 @@ class HomePage extends StatefulWidget {
 class _HomeState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    return CupertinoTabScaffold(
+    return new CupertinoTabScaffold(
       tabBar: CupertinoTabBar(
         backgroundColor: ColorConst.white,
         border: Border(

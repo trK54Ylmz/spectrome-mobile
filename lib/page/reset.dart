@@ -293,7 +293,7 @@ class _ResetState extends State<ResetPage> {
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
+        children: [
           pt,
           logo,
           ptl,

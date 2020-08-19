@@ -56,7 +56,7 @@ class Fatal extends StatelessWidget {
     return new Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
+      children: [
         icon,
         message,
         button,

@@ -350,7 +350,7 @@ class CameraState extends State<CameraPage> {
     final s = new Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
+      children: [
         p,
         v,
       ],
@@ -361,7 +361,7 @@ class CameraState extends State<CameraPage> {
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.end,
-        children: <Widget>[
+        children: [
           ptl,
           _isVideo ? tc : ec,
           pt,

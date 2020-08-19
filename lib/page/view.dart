@@ -24,7 +24,7 @@ class _ViewState extends State<ViewPage> {
       body: new PageView(
         controller: _pc,
         physics: const ClampingScrollPhysics(),
-        children: <Widget>[
+        children: [
           new SelectPage(),
           new HomePage(),
         ],
