@@ -7,7 +7,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/loading.dart';
-import 'package:spectrome/model/profile/me.dart';
 import 'package:spectrome/model/profile/simple.dart';
 import 'package:spectrome/page/me.dart';
 import 'package:spectrome/page/profile.dart';
