@@ -8,6 +8,7 @@ import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/model/profile/simple.dart';
+import 'package:spectrome/page/me.dart';
 import 'package:spectrome/page/profile.dart';
 import 'package:spectrome/service/query/user.dart';
 import 'package:spectrome/theme/color.dart';
@@ -38,6 +39,9 @@ class _SearchState extends State<SearchPage> {
 
   // Loading indicator
   bool _loading = false;
+
+  // My username
+  String _me;
 
   // Account session key
   String _session;
@@ -235,9 +239,10 @@ class _SearchState extends State<SearchPage> {
           dev.log('User "${_suggests[i].username}" selected.');
 
           final u = _suggests[i].username;
+          final t = u == _me ? MePage.tag : ProfilePage.tag;
 
           // Route to profile page
-          await Navigator.of(context).pushNamed(ProfilePage.tag, arguments: u);
+          await Navigator.of(context).pushNamed(t, arguments: u);
         },
         child: new Container(
           child: new Padding(
@@ -287,6 +292,9 @@ class _SearchState extends State<SearchPage> {
 
         return;
       }
+
+      // Set my username
+      _me = r.me;
 
       // Clear current list
       _suggests.clear();
