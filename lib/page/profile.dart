@@ -4,10 +4,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/model/profile/user.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/service/profile/user.dart';
+import 'package:spectrome/service/user/follow.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
@@ -42,6 +44,9 @@ class _ProfileState extends State<ProfilePage> {
 
   // Loading indicator
   bool _loading = true;
+
+  // Follow request sent or not
+  bool _sent = false;
 
   @override
   void initState() {
@@ -92,7 +97,6 @@ class _ProfileState extends State<ProfilePage> {
   Widget _getPage() {
     final width = MediaQuery.of(context).size.width;
     final hp = width > 400.0 ? 64.0 : 32.0;
-    final hps = width > 400.0 ? 32.0 : 16.0;
 
     final pts = const Padding(
       padding: EdgeInsets.only(top: 4.0),
@@ -107,7 +111,7 @@ class _ProfileState extends State<ProfilePage> {
 
     // Profile picture
     final p = new Padding(
-      padding: EdgeInsets.all(hps),
+      padding: EdgeInsets.all(8.0),
       child: new Container(
         decoration: new BoxDecoration(
           border: new Border.all(
@@ -152,17 +156,17 @@ class _ProfileState extends State<ProfilePage> {
       style: new TextStyle(
         fontFamily: FontConst.primary,
         color: ColorConst.darkGray,
-        fontSize: 16.0,
+        fontSize: 14.0,
         letterSpacing: 0.33,
       ),
     );
 
     // Profile details
     final i = new Padding(
-      padding: EdgeInsets.all(hps),
+      padding: EdgeInsets.only(left: 20.0),
       child: new Container(
-        width: width - ((hp * 3) + 60.0 + 1.0),
-        height: 60.0,
+        width: width - ((hp * 3) + 38.0 + 1.0),
+        height: 48.0,
         child: new Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -201,11 +205,12 @@ class _ProfileState extends State<ProfilePage> {
 
     // Posts count text
     final ps = new Flexible(
-      flex: 2,
+      flex: 1,
       fit: FlexFit.tight,
       child: new Padding(
         padding: EdgeInsets.symmetric(horizontal: 8.0),
         child: new RichText(
+          textAlign: TextAlign.left,
           text: new TextSpan(
             text: _profile.posts.toString(),
             style: ts,
@@ -222,12 +227,12 @@ class _ProfileState extends State<ProfilePage> {
 
     // Following count text
     final fr = new Flexible(
-      flex: 3,
+      flex: 1,
       fit: FlexFit.tight,
       child: new Padding(
         padding: EdgeInsets.symmetric(horizontal: 8.0),
         child: new RichText(
-          overflow: TextOverflow.visible,
+          textAlign: TextAlign.center,
           text: new TextSpan(
             text: _profile.followings.toString(),
             style: ts,
@@ -244,11 +249,12 @@ class _ProfileState extends State<ProfilePage> {
 
     // Followers count text
     final to = new Flexible(
-      flex: 3,
+      flex: 1,
       fit: FlexFit.tight,
       child: new Padding(
         padding: EdgeInsets.symmetric(horizontal: 8.0),
         child: new RichText(
+          textAlign: TextAlign.right,
           text: new TextSpan(
             text: _profile.followers.toString(),
             style: ts,
@@ -274,9 +280,36 @@ class _ProfileState extends State<ProfilePage> {
       ],
     );
 
+    final fl = new Expanded(
+      flex: 1,
+      child: new Padding(
+        padding: EdgeInsets.only(top: 8.0),
+        child: new Button(
+          text: _sent ? 'Request sent' : 'Follow',
+          padding: EdgeInsets.all(8.0),
+          background: _sent ? ColorConst.white : ColorConst.button,
+          color: _sent ? ColorConst.darkerGray : ColorConst.white,
+          border: new Border.all(
+            color: _sent ? ColorConst.gray : ColorConst.button,
+          ),
+          onPressed: _sent ? _cancel : _follow,
+        ),
+      ),
+    );
+
+    // Follow button container
+    final b = new Container(
+        child: new Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        fl,
+      ],
+    ));
+
     // User detail container
     final u = new Container(
-      height: 180.0,
+      height: 172.0,
       decoration: new BoxDecoration(
         border: Border(
           bottom: BorderSide(
@@ -286,27 +319,52 @@ class _ProfileState extends State<ProfilePage> {
         ),
       ),
       child: new Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.0),
+        padding: EdgeInsets.only(
+          bottom: 16.0,
+          left: 16.0,
+          right: 16.0,
+          top: 0.0,
+        ),
         child: new Column(
           crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            pt,
             f,
             pt,
             d,
             pt,
+            b,
           ],
         ),
       ),
     );
 
-    return new Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        u,
-      ],
+    return new CupertinoPageScaffold(
+      backgroundColor: ColorConst.white,
+      navigationBar: new CupertinoNavigationBar(
+        heroTag: 4,
+        transitionBetweenRoutes: false,
+        padding: EdgeInsetsDirectional.only(
+          top: 4.0,
+          bottom: 4.0,
+        ),
+        backgroundColor: ColorConst.white,
+        border: new Border(bottom: BorderSide.none),
+        leading: new GestureDetector(
+          onTap: () => Navigator.of(context).pop(),
+          child: new Icon(
+            IconData(0xf104, fontFamily: FontConst.fal),
+            color: ColorConst.darkerGray,
+          ),
+        ),
+      ),
+      child: new Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          u,
+        ],
+      ),
     );
   }
 
@@ -381,5 +439,63 @@ class _ProfileState extends State<ProfilePage> {
     final s = UserProfileService.call(_session, _username);
 
     await s.then(sc).catchError(e).whenComplete(cc);
+  }
+
+  /// Follow user
+  void _follow() async {
+    dev.log('Follow button clicked.');
+
+    if (_loading) {
+      return;
+    }
+
+    setState(() => _loading = true);
+
+    dev.log('Follow request sending.');
+
+    final sc = (FollowingResponse r) async {
+      dev.log('Follow request sent.');
+
+      if (!r.status) {
+        if (r.isNetErr ?? false) {
+          // Create network error
+          _error = ErrorMessage.network();
+        } else {
+          // Create custom error
+          _showSnackBar(r.message, isError: true);
+        }
+
+        return;
+      }
+
+      // Set request sent
+      setState(() => _sent = true);
+    };
+
+    // Error callback
+    final e = (e, s) {
+      final msg = 'Unknown error. Please try again later.';
+
+      // Create unknown error message
+      _error = ErrorMessage.custom(msg);
+    };
+
+    final cc = () {
+      // Skip if dispose method called from application
+      if (!this.mounted) {
+        return;
+      }
+
+      setState(() => _loading = false);
+    };
+
+    // Prepare request
+    final s = FollowingService.call(_session, _username);
+
+    await s.then(sc).catchError(e).whenComplete(cc);
+  }
+
+  void _cancel() {
+
   }
 }

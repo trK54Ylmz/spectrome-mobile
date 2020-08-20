@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/model/profile/me.dart';
+import 'package:spectrome/page/select.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/service/account/sign_out.dart';
 import 'package:spectrome/service/profile/me.dart';
@@ -91,7 +92,6 @@ class _MeState extends State<MePage> {
   Widget _getPage() {
     final width = MediaQuery.of(context).size.width;
     final hp = width > 400.0 ? 64.0 : 32.0;
-    final hps = width > 400.0 ? 32.0 : 16.0;
 
     final pts = const Padding(
       padding: EdgeInsets.only(top: 4.0),
@@ -106,7 +106,7 @@ class _MeState extends State<MePage> {
 
     // Profile picture
     final p = new Padding(
-      padding: EdgeInsets.all(hps),
+      padding: EdgeInsets.all(8.0),
       child: new Container(
         decoration: new BoxDecoration(
           border: new Border.all(
@@ -151,17 +151,17 @@ class _MeState extends State<MePage> {
       style: new TextStyle(
         fontFamily: FontConst.primary,
         color: ColorConst.darkGray,
-        fontSize: 16.0,
+        fontSize: 14.0,
         letterSpacing: 0.33,
       ),
     );
 
     // Profile details
     final i = new Padding(
-      padding: EdgeInsets.all(hps),
+      padding: EdgeInsets.only(left: 20.0),
       child: new Container(
-        width: width - ((hp * 3) + 60.0 + 1.0),
-        height: 60.0,
+        width: width - ((hp * 3) + 38.0 + 1.0),
+        height: 48.0,
         child: new Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -200,11 +200,12 @@ class _MeState extends State<MePage> {
 
     // Posts count text
     final ps = new Flexible(
-      flex: 2,
+      flex: 1,
       fit: FlexFit.tight,
       child: new Padding(
         padding: EdgeInsets.symmetric(horizontal: 8.0),
         child: new RichText(
+          textAlign: TextAlign.left,
           text: new TextSpan(
             text: _profile.posts.toString(),
             style: ts,
@@ -221,12 +222,12 @@ class _MeState extends State<MePage> {
 
     // Following count text
     final fr = new Flexible(
-      flex: 3,
+      flex: 1,
       fit: FlexFit.tight,
       child: new Padding(
         padding: EdgeInsets.symmetric(horizontal: 8.0),
         child: new RichText(
-          overflow: TextOverflow.visible,
+          textAlign: TextAlign.center,
           text: new TextSpan(
             text: _profile.followings.toString(),
             style: ts,
@@ -243,11 +244,12 @@ class _MeState extends State<MePage> {
 
     // Followers count text
     final to = new Flexible(
-      flex: 3,
+      flex: 1,
       fit: FlexFit.tight,
       child: new Padding(
         padding: EdgeInsets.symmetric(horizontal: 8.0),
         child: new RichText(
+          textAlign: TextAlign.right,
           text: new TextSpan(
             text: _profile.followers.toString(),
             style: ts,
@@ -262,25 +264,6 @@ class _MeState extends State<MePage> {
       ),
     );
 
-    // Settings button
-    final st = new Expanded(
-      flex: 1,
-      child: new Semantics(
-        button: true,
-        child: new GestureDetector(
-          onTap: _showSettings,
-          child: new Icon(
-            IconData(
-              0xf141,
-              fontFamily: FontConst.fal,
-            ),
-            color: ColorConst.darkGray,
-            size: 32.0,
-          ),
-        ),
-      ),
-    );
-
     // Following, followers and settings
     final d = new Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -289,13 +272,35 @@ class _MeState extends State<MePage> {
         ps,
         fr,
         to,
-        st,
       ],
     );
 
+    final fl = new Expanded(
+      flex: 1,
+      child: new Padding(
+        padding: EdgeInsets.only(top: 8.0),
+        child: new Button(
+          text: 'Share',
+          background: ColorConst.success,
+          padding: EdgeInsets.all(8.0),
+          onPressed: () => Navigator.of(context).pushNamed(SelectPage.tag),
+        ),
+      ),
+    );
+
+    // Follow button container
+    final b = new Container(
+        child: new Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        fl,
+      ],
+    ));
+
     // User detail container
     final u = new Container(
-      height: 180.0,
+      height: 172.0,
       decoration: new BoxDecoration(
         border: Border(
           bottom: BorderSide(
@@ -305,27 +310,72 @@ class _MeState extends State<MePage> {
         ),
       ),
       child: new Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.0),
+        padding: EdgeInsets.only(
+          bottom: 16.0,
+          left: 16.0,
+          right: 16.0,
+          top: 0.0,
+        ),
         child: new Column(
           crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            pt,
             f,
             pt,
             d,
             pt,
+            b,
           ],
         ),
       ),
     );
 
-    return new Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        u,
-      ],
+    return new CupertinoPageScaffold(
+      backgroundColor: ColorConst.white,
+      navigationBar: new CupertinoNavigationBar(
+        heroTag: 4,
+        transitionBetweenRoutes: false,
+        padding: EdgeInsetsDirectional.only(
+          top: 4.0,
+          bottom: 4.0,
+        ),
+        backgroundColor: ColorConst.white,
+        border: new Border(bottom: BorderSide.none),
+        leading: new GestureDetector(
+          onTap: () => Navigator.of(context).pop(),
+          child: new Icon(
+            IconData(0xf104, fontFamily: FontConst.fal),
+            color: ColorConst.darkerGray,
+          ),
+        ),
+        trailing: new Semantics(
+          button: true,
+          child: new GestureDetector(
+            onTap: _showSettings,
+            child: new Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: 4.0,
+                horizontal: 4.0,
+              ),
+              child: new Icon(
+                IconData(
+                  0xf141,
+                  fontFamily: FontConst.fal,
+                ),
+                color: ColorConst.darkerGray,
+                size: 32.0,
+              ),
+            ),
+          ),
+        ),
+      ),
+      child: new Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          u,
+        ],
+      ),
     );
   }
 

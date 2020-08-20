@@ -41,6 +41,9 @@ class UserQueryService extends Service {
 }
 
 class UserQueryResponse extends BasicResponse {
+  // My username
+  String me;
+
   // List of suggested users
   List<SimpleProfile> users;
 
@@ -56,6 +59,8 @@ class UserQueryResponse extends BasicResponse {
   /// Create response by using JSON input
   UserQueryResponse.fromJson(String input) {
     final json = super.fromJson(input);
+
+    me = json['me'];
 
     if (json['users'] == null) {
       users = [];
