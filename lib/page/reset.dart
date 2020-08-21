@@ -347,7 +347,8 @@ class _ResetState extends State<ResetPage> {
       // Clear API response message
       _message = null;
 
-      await Navigator.of(context).pushReplacementNamed(SignInPage.tag);
+      final f = (Route<dynamic> route) => false;
+      await Navigator.of(context).pushNamedAndRemoveUntil(SignInPage.tag, f);
     };
 
     // Error callback

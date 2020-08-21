@@ -91,30 +91,43 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
       items.add(s);
     }
 
+    // Settings button
+    final t = new Semantics(
+      button: true,
+      child: new GestureDetector(
+        onTap: () => Navigator.of(context).pushNamed(SearchPage.tag),
+        child: new Padding(
+          padding: EdgeInsets.symmetric(
+            vertical: 4.0,
+            horizontal: 12.0,
+          ),
+          child: new Icon(
+            IconData(
+              0xf002,
+              fontFamily: FontConst.fal,
+            ),
+            color: ColorConst.darkerGray,
+            size: 20.0,
+          ),
+        ),
+      ),
+    );
+
     return new Scaffold(
       key: _sk,
       backgroundColor: ColorConst.white,
       appBar: new CupertinoNavigationBar(
         heroTag: 3,
+        padding: EdgeInsetsDirectional.only(
+          top: 4.0,
+          bottom: 4.0,
+        ),
         transitionBetweenRoutes: false,
         backgroundColor: ColorConst.white,
         border: Border(
           bottom: BorderSide.none,
         ),
-        trailing: new Semantics(
-          button: true,
-          child: new GestureDetector(
-            onTap: () => Navigator.of(context).pushNamed(SearchPage.tag),
-            child: new Padding(
-              padding: EdgeInsets.all(4.0),
-              child: new Icon(
-                IconData(0xf002, fontFamily: FontConst.fal),
-                color: ColorConst.darkGray,
-                size: 20.0,
-              ),
-            ),
-          ),
-        ),
+        trailing: t,
       ),
       body: new SingleChildScrollView(
         child: new Column(
