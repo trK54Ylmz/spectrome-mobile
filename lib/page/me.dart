@@ -7,6 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/model/profile/me.dart';
+import 'package:spectrome/page/edit.dart';
+import 'package:spectrome/page/request.dart';
 import 'package:spectrome/page/select.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/service/account/sign_out.dart';
@@ -34,6 +36,9 @@ class _MeState extends State<MePage> {
 
   // Loading indicator
   bool _loading = true;
+
+  // Has username
+  bool _hu = false;
 
   // Shared preferences instance
   SharedPreferences _sp;
@@ -70,6 +75,17 @@ class _MeState extends State<MePage> {
     };
 
     Storage.load().then(spc);
+
+    // Argument callback
+    final ac = (_) {
+      final username = ModalRoute.of(context).settings.arguments;
+
+      // Set has username
+      _hu = username != null;
+    };
+
+    // Add callback for argument
+    WidgetsBinding.instance.addPostFrameCallback(ac);
   }
 
   @override
@@ -281,8 +297,10 @@ class _MeState extends State<MePage> {
         padding: EdgeInsets.only(top: 8.0),
         child: new Button(
           text: 'Share',
-          background: ColorConst.success,
+          color: ColorConst.success,
+          background: ColorConst.transparent,
           padding: EdgeInsets.all(8.0),
+          border: new Border.all(color: ColorConst.success),
           onPressed: () => Navigator.of(context).pushNamed(SelectPage.tag),
         ),
       ),
@@ -330,6 +348,39 @@ class _MeState extends State<MePage> {
       ),
     );
 
+    // Back button
+    final l = new GestureDetector(
+      onTap: () => Navigator.of(context).pop(),
+      child: new Icon(
+        IconData(0xf104, fontFamily: FontConst.fal),
+        color: ColorConst.darkerGray,
+      ),
+    );
+
+    // Settings button
+    final t = new Semantics(
+      button: true,
+      child: new GestureDetector(
+        onTap: _showSettings,
+        child: new Padding(
+          padding: EdgeInsets.symmetric(
+            vertical: 4.0,
+            horizontal: 4.0,
+          ),
+          child: new Icon(
+            IconData(
+              0xf141,
+              fontFamily: FontConst.fal,
+            ),
+            color: ColorConst.darkerGray,
+            size: 32.0,
+          ),
+        ),
+      ),
+    );
+
+    final ec = new Container();
+
     return new CupertinoPageScaffold(
       backgroundColor: ColorConst.white,
       navigationBar: new CupertinoNavigationBar(
@@ -341,33 +392,8 @@ class _MeState extends State<MePage> {
         ),
         backgroundColor: ColorConst.white,
         border: new Border(bottom: BorderSide.none),
-        leading: new GestureDetector(
-          onTap: () => Navigator.of(context).pop(),
-          child: new Icon(
-            IconData(0xf104, fontFamily: FontConst.fal),
-            color: ColorConst.darkerGray,
-          ),
-        ),
-        trailing: new Semantics(
-          button: true,
-          child: new GestureDetector(
-            onTap: _showSettings,
-            child: new Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: 4.0,
-                horizontal: 4.0,
-              ),
-              child: new Icon(
-                IconData(
-                  0xf141,
-                  fontFamily: FontConst.fal,
-                ),
-                color: ColorConst.darkerGray,
-                size: 32.0,
-              ),
-            ),
-          ),
-        ),
+        leading: _hu ? l : ec,
+        trailing: t,
       ),
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -400,7 +426,8 @@ class _MeState extends State<MePage> {
 
   /// Show settings overlay
   void _showSettings() {
-    _oe = OverlayEntry(builder: (BuildContext context) {
+    // Overlay builder
+    final b = (BuildContext context) {
       final width = MediaQuery.of(context).size.width;
       final height = MediaQuery.of(context).size.height;
 
@@ -410,11 +437,19 @@ class _MeState extends State<MePage> {
       );
 
       final eb = new Button(
-        color: ColorConst.button,
+        color: ColorConst.darkerGray,
         background: ColorConst.transparent,
         radius: BorderRadius.zero,
         text: 'Edit profile',
         onPressed: _editProfile,
+      );
+
+       final rb = new Button(
+        color: ColorConst.darkerGray,
+        background: ColorConst.transparent,
+        radius: BorderRadius.zero,
+        text: 'Follow requests',
+        onPressed: _followRequests,
       );
 
       final sb = new Button(
@@ -440,6 +475,8 @@ class _MeState extends State<MePage> {
         children: [
           eb,
           hr,
+          rb,
+          hr,
           sb,
           hr,
           cb,
@@ -452,8 +489,8 @@ class _MeState extends State<MePage> {
         color: ColorConst.darkerGray.withOpacity(0.67),
         child: new Center(
           child: new FittedBox(
-            child: new GestureDetector(
-              onTapUp: (_) => _closeSettings(),
+            child: new Listener(
+              onPointerUp: (_) => _closeSettings(),
               child: new Container(
                 width: width - 120,
                 decoration: new BoxDecoration(
@@ -471,7 +508,9 @@ class _MeState extends State<MePage> {
           ),
         ),
       );
-    });
+    };
+
+    _oe = OverlayEntry(builder: b);
 
     // Show overlay
     Overlay.of(context).insert(_oe);
@@ -560,7 +599,12 @@ class _MeState extends State<MePage> {
 
   /// Go to profile edit page
   void _editProfile() async {
-    await Navigator.of(context).pushNamed(MePage.tag);
+    await Navigator.of(context).pushNamed(EditPage.tag);
+  }
+
+  /// Go to follow requests page
+  void _followRequests() async {
+    await Navigator.of(context).pushNamed(RequestPage.tag);
   }
 
   /// Sign out from current session

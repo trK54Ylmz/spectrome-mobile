@@ -79,8 +79,10 @@ class _ButtonState extends State<Button> {
 
         widget.onPressed.call();
       },
+      behavior: HitTestBehavior.opaque,
       child: new Semantics(
         button: true,
+        focusable: true,
         child: new ConstrainedBox(
           constraints: new BoxConstraints(
             maxWidth: widget.width,
