@@ -9,7 +9,9 @@ import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/model/profile/user.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/service/profile/user.dart';
+import 'package:spectrome/service/user/cancel.dart';
 import 'package:spectrome/service/user/follow.dart';
+import 'package:spectrome/service/user/unfollow.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
@@ -42,11 +44,17 @@ class _ProfileState extends State<ProfilePage> {
   // Profile object
   UserProfile _profile;
 
+  // Is user following
+  bool _followed = false;
+
+  // Is following request sent
+  bool _requested = false;
+
   // Loading indicator
   bool _loading = true;
 
-  // Follow request sent or not
-  bool _sent = false;
+  // Action loading indicator
+  bool _action = false;
 
   @override
   void initState() {
@@ -280,32 +288,60 @@ class _ProfileState extends State<ProfilePage> {
       ],
     );
 
-    final fl = new Expanded(
+    final fl = new Button(
+      text: 'Follow',
+      disabled: _action,
+      padding: EdgeInsets.all(8.0),
+      background: ColorConst.button,
+      color: ColorConst.white,
+      border: new Border.all(
+        color: ColorConst.button,
+      ),
+      onPressed: _follow,
+    );
+
+    final rq = new Button(
+      text: 'Request sent',
+      disabled: _action,
+      padding: EdgeInsets.all(8.0),
+      background: ColorConst.transparent,
+      color: ColorConst.darkGray,
+      border: new Border.all(
+        color: ColorConst.gray,
+      ),
+      onPressed: _cancel,
+    );
+
+    final uf = new Button(
+      text: 'Unfollow',
+      disabled: _action,
+      padding: EdgeInsets.all(8.0),
+      background: ColorConst.button,
+      color: ColorConst.white,
+      border: new Border.all(
+        color: ColorConst.button,
+      ),
+      onPressed: _unfollow,
+    );
+
+    final fb = new Expanded(
       flex: 1,
       child: new Padding(
         padding: EdgeInsets.only(top: 8.0),
-        child: new Button(
-          text: _sent ? 'Request sent' : 'Follow',
-          padding: EdgeInsets.all(8.0),
-          background: _sent ? ColorConst.white : ColorConst.button,
-          color: _sent ? ColorConst.darkerGray : ColorConst.white,
-          border: new Border.all(
-            color: _sent ? ColorConst.gray : ColorConst.button,
-          ),
-          onPressed: _sent ? _cancel : _follow,
-        ),
+        child: _followed ? uf : _requested ? rq : fl,
       ),
     );
 
     // Follow button container
     final b = new Container(
-        child: new Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        fl,
-      ],
-    ));
+      child: new Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          fb,
+        ],
+      ),
+    );
 
     // User detail container
     final u = new Container(
@@ -415,6 +451,8 @@ class _ProfileState extends State<ProfilePage> {
 
       // Update profile instance
       _profile = r.profile;
+      _requested = r.request;
+      _followed = r.follow;
     };
 
     // Error callback
@@ -445,11 +483,11 @@ class _ProfileState extends State<ProfilePage> {
   void _follow() async {
     dev.log('Follow button clicked.');
 
-    if (_loading) {
+    if (_action) {
       return;
     }
 
-    setState(() => _loading = true);
+    setState(() => _action = true);
 
     dev.log('Follow request sending.');
 
@@ -469,7 +507,7 @@ class _ProfileState extends State<ProfilePage> {
       }
 
       // Set request sent
-      setState(() => _sent = true);
+      _requested = true;
     };
 
     // Error callback
@@ -486,7 +524,7 @@ class _ProfileState extends State<ProfilePage> {
         return;
       }
 
-      setState(() => _loading = false);
+      setState(() => _action = false);
     };
 
     // Prepare request
@@ -495,7 +533,111 @@ class _ProfileState extends State<ProfilePage> {
     await s.then(sc).catchError(e).whenComplete(cc);
   }
 
-  void _cancel() {
+  /// Unfollow current user
+  void _unfollow() async {
+    dev.log('Unfollow button clicked.');
 
+    if (_action) {
+      return;
+    }
+
+    setState(() => _action = true);
+
+    dev.log('Unfollow request sending.');
+
+    final sc = (UnfollowingResponse r) async {
+      dev.log('Unfollow request sent.');
+
+      if (!r.status) {
+        if (r.isNetErr ?? false) {
+          // Create network error
+          _error = ErrorMessage.network();
+        } else {
+          // Create custom error
+          _showSnackBar(r.message, isError: true);
+        }
+
+        return;
+      }
+
+      // Set following as false
+      _followed = false;
+    };
+
+    // Error callback
+    final e = (e, s) {
+      final msg = 'Unknown error. Please try again later.';
+
+      // Create unknown error message
+      _error = ErrorMessage.custom(msg);
+    };
+
+    final cc = () {
+      // Skip if dispose method called from application
+      if (!this.mounted) {
+        return;
+      }
+
+      setState(() => _action = false);
+    };
+
+    // Prepare request
+    final s = UnfollowingService.call(_session, _username);
+
+    await s.then(sc).catchError(e).whenComplete(cc);
+  }
+
+  /// Cancel follow request
+  void _cancel() async {
+    dev.log('Intention cancel button clicked.');
+
+    if (_action) {
+      return;
+    }
+
+    setState(() => _action = true);
+
+    dev.log('Intention cancel request sending.');
+
+    final sc = (IntentionCancelResponse r) async {
+      dev.log('Intention cancel request sent.');
+
+      if (!r.status) {
+        if (r.isNetErr ?? false) {
+          // Create network error
+          _error = ErrorMessage.network();
+        } else {
+          // Create custom error
+          _showSnackBar(r.message, isError: true);
+        }
+
+        return;
+      }
+
+      // Set request sent as false
+      _requested = false;
+    };
+
+    // Error callback
+    final e = (e, s) {
+      final msg = 'Unknown error. Please try again later.';
+
+      // Create unknown error message
+      _error = ErrorMessage.custom(msg);
+    };
+
+    final cc = () {
+      // Skip if dispose method called from application
+      if (!this.mounted) {
+        return;
+      }
+
+      setState(() => _action = false);
+    };
+
+    // Prepare request
+    final s = IntentionCancelService.call(_session, _username);
+
+    await s.then(sc).catchError(e).whenComplete(cc);
   }
 }
