@@ -8,7 +8,7 @@ class SignOutService extends Service {
   /// Sign out from current session
   static Future<BasicResponse> call() {
     final path = '/account/out';
- 
+
     // Http response handle callback
     final c = (Response r) {
       if (r.code != 200) {

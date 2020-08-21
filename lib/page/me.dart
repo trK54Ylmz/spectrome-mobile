@@ -444,7 +444,7 @@ class _MeState extends State<MePage> {
         onPressed: _editProfile,
       );
 
-       final rb = new Button(
+      final rb = new Button(
         color: ColorConst.darkerGray,
         background: ColorConst.transparent,
         radius: BorderRadius.zero,

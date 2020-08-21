@@ -219,7 +219,7 @@ class _SelectState extends State<SelectPage> {
         ),
       ),
     );
-    
+
     // Next button
     final nbt = new Padding(
       padding: EdgeInsets.only(top: 2.0),

@@ -29,6 +29,6 @@ class _ViewState extends State<ViewPage> {
           new HomePage(),
         ],
       ),
-    ); 
+    );
   }
 }

@@ -334,13 +334,14 @@ class _ProfileState extends State<ProfilePage> {
 
     // Follow button container
     final b = new Container(
-        child: new Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        fb,
-      ],
-    ));
+      child: new Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          fb,
+        ],
+      ),
+    );
 
     // User detail container
     final u = new Container(

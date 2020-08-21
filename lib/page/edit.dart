@@ -15,7 +15,7 @@ class EditPage extends StatefulWidget {
 class _EditState extends State<EditPage> {
   // Scaffold key
   final _sk = new GlobalKey<ScaffoldState>();
-  
+
   // Account session key
   String _session;
 
