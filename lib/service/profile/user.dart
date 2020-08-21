@@ -40,7 +40,14 @@ class UserProfileService extends Service {
 }
 
 class UserProfileResponse extends BasicResponse {
+  // User profile details
   UserProfile profile;
+
+  // User following
+  bool follow;
+
+  // User follow request sent
+  bool request;
 
   /// Create empty object
   UserProfileResponse.empty() : super.empty();
@@ -54,6 +61,9 @@ class UserProfileResponse extends BasicResponse {
   /// Create response by using JSON input
   UserProfileResponse.fromJson(String input) {
     final json = super.fromJson(input);
+
+    follow = json['follow'] ?? false;
+    request = json['request'] ?? false;
 
     final p = json['user'] as Map<String, dynamic>;
 
