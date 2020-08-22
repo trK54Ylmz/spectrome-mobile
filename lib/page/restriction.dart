@@ -1,16 +1,19 @@
 import 'dart:developer' as dev;
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/input.dart';
+import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/model/profile/simple.dart';
 import 'package:spectrome/service/query/following.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
 import 'package:spectrome/util/error.dart';
+import 'package:spectrome/util/http.dart';
 import 'package:spectrome/util/storage.dart';
 
 class RestrictionPage extends StatefulWidget {
@@ -128,9 +131,6 @@ class _RestrictionState extends State<RestrictionPage> {
     // Selected users list builder
     final lb = (BuildContext context, int i) {};
 
-    // Suggested users list builder
-    final sb = (BuildContext context, int i) {};
-
     // Selected users
     final l = new Container(
       child: new ListView.builder(
@@ -143,7 +143,7 @@ class _RestrictionState extends State<RestrictionPage> {
     final s = new Container(
       child: new ListView.builder(
         itemCount: _suggests.length,
-        itemBuilder: sb,
+        itemBuilder: _suggestBuilder,
       ),
     );
 
@@ -226,6 +226,103 @@ class _RestrictionState extends State<RestrictionPage> {
           l,
           s,
         ],
+      ),
+    );
+  }
+
+  /// Suggested users list builder
+  Widget _suggestBuilder(BuildContext context, int i) {
+    // Http headers for image request
+    final h = {Http.CONTENT_HEADER: _session};
+
+    // Request profile photo from server
+    final p = new ClipRRect(
+      borderRadius: BorderRadius.circular(20.0),
+      child: new Container(
+        width: 40.0,
+        height: 40.0,
+        child: new CachedNetworkImage(
+          width: 40.0,
+          height: 40.0,
+          imageUrl: _suggests[i].photoUrl,
+          httpHeaders: h,
+          fadeInDuration: Duration.zero,
+          filterQuality: FilterQuality.high,
+          placeholder: (c, u) => new Loading(width: 40.0, height: 40.0),
+          errorWidget: (c, u, e) => new Image.asset('assets/images/default.1.webp'),
+        ),
+      ),
+    );
+
+    final pt = new Padding(
+      padding: EdgeInsets.only(top: 2.0),
+    );
+
+    // Username text
+    final un = new Text(
+      _suggests[i].username,
+      style: new TextStyle(
+        fontFamily: FontConst.primary,
+        color: ColorConst.black,
+        fontSize: 16.0,
+        letterSpacing: 0.33,
+      ),
+    );
+
+    // Real name text
+    final nm = new Text(
+      _suggests[i].name,
+      style: new TextStyle(
+        fontFamily: FontConst.primary,
+        color: ColorConst.darkGray,
+        fontSize: 12.0,
+        letterSpacing: 0.33,
+      ),
+    );
+
+    // Information container
+    final d = new Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 12.0,
+        vertical: 2.0,
+      ),
+      child: new Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          un,
+          pt,
+          nm,
+        ],
+      ),
+    );
+
+    return new Semantics(
+      focusable: true,
+      button: true,
+      child: new GestureDetector(
+        onTap: () {
+          dev.log('User "${_suggests[i].username}" selected.');
+
+          // Add users to suggestion
+          _users.add(_suggests[i]);
+        },
+        child: new Container(
+          child: new Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
+            child: new Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                p,
+                d,
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

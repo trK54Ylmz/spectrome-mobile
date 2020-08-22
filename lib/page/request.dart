@@ -4,9 +4,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/page/profile.dart';
 import 'package:spectrome/page/sign_in.dart';
+import 'package:spectrome/service/user/accept.dart';
 import 'package:spectrome/service/user/request.dart';
 import 'package:spectrome/service/user/seen.dart';
 import 'package:spectrome/theme/color.dart';
@@ -34,6 +36,9 @@ class _RequestState extends State<RequestPage> {
 
   // Loading indicator
   bool _loading = true;
+
+  // Action loading indicator
+  bool _action = false;
 
   // Account session key
   String _session;
@@ -149,35 +154,38 @@ class _RequestState extends State<RequestPage> {
         ),
       ),
       child: new Container(
-        child: new Padding(
-          padding: EdgeInsets.symmetric(
-            vertical: 8.0,
-          ),
-          child: _requests.isEmpty ? e : l,
-        ),
+        child: _requests.isEmpty ? e : l,
       ),
     );
   }
 
   /// Follow request users list builder
   Widget _requestBuilder(BuildContext context, int i) {
+    final width = MediaQuery.of(context).size.width;
+
     // Http headers for image request
     final h = {Http.CONTENT_HEADER: _session};
 
     // Request profile photo from server
-    final p = new ClipRRect(
-      borderRadius: BorderRadius.circular(20.0),
-      child: new Container(
-        width: 40.0,
-        height: 40.0,
-        child: new CachedNetworkImage(
+    final p = new Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 4.0,
+      ),
+      child: new ClipRRect(
+        borderRadius: BorderRadius.circular(20.0),
+        child: new Container(
           width: 40.0,
           height: 40.0,
-          imageUrl: _requests[i].user.photoUrl,
-          httpHeaders: h,
-          fadeInDuration: Duration.zero,
-          placeholder: (c, u) => new Loading(width: 40.0, height: 40.0),
-          errorWidget: (c, u, e) => new Image.asset('assets/images/default.1.webp'),
+          child: new CachedNetworkImage(
+            width: 40.0,
+            height: 40.0,
+            imageUrl: _requests[i].user.photoUrl,
+            httpHeaders: h,
+            fadeInDuration: Duration.zero,
+            filterQuality: FilterQuality.high,
+            placeholder: (c, u) => new Loading(width: 40.0, height: 40.0),
+            errorWidget: (c, u, e) => new Image.asset('assets/images/default.1.webp'),
+          ),
         ),
       ),
     );
@@ -209,19 +217,39 @@ class _RequestState extends State<RequestPage> {
     );
 
     // Information container
-    final d = new Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: 12.0,
-        vertical: 2.0,
+    final d = new Container(
+      width: width - 136.0,
+      child: new Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: 12.0,
+          vertical: 2.0,
+        ),
+        child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            un,
+            pt,
+            nm,
+          ],
+        ),
       ),
-      child: new Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          un,
-          pt,
-          nm,
-        ],
+    );
+
+    // Accept button
+    final a = new Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 4.0,
+        vertical: 3.0,
+      ),
+      child: new Button(
+        text: 'Accept',
+        width: 64.0,
+        disabled: _action,
+        padding: EdgeInsets.symmetric(
+          vertical: 6.0,
+        ),
+        onPressed: () => _accept(i),
       ),
     );
 
@@ -240,15 +268,16 @@ class _RequestState extends State<RequestPage> {
         child: new Container(
           child: new Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 8.0,
+              horizontal: 8.0,
+              vertical: 12.0,
             ),
             child: new Row(
               crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 p,
                 d,
+                a,
               ],
             ),
           ),
@@ -355,5 +384,62 @@ class _RequestState extends State<RequestPage> {
 
     // Prepare request
     await IntentionSeenService.call(_session).then(sc);
+  }
+
+  /// Accept following request
+  void _accept(int index) async {
+    dev.log('Follow accept button clicked.');
+
+    if (_action) {
+      return;
+    }
+
+    dev.log('Follow accept request sending.');
+
+    // Set loading true
+    setState(() => _action = true);
+
+    // Handle HTTP response
+    final c = (FollowAcceptResponse r) async {
+      dev.log('Follow accept request sent.');
+
+      if (!r.status) {
+        if (r.isNetErr ?? false) {
+          // Create network error
+          _error = ErrorMessage.network();
+        } else {
+          // Create custom error
+          // _message = r.message;
+        }
+
+        return;
+      }
+
+      // Remove accepted request
+      setState(() => _requests.removeAt(index));
+    };
+
+    // Error callback
+    final e = (e, s) {
+      final msg = 'Unknown error. Please try again later.';
+
+      // Create unknown error message
+      _error = ErrorMessage.custom(msg);
+    };
+
+    // Complete callback
+    final cc = () {
+      // Skip if dispose method called from application
+      if (!this.mounted) {
+        return;
+      }
+
+      setState(() => _action = false);
+    };
+
+    // Prepare request
+    final s = FollowAcceptService.call(_session, _requests[index].intention.code);
+
+    s.then(c).catchError(e).whenComplete(cc);
   }
 }

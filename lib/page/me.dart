@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -79,6 +80,9 @@ class _MeState extends State<MePage> {
 
       // Load number of follow requests
       _getRequests();
+
+      // Set periodic tasks for prefile updates
+      Timer.periodic(Duration(seconds: 60), (_) => _getProfile());
     };
 
     Storage.load().then(spc);
@@ -151,6 +155,7 @@ class _MeState extends State<MePage> {
               imageUrl: _profile.photoUrl,
               httpHeaders: h,
               fadeInDuration: Duration.zero,
+              filterQuality: FilterQuality.high,
               placeholder: (c, u) => new Loading(width: 60.0, height: 60.0),
               errorWidget: (c, u, e) => new Image.asset('assets/images/default.1.webp'),
             ),

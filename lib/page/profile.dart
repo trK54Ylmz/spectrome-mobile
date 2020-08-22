@@ -141,6 +141,7 @@ class _ProfileState extends State<ProfilePage> {
               imageUrl: _profile.photoUrl,
               httpHeaders: h,
               fadeInDuration: Duration.zero,
+              filterQuality: FilterQuality.high,
               placeholder: (c, u) => new Loading(width: 60.0, height: 60.0),
               errorWidget: (c, u, e) => new Image.asset('assets/images/default.1.webp'),
             ),
