@@ -279,17 +279,76 @@ class _ShareState extends State<SharePage> {
       ),
     );
 
-    // Share with friends text
-    final st = new Padding(
-      padding: EdgeInsets.all(8.0),
-      child: new Text(
-        'Share post with only few followers?',
-        style: new TextStyle(
-          fontFamily: FontConst.primary,
-          color: ColorConst.darkGray,
-          fontSize: 14.0,
-          letterSpacing: 0.33,
+    final ts = new TextStyle(
+      fontFamily: FontConst.primary,
+      fontSize: 14.0,
+      letterSpacing: 0.33,
+    );
+
+    final hs = new TextStyle(
+      fontFamily: FontConst.primary,
+      fontSize: 14.0,
+      letterSpacing: 0.33,
+      color: ColorConst.gray,
+    );
+
+    final tsn = new TextStyle(
+      fontFamily: FontConst.primary,
+      color: ColorConst.darkGray,
+      fontSize: 14.0,
+      letterSpacing: 0.33,
+    );
+
+    final tsb = new TextStyle(
+      fontFamily: FontConst.primary,
+      color: ColorConst.darkGray,
+      fontSize: 14.0,
+      letterSpacing: 0.33,
+      fontWeight: FontWeight.bold,
+    );
+
+    Widget sm;
+    if (_restricted && _users.isNotEmpty) {
+      final smi = <InlineSpan>[];
+
+      if (_users.length > 3) {
+        smi.add(new TextSpan(text: _users[0], style: tsb));
+        smi.add(new TextSpan(text: ', ', style: tsn));
+        smi.add(new TextSpan(text: _users[1], style: tsb));
+        smi.add(new TextSpan(text: ' and ', style: tsn));
+        smi.add(new TextSpan(text: '${_users.length - 2} more', style: tsb));
+      } else if (_users.length == 2) {
+        smi.add(new TextSpan(text: _users[0], style: tsb));
+        smi.add(new TextSpan(text: ' and ', style: tsn));
+        smi.add(new TextSpan(text: _users[1], style: tsb));
+      } else {
+        smi.add(new TextSpan(text: _users[0], style: tsb));
+      }
+
+      sm = new RichText(
+        overflow: TextOverflow.ellipsis,
+        text: new TextSpan(
+          text: 'The post will be shared with ',
+          style: tsn,
+          children: smi,
         ),
+      );
+    } else {
+      sm = new Text(
+        'Share post with only few followers?',
+        style: tsn,
+      );
+    }
+
+    // Share with friends text
+    final st = new Expanded(
+      child: new Padding(
+        padding: EdgeInsets.only(
+          top: 8.0,
+          bottom: 8.0,
+          right: 8.0,
+        ),
+        child: sm,
       ),
     );
 
@@ -343,19 +402,6 @@ class _ShareState extends State<SharePage> {
           sb,
         ],
       ),
-    );
-
-    final ts = new TextStyle(
-      fontFamily: FontConst.primary,
-      fontSize: 14.0,
-      letterSpacing: 0.33,
-    );
-
-    final hs = new TextStyle(
-      fontFamily: FontConst.primary,
-      fontSize: 14.0,
-      letterSpacing: 0.33,
-      color: ColorConst.gray,
     );
 
     // Comment text field hint value

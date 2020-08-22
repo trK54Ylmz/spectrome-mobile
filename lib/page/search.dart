@@ -127,13 +127,6 @@ class _SearchState extends State<SearchPage> {
         ),
         backgroundColor: ColorConst.white,
         border: new Border(bottom: BorderSide.none),
-        leading: new GestureDetector(
-          onTap: () => Navigator.of(context).pop(),
-          child: new Icon(
-            IconData(0xf104, fontFamily: FontConst.fal),
-            color: ColorConst.darkerGray,
-          ),
-        ),
         middle: new FormText(
           hint: 'Type something',
           hintStyle: hs,
