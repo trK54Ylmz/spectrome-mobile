@@ -99,18 +99,22 @@ class _SearchState extends State<SearchPage> {
     // Trailing button
     final b = new Button(
       background: ColorConst.transparent,
-      color: ColorConst.darkGray,
+      color: ColorConst.darkerGray,
       width: 60.0,
       text: 'Clear',
+      disabled: _sc.text.length == 0,
       padding: EdgeInsets.symmetric(
         vertical: 10.0,
         horizontal: 4.0,
       ),
-      onPressed: () => _sc.clear(),
-    );
+      onPressed: () {
+        // Clear user results
+        _suggests.clear();
 
-    // Empty container
-    final bc = new Container(width: 60.0);
+        // Clear text field
+        setState(() => _sc.clear());
+      },
+    );
 
     return new CupertinoPageScaffold(
       backgroundColor: ColorConst.white,
@@ -122,6 +126,7 @@ class _SearchState extends State<SearchPage> {
           bottom: 4.0,
         ),
         backgroundColor: ColorConst.white,
+        border: new Border(bottom: BorderSide.none),
         leading: new GestureDetector(
           onTap: () => Navigator.of(context).pop(),
           child: new Icon(
@@ -149,7 +154,7 @@ class _SearchState extends State<SearchPage> {
           },
           borderColor: ColorConst.gray,
         ),
-        trailing: _sc.text.length == 0 ? bc : b,
+        trailing: b,
       ),
       child: new Container(
         child: new Padding(

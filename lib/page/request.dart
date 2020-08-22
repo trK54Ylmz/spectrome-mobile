@@ -8,6 +8,7 @@ import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/page/profile.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/service/user/request.dart';
+import 'package:spectrome/service/user/seen.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
@@ -40,6 +41,9 @@ class _RequestState extends State<RequestPage> {
   // Error message
   ErrorMessage _error;
 
+  // Number of requests count
+  int _count = 0;
+
   @override
   void initState() {
     super.initState();
@@ -52,9 +56,26 @@ class _RequestState extends State<RequestPage> {
 
       // Load follow requests from API
       _getRequests();
+
+      if (_count > 0) {
+        // Set request count as seen
+        _setSeen();
+      }
     };
 
-    Storage.load().then(spc);
+    // Request count callback
+    final ac = (_) {
+      final count = ModalRoute.of(context).settings.arguments as int;
+
+      if (count != null && count > 0) {
+        _count = count;
+      }
+
+      Storage.load().then(spc);
+    };
+
+    // Add callback for argument
+    WidgetsBinding.instance.addPostFrameCallback(ac);
   }
 
   @override
@@ -110,8 +131,9 @@ class _RequestState extends State<RequestPage> {
           bottom: 4.0,
         ),
         backgroundColor: ColorConst.white,
+        border: new Border(bottom: BorderSide.none),
         leading: new GestureDetector(
-          onTap: () => Navigator.of(context).pop(),
+          onTap: () => Navigator.of(context).pop(true),
           child: new Icon(
             IconData(0xf104, fontFamily: FontConst.fal),
             color: ColorConst.darkerGray,
@@ -265,7 +287,8 @@ class _RequestState extends State<RequestPage> {
       if (!r.status) {
         // Route to sign page, if session is expired
         if (r.expired) {
-          await Navigator.of(context).pushReplacementNamed(SignInPage.tag);
+          final r = (Route<dynamic> route) => false;
+          await Navigator.of(context).pushNamedAndRemoveUntil(SignInPage.tag, r);
           return;
         }
 
@@ -309,5 +332,28 @@ class _RequestState extends State<RequestPage> {
     final s = IntentionService.call(_session);
 
     await s.then(sc).catchError(e).whenComplete(cc);
+  }
+
+  /// Set request count as seen
+  void _setSeen() async {
+    dev.log('Follow requests seen request sending.');
+
+    // Handle HTTP response
+    final sc = (IntentionSeenResponse r) async {
+      dev.log('Follow requests seen request sent.');
+
+      if (!r.status) {
+        // Route to sign page, if session is expired
+        if (r.expired) {
+          final r = (Route<dynamic> route) => false;
+          await Navigator.of(context).pushNamedAndRemoveUntil(SignInPage.tag, r);
+        }
+
+        return;
+      }
+    };
+
+    // Prepare request
+    await IntentionSeenService.call(_session).then(sc);
   }
 }

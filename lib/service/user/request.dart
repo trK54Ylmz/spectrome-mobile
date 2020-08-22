@@ -7,7 +7,7 @@ import 'package:spectrome/service/response.dart';
 import 'package:spectrome/util/http.dart';
 
 class IntentionService extends Service {
-  /// Follow user by username
+  /// Get following requests by using session code
   static Future<IntentionResponse> call(String session) {
     final path = '/users/request';
     final headers = {Http.TOKEN_HEADER: session};
@@ -34,7 +34,6 @@ class IntentionService extends Service {
     final post = Http.doGet(
       path: path,
       headers: headers,
-      type: Http.FORM,
     );
 
     return post.then(c).catchError(e);

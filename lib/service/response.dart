@@ -38,7 +38,7 @@ class BasicResponse extends JsonResponse {
     final json = jsonToMap(input);
 
     status = json['status'];
-    expired = json['expired'] ?? null;
+    expired = json['expired'] ?? false;
     message = json['message'] ?? null;
 
     return json;

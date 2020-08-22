@@ -14,6 +14,7 @@ import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/service/account/sign_out.dart';
 import 'package:spectrome/service/profile/me.dart';
 import 'package:spectrome/service/response.dart';
+import 'package:spectrome/service/user/count.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
@@ -55,6 +56,9 @@ class _MeState extends State<MePage> {
   // Settings overlay entry
   OverlayEntry _oe;
 
+  // Number of active follow requests
+  int _count = 0;
+
   @override
   void initState() {
     super.initState();
@@ -72,6 +76,9 @@ class _MeState extends State<MePage> {
 
       // Load profile from API
       _getProfile();
+
+      // Load number of follow requests
+      _getRequests();
     };
 
     Storage.load().then(spc);
@@ -372,7 +379,7 @@ class _MeState extends State<MePage> {
               0xf141,
               fontFamily: FontConst.fal,
             ),
-            color: ColorConst.darkerGray,
+            color: _count > 0 ? ColorConst.darkRed : ColorConst.darkerGray,
             size: 32.0,
           ),
         ),
@@ -444,14 +451,6 @@ class _MeState extends State<MePage> {
         onPressed: _editProfile,
       );
 
-      final rb = new Button(
-        color: ColorConst.darkerGray,
-        background: ColorConst.transparent,
-        radius: BorderRadius.zero,
-        text: 'Follow requests',
-        onPressed: _followRequests,
-      );
-
       final sb = new Button(
         color: ColorConst.darkRed,
         background: ColorConst.transparent,
@@ -466,6 +465,61 @@ class _MeState extends State<MePage> {
         radius: BorderRadius.zero,
         text: 'Close',
         onPressed: _closeSettings,
+      );
+
+      // Follow requets text
+      final rbt = new Text(
+        'Follow requests',
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          color: ColorConst.darkerGray,
+          fontSize: 14.0,
+          letterSpacing: 0.33,
+        ),
+      );
+
+      // Follow request button request count
+      final rbc = new Padding(
+        padding: EdgeInsets.all(6.0),
+        child: new ClipRRect(
+          borderRadius: BorderRadius.circular(30.0),
+          child: new Container(
+            color: ColorConst.darkRed,
+            width: 16.0,
+            height: 16.0,
+            child: new Center(
+              child: new Text(
+                _count.toString(),
+                style: new TextStyle(
+                  fontFamily: FontConst.primary,
+                  fontSize: 10.0,
+                  fontWeight: FontWeight.bold,
+                  color: ColorConst.white,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Follow request button
+      final rb = new Semantics(
+        button: true,
+        focusable: true,
+        child: new GestureDetector(
+          onTap: _followRequests,
+          child: new Container(
+            height: 40.0,
+            child: new Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                rbt,
+                _count > 0 ? rbc : new Container(),
+              ],
+            ),
+          ),
+        ),
       );
 
       // List of buttons
@@ -554,7 +608,8 @@ class _MeState extends State<MePage> {
       if (!r.status) {
         // Route to sign page, if session is expired
         if (r.expired) {
-          await Navigator.of(context).pushReplacementNamed(SignInPage.tag);
+          final r = (Route<dynamic> route) => false;
+          await Navigator.of(context).pushNamedAndRemoveUntil(SignInPage.tag, r);
           return;
         }
 
@@ -604,7 +659,12 @@ class _MeState extends State<MePage> {
 
   /// Go to follow requests page
   void _followRequests() async {
-    await Navigator.of(context).pushNamed(RequestPage.tag);
+    final c = (_) {
+      // Set number of unseen requests to zero
+      setState(() => _count = 0);
+    };
+
+    await Navigator.of(context).pushNamed(RequestPage.tag, arguments: _count).then(c);
   }
 
   /// Sign out from current session
@@ -644,9 +704,46 @@ class _MeState extends State<MePage> {
         return;
       }
 
-      await Navigator.of(context).pushReplacementNamed(SignInPage.tag);
+      final r = (Route<dynamic> route) => false;
+      await Navigator.of(context).pushNamedAndRemoveUntil(SignInPage.tag, r);
     };
 
     await SignOutService.call().then(sc).catchError(e).whenComplete(cc);
+  }
+
+  /// Get number of follow requests sent to user
+  void _getRequests() async {
+    dev.log('Follow request count is loading.');
+
+    // Handle HTTP response
+    final sc = (IntentionCountResponse r) async {
+      dev.log('Follow request count request sent.');
+
+      if (!r.status) {
+        // Route to sign page, if session is expired
+        if (r.expired) {
+          final r = (Route<dynamic> route) => false;
+          await Navigator.of(context).pushNamedAndRemoveUntil(SignInPage.tag, r);
+        }
+
+        return;
+      }
+
+      // Clear items
+      setState(() => _count = r.count);
+    };
+
+    // Error callback
+    final e = (e, s) {
+      final msg = 'Unknown error. Please try again later.';
+
+      // Create unknown error message
+      dev.log(msg);
+    };
+
+    // Prepare request
+    final s = IntentionCountService.call(_session);
+
+    await s.then(sc).catchError(e);
   }
 }

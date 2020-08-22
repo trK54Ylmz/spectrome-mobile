@@ -181,6 +181,7 @@ class _RestrictionState extends State<RestrictionPage> {
           top: 4.0,
           bottom: 4.0,
         ),
+        border: new Border(bottom: BorderSide.none),
         backgroundColor: ColorConst.white,
         leading: new GestureDetector(
           onTap: () {

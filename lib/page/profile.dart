@@ -434,7 +434,8 @@ class _ProfileState extends State<ProfilePage> {
       if (!r.status) {
         // Route to sign page, if session is expired
         if (r.expired) {
-          await Navigator.of(context).pushReplacementNamed(SignInPage.tag);
+          final r = (Route<dynamic> route) => false;
+          await Navigator.of(context).pushNamedAndRemoveUntil(SignInPage.tag, r);
           return;
         }
 
