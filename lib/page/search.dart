@@ -187,6 +187,7 @@ class _SearchState extends State<SearchPage> {
           imageUrl: _suggests[i].photoUrl,
           httpHeaders: h,
           fadeInDuration: Duration.zero,
+          filterQuality: FilterQuality.high,
           placeholder: (c, u) => new Loading(width: 40.0, height: 40.0),
           errorWidget: (c, u, e) => new Image.asset('assets/images/default.1.webp'),
         ),

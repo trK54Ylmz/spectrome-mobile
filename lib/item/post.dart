@@ -43,6 +43,7 @@ class _PostState extends State<PostCard> {
     if (asset.type == PostAssetType.PHOTO) {
       return new Container(
         child: new CachedNetworkImage(
+              filterQuality: FilterQuality.high,
           imageUrl: widget.post.assets.first.url,
         ),
       );
