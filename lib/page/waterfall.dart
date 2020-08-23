@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/post.dart';
 import 'package:spectrome/item/shimmer.dart';
-import 'package:spectrome/model/post/post.dart';
+import 'package:spectrome/model/post/detail.dart';
 import 'package:spectrome/service/post/waterfall.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
@@ -31,7 +31,7 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
   final _sk = GlobalKey<ScaffoldState>();
 
   // Post items
-  final _posts = <Post>[];
+  final _posts = <PostDetail>[];
 
   // Scroll controller
   final _sc = new ScrollController();
@@ -80,18 +80,26 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
     final sh = new Shimmer();
 
     // Use multiple widgets to show shimmer
-    final items = <Widget>[
-      _getWaterFall(),
-      sh,
-      sh,
-      sh
-    ];
+    final items = <Widget>[];
+
+    final builder = (context, index) {
+      // Create post card
+      return new PostCard(detail: _posts[index]);
+    };
+
+    final b = ListView.builder(
+      shrinkWrap: true,
+      controller: _sc,
+      padding: new EdgeInsets.only(top: 8.0, bottom: 8.0),
+      itemCount: _posts.length,
+      itemBuilder: builder,
+    );
+
+    items.add(b);
 
     // Add shimmer in case of loading state
     if (_loading) {
-      final s = new Shimmer();
-
-      items.add(s);
+      items.add(sh);
     }
 
     // Share post button callback
@@ -194,23 +202,6 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
     );
 
     _sk.currentState.showSnackBar(snackBar);
-  }
-
-  /// Get waterfall posts widget
-  Widget _getWaterFall() {
-    final builder = (context, index) {
-      return new PostCard(
-        post: _posts[index],
-      );
-    };
-
-    return ListView.builder(
-      shrinkWrap: true,
-      controller: _sc,
-      padding: new EdgeInsets.only(top: 8.0, bottom: 8.0),
-      itemCount: _posts.length,
-      itemBuilder: builder,
-    );
   }
 
   /// Get waterfall posts

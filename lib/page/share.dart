@@ -982,6 +982,7 @@ class _ShareState extends State<SharePage> {
       disposible: _disposible,
       restricted: _restricted,
       comment: _cc.text,
+      size: _size,
       files: files,
       scales: _scales,
       users: _users,

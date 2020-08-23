@@ -12,7 +12,7 @@ class Http {
 
   static const FORM = 'application/x-www-form-urlencoded; charset=utf-8';
 
-  static const MULTIPART = 'multipart/form-data';
+  static const MULTIPART = 'multipart/form-data; charset=utf-8';
 
   static const JSON = 'application/json; charset=utf-8';
 
@@ -172,7 +172,7 @@ class Http {
               // Write plain text data
               r.write('Content-Disposition: form-data; name="$key"\n');
               r.write('\n');
-              r.write(body[key].toString());
+              r.write(body[key]);
               r.write('\n');
             }
           }
@@ -235,6 +235,16 @@ class Http {
     return t.transform(utf8.decoder).join().then((content) {
       return Response(res.statusCode, content, headers);
     });
+  }
+}
+
+class DebugHttpOverrides extends HttpOverrides {
+  /// Override current http client
+  @override
+  HttpClient createHttpClient(SecurityContext context) {
+    Http.client.badCertificateCallback = (c, h, p) => true;
+
+    return Http.client;
   }
 }
 

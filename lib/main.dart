@@ -224,6 +224,9 @@ class _MainState extends State<MainPage> {
           Http.domain = ip.controller.text;
           Http.client.badCertificateCallback = (c, h, p) => true;
 
+          // Override current http client
+          HttpOverrides.global = new DebugHttpOverrides();
+
           setState(() => _domain = true);
         },
       );

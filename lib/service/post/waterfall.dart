@@ -1,6 +1,8 @@
 import 'dart:developer' as dev;
 
+import 'package:spectrome/model/post/detail.dart';
 import 'package:spectrome/model/post/post.dart';
+import 'package:spectrome/model/profile/simple.dart';
 import 'package:spectrome/service/base.dart';
 import 'package:spectrome/service/response.dart';
 import 'package:spectrome/util/http.dart';
@@ -48,7 +50,8 @@ class WaterFallService extends Service {
 }
 
 class WaterFallResponse extends BasicResponse {
-  List<Post> posts;
+  // List of posts
+  List<PostDetail> posts;
 
   /// Create empty object
   WaterFallResponse.empty() : super.empty();
@@ -69,22 +72,56 @@ class WaterFallResponse extends BasicResponse {
       final p = json['posts'] as List<dynamic>;
 
       // Post assets callback
-      final a = (Map<String, dynamic> a) {
-        return new PostAsset(
-          name: a['name'] as String,
-          type: PostAssetType.from(a['type']),
+      final u = (Map<String, dynamic> u) {
+        return new SimpleProfile(
+          name: u['name'],
+          username: u['username'],
+          photoUrl: u['photo_url'],
+        );
+      };
+
+      // Post item callback
+      final i = (Map<String,dynamic> i) {
+        return new PostItem(
+          large: i['large'],
+          thumb: i['thumb'],
         );
       };
 
       // Post creator callback
       final c = (Map<String, dynamic> p) {
-        final assets = p['assets'] as List<dynamic>;
+        final ps = p['post'] as Map<String, dynamic>;
+        final us = p['user'] as Map<String, dynamic>;
+        final ul = p['users'] as List<dynamic>;
 
-        return new Post(
-          username: p['username'] as String,
-          assets: assets.map((i) => a(i as Map<String, dynamic>)).toList(),
-          width: p['width'] as int,
-          height: p['height'] as int,
+        final t = ps['types'] as List<dynamic>;
+        final l = ps['items'] as List<dynamic>;
+
+        // Post detail
+        final post = new Post(
+          code: ps['code'],
+          size: ps['size'] as int,
+          disposible: ps['disposible'] as bool,
+          restricted: ps['restricted'] as bool,
+          createTime: DateTime.parse(ps['create_time']),
+          types: t.map((e) => e as int).toList(),
+          items: l.map((e) => i(e as Map<String, dynamic>)).toList(),
+        );
+
+        // Post owner details
+        final user = new SimpleProfile(
+          name: us['name'],
+          username: us['username'],
+          photoUrl: us['photo_url'],
+        );
+
+        // Restricted users
+        final users = ul.map((e) => u(e as Map<String, dynamic>)).toList();
+
+        return new PostDetail(
+          post: post,
+          user: user,
+          users: users,
         );
       };
 
