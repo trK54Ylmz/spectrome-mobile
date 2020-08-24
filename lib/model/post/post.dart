@@ -37,6 +37,10 @@ class Post {
 
   final bool restricted;
 
+  final int users;
+
+  final int comments;
+
   final List<PostItem> items;
 
   final List<int> types;
@@ -49,6 +53,8 @@ class Post {
     this.size,
     this.disposible,
     this.restricted,
+    this.comments,
+    this.users,
     this.items,
     this.types,
     this.createTime,

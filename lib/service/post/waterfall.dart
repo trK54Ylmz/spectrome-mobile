@@ -103,6 +103,8 @@ class WaterFallResponse extends BasicResponse {
           size: ps['size'] as int,
           disposible: ps['disposible'] as bool,
           restricted: ps['restricted'] as bool,
+          users: ps['number_of_users'] as int,
+          comments: ps['number_of_comments'] as int,
           createTime: DateTime.parse(ps['create_time']),
           types: t.map((e) => e as int).toList(),
           items: l.map((e) => i(e as Map<String, dynamic>)).toList(),

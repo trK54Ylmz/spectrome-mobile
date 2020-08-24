@@ -115,7 +115,7 @@ class _ProfileState extends State<ProfilePage> {
     );
 
     // Http headers for image request
-    final h = {Http.CONTENT_HEADER: _session};
+    final h = {Http.TOKEN_HEADER: _session};
 
     // Profile picture
     final p = new Padding(

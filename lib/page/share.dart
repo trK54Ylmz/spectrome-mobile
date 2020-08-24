@@ -838,6 +838,148 @@ class _ShareState extends State<SharePage> {
     final width = MediaQuery.of(context).size.width;
     final height = (width / size.first) * size.last;
 
+    final ptl = new Padding(
+      padding: EdgeInsets.only(top: 16.0),
+    );
+
+    // Wide post button
+    final wb = new Expanded(
+      flex: 1,
+      child: new Semantics(
+        button: true,
+        child: new GestureDetector(
+          onTap: () {
+            if (_loading) {
+              return;
+            }
+
+            setState(() => _size = 1);
+          },
+          child: new Container(
+            decoration: new BoxDecoration(
+              color: _size == 1 ? ColorConst.white : ColorConst.gray.withOpacity(0.33),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(8.0),
+                bottomLeft: Radius.circular(8.0),
+              ),
+            ),
+            child: new Padding(
+              padding: EdgeInsets.all(8.0),
+              child: new Text(
+                'Wide'.toUpperCase(),
+                style: new TextStyle(
+                  fontFamily: FontConst.primary,
+                  fontSize: 12.0,
+                  color: _size == 1 ? ColorConst.darkerGray : ColorConst.gray,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // Square post button
+    final sb = new Expanded(
+      flex: 1,
+      child: new Semantics(
+        button: true,
+        child: new GestureDetector(
+          onTap: () {
+            if (_loading) {
+              return;
+            }
+
+            setState(() => _size = 2);
+          },
+          child: new Container(
+            decoration: new BoxDecoration(
+              color: _size == 2 ? ColorConst.white : ColorConst.gray.withOpacity(0.33),
+              border: Border(
+                left: new BorderSide(
+                  color: ColorConst.gray.withOpacity(0.67),
+                ),
+                right: new BorderSide(
+                  color: ColorConst.gray.withOpacity(0.67),
+                ),
+              ),
+            ),
+            child: new Padding(
+              padding: EdgeInsets.all(8.0),
+              child: new Text(
+                'Square'.toUpperCase(),
+                style: new TextStyle(
+                  fontFamily: FontConst.primary,
+                  fontSize: 12.0,
+                  color: _size == 2 ? ColorConst.darkerGray : ColorConst.gray,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // Tall post button
+    final tb = new Expanded(
+      flex: 1,
+      child: new Semantics(
+        button: true,
+        child: new GestureDetector(
+          onTap: () {
+            if (_loading) {
+              return;
+            }
+
+            setState(() => _size = 3);
+          },
+          child: new Container(
+            decoration: new BoxDecoration(
+              color: _size == 3 ? ColorConst.white : ColorConst.gray.withOpacity(0.33),
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(8.0),
+                bottomRight: Radius.circular(8.0),
+              ),
+            ),
+            child: new Padding(
+              padding: EdgeInsets.all(8.0),
+              child: new Text(
+                'Tall'.toUpperCase(),
+                style: new TextStyle(
+                  fontFamily: FontConst.primary,
+                  fontSize: 12.0,
+                  color: _size == 3 ? ColorConst.darkerGray : ColorConst.gray,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // Post size row
+    final w = new Center(
+      child: new Container(
+        width: 220.0,
+        decoration: new BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(8.0)),
+          border: new Border.all(
+            color: ColorConst.gray.withOpacity(0.67),
+          ),
+        ),
+        child: new Row(
+          children: [
+            wb,
+            sb,
+            tb,
+          ],
+        ),
+      ),
+    );
+
     // Create resizable photo or video widget
     Widget b;
     if (_scales.elementAt(0) == 1.0) {
@@ -859,7 +1001,7 @@ class _ShareState extends State<SharePage> {
       );
     }
 
-    return new GestureDetector(
+    final c = new GestureDetector(
       onScaleStart: _scaleStart,
       onScaleEnd: _scaleEnd,
       onScaleUpdate: (d) => _scaleUpdate(d, 0),
@@ -885,6 +1027,16 @@ class _ShareState extends State<SharePage> {
           ),
         ),
       ),
+    );
+
+    return new Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        w,
+        ptl,
+        c,
+      ],
     );
   }
 
@@ -976,6 +1128,8 @@ class _ShareState extends State<SharePage> {
       setState(() => _loading = false);
     };
 
+    final width = MediaQuery.of(context).size.width;
+
     // Create http request
     final r = ShareService.call(
       session: _session,
@@ -986,6 +1140,7 @@ class _ShareState extends State<SharePage> {
       files: files,
       scales: _scales,
       users: _users,
+      device: width,
     );
 
     return r.then(c).catchError(e).whenComplete(cc);

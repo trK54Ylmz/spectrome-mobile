@@ -166,7 +166,7 @@ class _SearchState extends State<SearchPage> {
   /// Suggested users list builder
   Widget _suggestBuilder(BuildContext context, int i) {
     // Http headers for image request
-    final h = {Http.CONTENT_HEADER: _session};
+    final h = {Http.TOKEN_HEADER: _session};
 
     // Request profile photo from server
     final p = new ClipRRect(

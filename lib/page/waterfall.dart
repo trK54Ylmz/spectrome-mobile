@@ -84,7 +84,7 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
 
     final builder = (context, index) {
       // Create post card
-      return new PostCard(detail: _posts[index]);
+      return new PostCard(detail: _posts[index], session: _session);
     };
 
     final b = ListView.builder(
@@ -182,6 +182,7 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
         trailing: t,
       ),
       body: new SingleChildScrollView(
+        physics: const ClampingScrollPhysics(),
         child: new Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
