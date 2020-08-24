@@ -46,6 +46,9 @@ class _RestrictionState extends State<RestrictionPage> {
   // Loading indicator
   bool _loading = false;
 
+  // Action loading indicator
+  bool _action = false;
+
   // Account session key
   String _session;
 
@@ -58,14 +61,14 @@ class _RestrictionState extends State<RestrictionPage> {
 
     // User typing listener callback
     final lc = () {
-      final d = Duration(seconds: 1);
+      final d = Duration(milliseconds: 300);
       final c = Curves.ease;
 
       // Move between pages according value
       if (_typing.value) {
-        _pc.animateToPage(2, duration: d, curve: c);
-      } else {
         _pc.animateToPage(1, duration: d, curve: c);
+      } else {
+        _pc.animateToPage(0, duration: d, curve: c);
       }
     };
 
@@ -128,14 +131,11 @@ class _RestrictionState extends State<RestrictionPage> {
       fontWeight: FontWeight.normal,
     );
 
-    // Selected users list builder
-    final lb = (BuildContext context, int i) {};
-
     // Selected users
     final l = new Container(
       child: new ListView.builder(
         itemCount: _users.length,
-        itemBuilder: lb,
+        itemBuilder: _selectedBuilder,
       ),
     );
 
@@ -152,6 +152,7 @@ class _RestrictionState extends State<RestrictionPage> {
       if (_typing.value) {
         // Clear text value
         _sc.clear();
+        _suggests.clear();
 
         setState(() => _typing.value = false);
       } else {
@@ -202,6 +203,9 @@ class _RestrictionState extends State<RestrictionPage> {
           controller: _sc,
           onChange: (t) {
             if (t.length < 2) {
+              _suggests.clear();
+              setState(() => _typing.value = false);
+
               return null;
             }
 
@@ -217,7 +221,7 @@ class _RestrictionState extends State<RestrictionPage> {
           },
           borderColor: ColorConst.gray,
         ),
-        trailing: _sc.text.length == 0 ? bc : b,
+        trailing: _users.isEmpty || _sc.text.isEmpty ? bc : b,
       ),
       child: new PageView(
         controller: _pc,
@@ -232,24 +236,31 @@ class _RestrictionState extends State<RestrictionPage> {
 
   /// Suggested users list builder
   Widget _suggestBuilder(BuildContext context, int i) {
+    final width = MediaQuery.of(context).size.width;
+
     // Http headers for image request
-    final h = {Http.CONTENT_HEADER: _session};
+    final h = {Http.TOKEN_HEADER: _session};
 
     // Request profile photo from server
-    final p = new ClipRRect(
-      borderRadius: BorderRadius.circular(20.0),
-      child: new Container(
-        width: 40.0,
-        height: 40.0,
-        child: new CachedNetworkImage(
+    final p = new Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 4.0,
+      ),
+      child: new ClipRRect(
+        borderRadius: BorderRadius.circular(20.0),
+        child: new Container(
           width: 40.0,
           height: 40.0,
-          imageUrl: _suggests[i].photoUrl,
-          httpHeaders: h,
-          fadeInDuration: Duration.zero,
-          filterQuality: FilterQuality.high,
-          placeholder: (c, u) => new Loading(width: 40.0, height: 40.0),
-          errorWidget: (c, u, e) => new Image.asset('assets/images/default.1.webp'),
+          child: new CachedNetworkImage(
+            width: 40.0,
+            height: 40.0,
+            imageUrl: _suggests[i].photoUrl,
+            httpHeaders: h,
+            fadeInDuration: Duration.zero,
+            filterQuality: FilterQuality.high,
+            placeholder: (c, u) => new Loading(width: 40.0, height: 40.0),
+            errorWidget: (c, u, e) => new Image.asset('assets/images/default.1.webp'),
+          ),
         ),
       ),
     );
@@ -281,19 +292,39 @@ class _RestrictionState extends State<RestrictionPage> {
     );
 
     // Information container
-    final d = new Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: 12.0,
-        vertical: 2.0,
+    final d = new Container(
+      width: width - 136.0,
+      child: new Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: 12.0,
+          vertical: 2.0,
+        ),
+        child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            un,
+            pt,
+            nm,
+          ],
+        ),
       ),
-      child: new Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          un,
-          pt,
-          nm,
-        ],
+    );
+
+    // Accept button
+    final a = new Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 4.0,
+        vertical: 3.0,
+      ),
+      child: new Button(
+        text: 'Add',
+        width: 64.0,
+        disabled: _action,
+        padding: EdgeInsets.symmetric(
+          vertical: 6.0,
+        ),
+        onPressed: () => _addUser(i),
       ),
     );
 
@@ -301,24 +332,141 @@ class _RestrictionState extends State<RestrictionPage> {
       focusable: true,
       button: true,
       child: new GestureDetector(
-        onTap: () {
-          dev.log('User "${_suggests[i].username}" selected.');
-
-          // Add users to suggestion
-          _users.add(_suggests[i]);
-        },
+        onTap: () => _addUser(i),
         child: new Container(
           child: new Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 8.0,
+              horizontal: 8.0,
+              vertical: 12.0,
             ),
             child: new Row(
               crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 p,
                 d,
+                a,
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Suggested users list builder
+  Widget _selectedBuilder(BuildContext context, int i) {
+    final width = MediaQuery.of(context).size.width;
+
+    // Http headers for image request
+    final h = {Http.TOKEN_HEADER: _session};
+
+    // Request profile photo from server
+    final p = new Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 4.0,
+      ),
+      child: new ClipRRect(
+        borderRadius: BorderRadius.circular(20.0),
+        child: new Container(
+          width: 40.0,
+          height: 40.0,
+          child: new CachedNetworkImage(
+            width: 40.0,
+            height: 40.0,
+            imageUrl: _users[i].photoUrl,
+            httpHeaders: h,
+            fadeInDuration: Duration.zero,
+            filterQuality: FilterQuality.high,
+            placeholder: (c, u) => new Loading(width: 40.0, height: 40.0),
+            errorWidget: (c, u, e) => new Image.asset('assets/images/default.1.webp'),
+          ),
+        ),
+      ),
+    );
+
+    final pt = new Padding(
+      padding: EdgeInsets.only(top: 2.0),
+    );
+
+    // Username text
+    final un = new Text(
+      _users[i].username,
+      style: new TextStyle(
+        fontFamily: FontConst.primary,
+        color: ColorConst.black,
+        fontSize: 16.0,
+        letterSpacing: 0.33,
+      ),
+    );
+
+    // Real name text
+    final nm = new Text(
+      _users[i].name,
+      style: new TextStyle(
+        fontFamily: FontConst.primary,
+        color: ColorConst.darkGray,
+        fontSize: 12.0,
+        letterSpacing: 0.33,
+      ),
+    );
+
+    // Information container
+    final d = new Container(
+      width: width - 148.0,
+      child: new Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: 12.0,
+          vertical: 2.0,
+        ),
+        child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            un,
+            pt,
+            nm,
+          ],
+        ),
+      ),
+    );
+
+    // Accept button
+    final a = new Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 4.0,
+        vertical: 3.0,
+      ),
+      child: new Button(
+        text: 'Remove',
+        width: 76.0,
+        disabled: _action,
+        background: ColorConst.darkRed,
+        padding: EdgeInsets.symmetric(
+          vertical: 6.0,
+        ),
+        onPressed: () => _removeUser(i),
+      ),
+    );
+
+    return new Semantics(
+      focusable: true,
+      button: true,
+      child: new GestureDetector(
+        onTap: () => _removeUser(i),
+        child: new Container(
+          child: new Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 8.0,
+              vertical: 12.0,
+            ),
+            child: new Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                p,
+                d,
+                a,
               ],
             ),
           ),
@@ -385,5 +533,49 @@ class _RestrictionState extends State<RestrictionPage> {
     final s = FollowingQueryService.call(_session, _sc.text);
 
     s.then(c).catchError(e).whenComplete(cc);
+  }
+
+  /// Add selected user according to given index of suggestions
+  void _addUser(int index) {
+    for (int i = 0; i < _users.length; i++) {
+      // Check if selected user is exists in the list of selected users
+      if (_suggests[index].username == _users[i].username) {
+        return;
+      }
+    }
+
+    dev.log('User "${_suggests[index].username}" added.');
+
+    // Add suggestion to selected users
+    _users.add(_suggests[index]);
+
+    setState(() => _typing.value = false);
+  }
+
+  /// Remove selected user from selected users
+  void _removeUser(int index) {
+    int j = -1;
+    for (int i = 0; i < _users.length; i++) {
+      // Check if selected user is exists in the list of selected users
+      if (_suggests[index].username == _users[i].username) {
+        j = i;
+        break;
+      }
+    }
+
+    // The user should be exists
+    if (j == -1) {
+      return;
+    }
+
+    // Clear text
+    _sc.clear();
+
+    dev.log('User "${_suggests[index].username}" removed.');
+
+    // Remove suggestion from selected users
+    _users.removeAt(j);
+
+    setState(() => _typing.value = false);
   }
 }

@@ -127,13 +127,6 @@ class _SearchState extends State<SearchPage> {
         ),
         backgroundColor: ColorConst.white,
         border: new Border(bottom: BorderSide.none),
-        leading: new GestureDetector(
-          onTap: () => Navigator.of(context).pop(),
-          child: new Icon(
-            IconData(0xf104, fontFamily: FontConst.fal),
-            color: ColorConst.darkerGray,
-          ),
-        ),
         middle: new FormText(
           hint: 'Type something',
           hintStyle: hs,
@@ -173,7 +166,7 @@ class _SearchState extends State<SearchPage> {
   /// Suggested users list builder
   Widget _suggestBuilder(BuildContext context, int i) {
     // Http headers for image request
-    final h = {Http.CONTENT_HEADER: _session};
+    final h = {Http.TOKEN_HEADER: _session};
 
     // Request profile photo from server
     final p = new ClipRRect(

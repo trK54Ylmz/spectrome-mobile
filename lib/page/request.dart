@@ -164,7 +164,7 @@ class _RequestState extends State<RequestPage> {
     final width = MediaQuery.of(context).size.width;
 
     // Http headers for image request
-    final h = {Http.CONTENT_HEADER: _session};
+    final h = {Http.TOKEN_HEADER: _session};
 
     // Request profile photo from server
     final p = new Padding(

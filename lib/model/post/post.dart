@@ -17,34 +17,46 @@ class PostAssetType {
   }
 }
 
-class PostAsset {
-  final String name;
+class PostItem {
+  final String large;
 
-  final int type;
+  final String thumb;
 
-  final String url;
-
-  const PostAsset({
-    this.name,
-    this.type,
-    this.url,
+  const PostItem({
+    this.large,
+    this.thumb,
   });
 }
 
 class Post {
-  final String username;
+  final String code;
 
-  final List<PostAsset> assets;
+  final int size;
 
-  final int width;
+  final bool disposible;
 
-  final int height;
+  final bool restricted;
+
+  final int users;
+
+  final int comments;
+
+  final List<PostItem> items;
+
+  final List<int> types;
+
+  final DateTime createTime;
 
   /// Create post object
   const Post({
-    this.username,
-    this.assets,
-    this.width,
-    this.height,
+    this.code,
+    this.size,
+    this.disposible,
+    this.restricted,
+    this.comments,
+    this.users,
+    this.items,
+    this.types,
+    this.createTime,
   });
 }

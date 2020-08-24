@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/post.dart';
 import 'package:spectrome/item/shimmer.dart';
-import 'package:spectrome/model/post/post.dart';
-import 'package:spectrome/page/search.dart';
+import 'package:spectrome/model/post/detail.dart';
 import 'package:spectrome/service/post/waterfall.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
@@ -15,7 +14,13 @@ import 'package:spectrome/util/storage.dart';
 class WaterFallPage extends StatefulWidget {
   static final tag = 'waterfall';
 
-  WaterFallPage() : super();
+  // View page controller
+  final PageController controller;
+
+  // Number of active follow requests
+  final ValueNotifier<int> request;
+
+  WaterFallPage({this.controller, this.request}) : super();
 
   @override
   _WaterFallState createState() => new _WaterFallState();
@@ -26,7 +31,7 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
   final _sk = GlobalKey<ScaffoldState>();
 
   // Post items
-  final _posts = <Post>[];
+  final _posts = <PostDetail>[];
 
   // Scroll controller
   final _sc = new ScrollController();
@@ -72,30 +77,45 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
   Widget build(BuildContext context) {
     super.build(context);
 
+    final sh = new Shimmer();
+
     // Use multiple widgets to show shimmer
-    final items = <Widget>[
-      _getWaterFall(),
-    ];
+    final items = <Widget>[];
+
+    final builder = (context, index) {
+      // Create post card
+      return new PostCard(detail: _posts[index], session: _session);
+    };
+
+    final b = ListView.builder(
+      shrinkWrap: true,
+      controller: _sc,
+      padding: new EdgeInsets.only(top: 8.0, bottom: 8.0),
+      itemCount: _posts.length,
+      itemBuilder: builder,
+    );
+
+    items.add(b);
 
     // Add shimmer in case of loading state
     if (_loading) {
-      final s = new Shimmer(
-        duration: Duration(seconds: 1),
-        child: new Container(
-          width: 300,
-          height: 300,
-          color: ColorConst.gray,
-        ),
-      );
-
-      items.add(s);
+      items.add(sh);
     }
 
-    // Settings button
-    final t = new Semantics(
+    // Share post button callback
+    final sc = () {
+      final d = new Duration(milliseconds: 500);
+      final c = Curves.easeInOut;
+
+      // Move to profile page
+      widget.controller.animateToPage(0, duration: d, curve: c);
+    };
+
+    // Share post page button
+    final l = new Semantics(
       button: true,
       child: new GestureDetector(
-        onTap: () => Navigator.of(context).pushNamed(SearchPage.tag),
+        onTap: sc,
         child: new Padding(
           padding: EdgeInsets.symmetric(
             vertical: 4.0,
@@ -103,10 +123,41 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
           ),
           child: new Icon(
             IconData(
-              0xf002,
+              0xf0fe,
               fontFamily: FontConst.fal,
             ),
-            color: ColorConst.darkerGray,
+            color: ColorConst.darkGray,
+            size: 20.0,
+          ),
+        ),
+      ),
+    );
+
+    // Profile button callback
+    final pc = () {
+      final d = new Duration(milliseconds: 500);
+      final c = Curves.easeInOut;
+
+      // Move to profile page
+      widget.controller.animateToPage(2, duration: d, curve: c);
+    };
+
+    // Profile page button
+    final t = new Semantics(
+      button: true,
+      child: new GestureDetector(
+        onTap: pc,
+        child: new Padding(
+          padding: EdgeInsets.symmetric(
+            vertical: 4.0,
+            horizontal: 12.0,
+          ),
+          child: new Icon(
+            IconData(
+              0xf007,
+              fontFamily: FontConst.fal,
+            ),
+            color: widget.request.value > 0 ? ColorConst.darkRed : ColorConst.darkGray,
             size: 20.0,
           ),
         ),
@@ -127,11 +178,13 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
         border: Border(
           bottom: BorderSide.none,
         ),
+        leading: l,
         trailing: t,
       ),
       body: new SingleChildScrollView(
+        physics: const ClampingScrollPhysics(),
         child: new Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: items,
         ),
@@ -150,23 +203,6 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
     );
 
     _sk.currentState.showSnackBar(snackBar);
-  }
-
-  /// Get waterfall posts widget
-  Widget _getWaterFall() {
-    final builder = (context, index) {
-      return new PostCard(
-        post: _posts[index],
-      );
-    };
-
-    return ListView.builder(
-      shrinkWrap: true,
-      controller: _sc,
-      padding: new EdgeInsets.only(top: 8.0, bottom: 8.0),
-      itemCount: _posts.length,
-      itemBuilder: builder,
-    );
   }
 
   /// Get waterfall posts
