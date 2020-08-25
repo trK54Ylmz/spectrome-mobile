@@ -454,7 +454,9 @@ class _ProfileState extends State<ProfilePage> {
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown error. Please try again later.';
+      final msg = 'Unknown profile load error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
 
       // Create unknown error message
       _error = ErrorMessage.custom(msg);
@@ -509,7 +511,9 @@ class _ProfileState extends State<ProfilePage> {
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown error. Please try again later.';
+      final msg = 'Unknown follow error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
 
       // Create unknown error message
       _error = ErrorMessage.custom(msg);
@@ -563,7 +567,9 @@ class _ProfileState extends State<ProfilePage> {
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown error. Please try again later.';
+      final msg = 'Unknown unfollow error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
 
       // Create unknown error message
       _error = ErrorMessage.custom(msg);
@@ -617,7 +623,9 @@ class _ProfileState extends State<ProfilePage> {
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown error. Please try again later.';
+      final msg = 'Unknown cancel error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
 
       // Create unknown error message
       _error = ErrorMessage.custom(msg);

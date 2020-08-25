@@ -7,6 +7,7 @@ import 'package:spectrome/page/profile.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
+import 'package:spectrome/util/date.dart';
 import 'package:spectrome/util/http.dart';
 
 class PostCard extends StatefulWidget {
@@ -27,6 +28,9 @@ class PostCard extends StatefulWidget {
 }
 
 class _PostState extends State<PostCard> {
+  // Page controller for multiple items
+  final _pc = new PageController();
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -82,7 +86,7 @@ class _PostState extends State<PostCard> {
 
     final ur = new Container(
       width: 120.0,
-      height: 20.0,
+      height: 22.0,
       child: new Text(
         widget.detail.user.username,
         style: new TextStyle(
@@ -98,10 +102,10 @@ class _PostState extends State<PostCard> {
       width: 120.0,
       height: 14.0,
       child: new Text(
-        widget.detail.user.name,
+        DateTimes.diff(DateTime.now(), widget.detail.post.createTime),
         style: new TextStyle(
           fontFamily: FontConst.primary,
-          color: ColorConst.darkerGray,
+          color: ColorConst.darkGray,
           fontSize: 12.0,
           letterSpacing: 0.33,
         ),
@@ -251,6 +255,7 @@ class _PostState extends State<PostCard> {
         height: ph,
         child: new PageView(
           physics: const ClampingScrollPhysics(),
+          controller: _pc,
           children: items,
         ),
       );

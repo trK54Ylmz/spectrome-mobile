@@ -380,7 +380,9 @@ class _ActivationState extends State<ActivationPage> {
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown error. Please try again later.';
+      final msg = 'Unknown activate error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
 
       // Create error message
       _error = ErrorMessage.custom(msg);
@@ -449,7 +451,9 @@ class _ActivationState extends State<ActivationPage> {
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown error. Please try again later.';
+      final msg = 'Unknown activation error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
 
       // Create error message
       _error = ErrorMessage.custom(msg);

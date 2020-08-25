@@ -513,7 +513,9 @@ class _RestrictionState extends State<RestrictionPage> {
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown error. Please try again later.';
+      final msg = 'Unknown suggestion error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
 
       // Create unknown error message
       _error = ErrorMessage.custom(msg);

@@ -249,7 +249,9 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown error. Please try again later.';
+      final msg = 'Unknown post load error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
 
       // Show snackbar error indicator
       _showSnackBar(msg);

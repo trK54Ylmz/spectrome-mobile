@@ -169,10 +169,12 @@ class Http {
 
               r.write('\n');
             } else {
+              final v = body[key] is bool ? body[key] ? 1 : 0 : body[key];
+              
               // Write plain text data
               r.write('Content-Disposition: form-data; name="$key"\n');
               r.write('\n');
-              r.write(body[key]);
+              r.write(v.toString());
               r.write('\n');
             }
           }
@@ -194,7 +196,9 @@ class Http {
               int i = 0;
 
               // Iterate over list params
-              for (var v in body[key] as List) {
+              for (var value in body[key] as List) {
+                final v = value is bool ? value ? 1 : 0 : value;
+
                 form.add('$k-$i=$v');
                 i++;
               }

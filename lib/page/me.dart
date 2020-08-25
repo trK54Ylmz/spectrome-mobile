@@ -635,7 +635,9 @@ class _MeState extends State<MePage> {
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown error. Please try again later.';
+      final msg = 'Unknown profile load error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
 
       // Create unknown error message
       _error = ErrorMessage.custom(msg);
@@ -693,7 +695,9 @@ class _MeState extends State<MePage> {
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown error. Please try again later.';
+      final msg = 'Unknown sign out error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
 
       // Create unknown error message
       _error = ErrorMessage.custom(msg);
@@ -737,10 +741,10 @@ class _MeState extends State<MePage> {
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown error. Please try again later.';
+      final msg = 'Unknown request count error. Please try again later.';
 
       // Create unknown error message
-      dev.log(msg);
+      dev.log(msg, stackTrace: s);
     };
 
     // Prepare request

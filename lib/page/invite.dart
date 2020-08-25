@@ -353,7 +353,9 @@ class _InviteState extends State<InvitePage> {
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown error. Please try again later.';
+      final msg = 'Unknown invitation error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
 
       // Create error message
       _error = ErrorMessage.custom(msg);
