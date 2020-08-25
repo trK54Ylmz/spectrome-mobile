@@ -1,6 +1,5 @@
 import 'dart:developer' as dev;
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -174,15 +173,13 @@ class _SearchState extends State<SearchPage> {
       child: new Container(
         width: 40.0,
         height: 40.0,
-        child: new CachedNetworkImage(
+        child: new Image.network(
+          _suggests[i].photoUrl,
+          headers: h,
           width: 40.0,
           height: 40.0,
-          imageUrl: _suggests[i].photoUrl,
-          httpHeaders: h,
-          fadeInDuration: Duration.zero,
-          filterQuality: FilterQuality.high,
-          placeholder: (c, u) => new Loading(width: 40.0, height: 40.0),
-          errorWidget: (c, u, e) => new Image.asset('assets/images/default.1.jpg'),
+          loadingBuilder: (b, w, i) => new Loading(width: 40.0, height: 40.0),
+          errorBuilder: (c, o, s) => new Image.asset('assets/images/default.1.jpg'),
         ),
       ),
     );

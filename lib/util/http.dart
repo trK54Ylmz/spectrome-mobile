@@ -21,7 +21,7 @@ class Http {
 
   static const UA = 'spectrome.app.agent - ${AppConst.version}';
 
-  static final client = new HttpClient();
+  static final client = new HttpClient()..autoUncompress = false;
 
   static final gzip = new GZipCodec();
 
@@ -108,7 +108,13 @@ class Http {
     final c = (HttpClientRequest r) {
       // Update request headers if headers parameter is present
       for (String k in headers.keys) {
-        r.headers.add(k, headers[k]);
+        if (r.headers.value(k) == null) {
+          // Add new header if header does not exists
+          r.headers.add(k, headers[k]);
+        } else {
+          // Set header if header is already exists
+          r.headers.set(k, headers[k]);
+        }
       }
 
       // Add http request content type header
@@ -218,8 +224,10 @@ class Http {
                 i++;
               }
             } else {
-              final v = Uri.encodeQueryComponent(body[key].toString());
-              form.add('$k=$v');
+              final v = body[key] is bool ? body[key] ? 1 : 0 : body[key];
+              final value = Uri.encodeQueryComponent(v);
+
+              form.add('$k=$value');
             }
           }
 
@@ -243,12 +251,10 @@ class Http {
 
     res.headers.forEach((f, s) => headers[f.toLowerCase()] = s[0]);
 
-    bool gzip = false;
-    if (headers.containsKey('content-encoding')) {
-      gzip = headers['content-encoding'] == 'gzip';
-    }
+    // Check if content encoding is gzip
+    final gzip = res.headers.value('content-encoding') == 'gzip';
 
-    // Decode gzip encoding
+    // Decode gzip if content compressed
     final t = gzip ? res.transform(Http.gzip.decoder) : res;
 
     return t.transform(utf8.decoder).join().then((content) {
@@ -261,9 +267,12 @@ class DebugHttpOverrides extends HttpOverrides {
   /// Override current http client
   @override
   HttpClient createHttpClient(SecurityContext context) {
-    Http.client.badCertificateCallback = (c, h, p) => true;
+    final c = Http.client;
 
-    return Http.client;
+    c.connectionTimeout = Duration(seconds: 10);
+    c.badCertificateCallback = (c, h, p) => true;
+
+    return c;
   }
 }
 

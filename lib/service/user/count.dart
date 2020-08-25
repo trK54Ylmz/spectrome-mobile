@@ -36,6 +36,7 @@ class IntentionCountService extends Service {
     final post = Http.doGet(
       path: path,
       headers: headers,
+      type: Http.JSON,
     );
 
     return post.then(c).catchError(e);

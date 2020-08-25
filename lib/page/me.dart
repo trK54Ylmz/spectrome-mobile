@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/button.dart';
-import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/model/profile/me.dart';
 import 'package:spectrome/page/edit.dart';
 import 'package:spectrome/page/request.dart';
@@ -153,7 +152,6 @@ class _MeState extends State<MePage> {
               headers: h,
               width: 60.0,
               height: 60.0,
-              loadingBuilder: (b, w, i) => new Loading(width: 60.0, height: 60.0),
               errorBuilder: (c, o, s) => new Image.asset('assets/images/default.1.jpg'),
             ),
           ),

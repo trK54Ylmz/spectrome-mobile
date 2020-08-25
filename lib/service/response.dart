@@ -26,6 +26,7 @@ class BasicResponse extends JsonResponse {
     this.status = status;
     this.message = message;
     this.isNetErr = isNetErr;
+    this.expired = false;
   }
 
   /// Convert http response body as json
