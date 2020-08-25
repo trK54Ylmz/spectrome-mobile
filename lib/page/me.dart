@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -154,6 +153,7 @@ class _MeState extends State<MePage> {
               headers: h,
               width: 60.0,
               height: 60.0,
+              loadingBuilder: (b, w, i) => new Loading(width: 60.0, height: 60.0),
               errorBuilder: (c, o, s) => new Image.asset('assets/images/default.1.jpg'),
             ),
           ),
