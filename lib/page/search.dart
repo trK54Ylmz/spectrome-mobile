@@ -182,7 +182,7 @@ class _SearchState extends State<SearchPage> {
           fadeInDuration: Duration.zero,
           filterQuality: FilterQuality.high,
           placeholder: (c, u) => new Loading(width: 40.0, height: 40.0),
-          errorWidget: (c, u, e) => new Image.asset('assets/images/default.1.webp'),
+          errorWidget: (c, u, e) => new Image.asset('assets/images/default.1.jpg'),
         ),
       ),
     );

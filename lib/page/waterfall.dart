@@ -30,14 +30,17 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
   // Scaffold key
   final _sk = GlobalKey<ScaffoldState>();
 
-  // Post items
-  final _posts = <PostDetail>[];
-
   // Scroll controller
   final _sc = new ScrollController();
 
+  // Post items
+  final _posts = <PostDetail>[];
+
   // Loading indicator
   bool _loading = true;
+
+  // Is scroll operation has made or not
+  bool _scrolled = false;
 
   // Account session key
   String _session;
@@ -49,7 +52,10 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
   void initState() {
     super.initState();
 
+    // Posts list view scroll controller
     _sc.addListener(() {
+      setState(() => _scrolled = (_sc.position.pixels > 1.0));
+
       // Load more posts
       if (_sc.offset == _sc.position.maxScrollExtent) {
         _getPosts();
@@ -74,6 +80,14 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
   }
 
   @override
+  void dispose() {
+    // Dispose scroll controller
+    _sc.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
 
@@ -87,12 +101,14 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
       return new PostCard(detail: _posts[index], session: _session);
     };
 
-    final b = ListView.builder(
-      shrinkWrap: true,
-      controller: _sc,
-      padding: new EdgeInsets.only(top: 8.0, bottom: 8.0),
-      itemCount: _posts.length,
-      itemBuilder: builder,
+    final b = new Expanded(
+      child: new ListView.builder(
+        controller: _sc,
+        physics: const ClampingScrollPhysics(),
+        padding: new EdgeInsets.only(top: 8.0, bottom: 8.0),
+        itemCount: _posts.length,
+        itemBuilder: builder,
+      ),
     );
 
     items.add(b);
@@ -164,6 +180,17 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
       ),
     );
 
+    final eb = Border(
+      bottom: BorderSide.none,
+    );
+
+    final gb = new Border(
+      bottom: BorderSide(
+        color: ColorConst.lightGray,
+        width: 0.5,
+      ),
+    );
+
     return new Scaffold(
       key: _sk,
       backgroundColor: ColorConst.white,
@@ -175,19 +202,14 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
         ),
         transitionBetweenRoutes: false,
         backgroundColor: ColorConst.white,
-        border: Border(
-          bottom: BorderSide.none,
-        ),
+        border: _scrolled ? gb : eb,
         leading: l,
         trailing: t,
       ),
-      body: new SingleChildScrollView(
-        physics: const ClampingScrollPhysics(),
-        child: new Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: items,
-        ),
+      body: new Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: items,
       ),
     );
   }

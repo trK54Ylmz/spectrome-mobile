@@ -90,6 +90,7 @@ class WaterFallResponse extends BasicResponse {
 
       // Post creator callback
       final c = (Map<String, dynamic> p) {
+        final me = p['me'] as bool;
         final ps = p['post'] as Map<String, dynamic>;
         final us = p['user'] as Map<String, dynamic>;
         final ul = p['users'] as List<dynamic>;
@@ -121,6 +122,7 @@ class WaterFallResponse extends BasicResponse {
         final users = ul.map((e) => u(e as Map<String, dynamic>)).toList();
 
         return new PostDetail(
+          me: me,
           post: post,
           user: user,
           users: users,

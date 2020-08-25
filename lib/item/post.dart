@@ -1,9 +1,9 @@
 import 'dart:developer' as dev;
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/model/post/detail.dart';
+import 'package:spectrome/page/me.dart';
+import 'package:spectrome/page/profile.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
@@ -44,28 +44,39 @@ class _PostState extends State<PostCard> {
     final pt = new Padding(padding: EdgeInsets.only(top: 16.0));
     final ptx = new Padding(padding: EdgeInsets.only(top: 32.0));
 
-    final pp = new Container(
-      width: 40.0,
-      height: 40.0,
-      decoration: new BoxDecoration(
-        color: ColorConst.gray,
-        border: new Border.all(
-          width: 0.5,
-          color: ColorConst.gray.withOpacity(0.5),
-        ),
-        borderRadius: BorderRadius.all(
-          Radius.circular(20.0),
-        ),
-      ),
-      child: new CachedNetworkImage(
+    // User profile callback
+    final uc = () async {
+      final t = widget.detail.me ? MePage.tag : ProfilePage.tag;
+
+      // Move to profile page
+      await Navigator.of(context).pushNamed(t, arguments: widget.detail.user.username);
+    };
+
+    final pp = new GestureDetector(
+      onTap: uc,
+      child: new Container(
         width: 40.0,
         height: 40.0,
-        imageUrl: widget.detail.user.photoUrl,
-        httpHeaders: h,
-        fadeInDuration: Duration.zero,
-        filterQuality: FilterQuality.high,
-        placeholder: (c, u) => new Loading(width: 40.0, height: 40.0),
-        errorWidget: (c, u, e) => new Image.asset('assets/images/default.1.webp'),
+        decoration: new BoxDecoration(
+          color: ColorConst.gray,
+          border: new Border.all(
+            width: 0.5,
+            color: ColorConst.gray.withOpacity(0.5),
+          ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(20.0),
+          ),
+        ),
+        child: new ClipRRect(
+          borderRadius: BorderRadius.circular(30.0),
+          child: new Image.network(
+            widget.detail.user.photoUrl,
+            headers: h,
+            width: 40.0,
+            height: 40.0,
+            errorBuilder: (c, o, s) => new Image.asset('assets/images/default.1.jpg'),
+          ),
+        ),
       ),
     );
 
@@ -97,15 +108,18 @@ class _PostState extends State<PostCard> {
       ),
     );
 
-    final uu = new Padding(
-      padding: EdgeInsets.only(left: 8.0),
-      child: new Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ur,
-          un,
-        ],
+    final uu = new GestureDetector(
+      onTap: uc,
+      child: new Padding(
+        padding: EdgeInsets.only(left: 8.0),
+        child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ur,
+            un,
+          ],
+        ),
       ),
     );
 
@@ -118,6 +132,7 @@ class _PostState extends State<PostCard> {
 
     final dt = new Text(
       'Disposible'.toUpperCase(),
+      textAlign: TextAlign.right,
       style: new TextStyle(
         fontFamily: FontConst.primary,
         fontSize: 12.0,
@@ -125,13 +140,10 @@ class _PostState extends State<PostCard> {
       ),
     );
 
-    final ds = new Padding(
-      padding: EdgeInsets.all(4.0),
-      child: new Container(
-        width: 64.0,
-        height: 14.0,
-        child: widget.detail.post.disposible ? dt : ec,
-      ),
+    final ds = new Container(
+      width: 64.0,
+      height: 14.0,
+      child: widget.detail.post.disposible ? dt : ec,
     );
 
     final i = new Row(
@@ -277,7 +289,7 @@ class _PostState extends State<PostCard> {
     final i = new Image.network(
       widget.detail.post.items[index].large,
       headers: h,
-      errorBuilder: _photoError,
+      errorBuilder: (c, o, s) => new Image.asset('assets/images/default.1.jpg'),
     );
 
     return new Container(
@@ -302,11 +314,5 @@ class _PostState extends State<PostCard> {
       width: pw,
       height: ph,
     );
-  }
-
-  Widget _photoError(BuildContext context, Object o, StackTrace s) {
-    print(s);
-
-    return new Container(color: ColorConst.gray);
   }
 }

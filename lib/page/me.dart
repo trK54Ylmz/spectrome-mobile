@@ -149,15 +149,12 @@ class _MeState extends State<MePage> {
           child: new Container(
             width: 60.0,
             height: 60.0,
-            child: new CachedNetworkImage(
+            child: new Image.network(
+              _profile.photoUrl,
+              headers: h,
               width: 60.0,
               height: 60.0,
-              imageUrl: _profile.photoUrl,
-              httpHeaders: h,
-              fadeInDuration: Duration.zero,
-              filterQuality: FilterQuality.high,
-              placeholder: (c, u) => new Loading(width: 60.0, height: 60.0),
-              errorWidget: (c, u, e) => new Image.asset('assets/images/default.1.webp'),
+              errorBuilder: (c, o, s) => new Image.asset('assets/images/default.1.jpg'),
             ),
           ),
         ),
