@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:crypto/crypto.dart';
+import 'package:spectrome/util/const.dart';
 
 class Http {
   static const TOKEN_HEADER = 'x-authorization';
@@ -10,11 +11,15 @@ class Http {
 
   static const CONTENT_HEADER = 'content-type';
 
+  static const UA_HEADER = 'user-agent';
+
   static const FORM = 'application/x-www-form-urlencoded; charset=utf-8';
 
   static const MULTIPART = 'multipart/form-data; charset=utf-8';
 
   static const JSON = 'application/json; charset=utf-8';
+
+  static const UA = 'spectrome.app.agent - ${AppConst.version}';
 
   static final client = new HttpClient();
 
@@ -34,20 +39,28 @@ class Http {
 
     final Uri url = new Uri.https(domain, path, params);
 
-    // Add gzip header
+    // Add gzip header and user agent
     if (headers == null) {
       headers = {
         Http.ACCEPT_HEADER: 'gzip',
+        Http.UA_HEADER: Http.UA,
       };
     } else {
       headers[Http.ACCEPT_HEADER] = 'gzip';
+      headers[Http.UA_HEADER] = Http.UA;
     }
 
     // Http request and response callback
     final c = (HttpClientRequest r) {
       // Update request headers if headers parameter is present
       for (String k in headers.keys) {
-        r.headers.add(k, headers[k]);
+        if (r.headers.value(k) == null) {
+          // Add new header if header does not exists
+          r.headers.add(k, headers[k]);
+        } else {
+          // Set header if header is already exists
+          r.headers.set(k, headers[k]);
+        }
       }
 
       // Add http request content type header
@@ -80,13 +93,15 @@ class Http {
 
     final Uri url = new Uri.https(domain, path, params);
 
-    // Add gzip header
+    // Add gzip header and user agent
     if (headers == null) {
       headers = {
         Http.ACCEPT_HEADER: 'gzip',
+        Http.UA_HEADER: Http.UA,
       };
     } else {
       headers[Http.ACCEPT_HEADER] = 'gzip';
+      headers[Http.UA_HEADER] = Http.UA;
     }
 
     // Http request and response callback
@@ -170,7 +185,7 @@ class Http {
               r.write('\n');
             } else {
               final v = body[key] is bool ? body[key] ? 1 : 0 : body[key];
-              
+
               // Write plain text data
               r.write('Content-Disposition: form-data; name="$key"\n');
               r.write('\n');
