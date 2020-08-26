@@ -38,6 +38,8 @@ class _SessionState extends State<SessionPage> {
     final e = (e, s) {
       final msg = 'Unknown error. Please try again later.';
 
+      dev.log(msg, stackTrace: s);
+
       // Create unknown error message
       _error = ErrorMessage.custom(msg);
     };

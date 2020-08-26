@@ -105,6 +105,10 @@ class GalleryState extends State<GalleryPage> {
 
     // Gallery request callback
     final c = (bool status) async {
+      if (!mounted) {
+        return;
+      }
+
       if (!status) {
         _message = 'Gallery access required. Please allow gallery from Settings.';
         return;

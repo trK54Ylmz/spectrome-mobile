@@ -57,6 +57,8 @@ class _VersionState extends State<VersionPage> {
     final e = (e, s) {
       final msg = 'Unknown error. Please try again later.';
 
+      dev.log(msg, stackTrace: s);
+
       // Create error message
       _error = ErrorMessage.custom(msg);
     };

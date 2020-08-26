@@ -33,6 +33,7 @@ class MyProfileService extends Service {
     final r = Http.doGet(
       path: path,
       headers: headers,
+      type: Http.JSON,
     );
 
     return r.then(c).catchError(e);

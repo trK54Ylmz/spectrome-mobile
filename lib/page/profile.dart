@@ -1,11 +1,9 @@
 import 'dart:developer' as dev;
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/button.dart';
-import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/model/profile/user.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/service/profile/user.dart';
@@ -135,15 +133,12 @@ class _ProfileState extends State<ProfilePage> {
           child: new Container(
             width: 60.0,
             height: 60.0,
-            child: new CachedNetworkImage(
+            child: new Image.network(
+              _profile.photoUrl,
+              headers: h,
               width: 60.0,
               height: 60.0,
-              imageUrl: _profile.photoUrl,
-              httpHeaders: h,
-              fadeInDuration: Duration.zero,
-              filterQuality: FilterQuality.high,
-              placeholder: (c, u) => new Loading(width: 60.0, height: 60.0),
-              errorWidget: (c, u, e) => new Image.asset('assets/images/default.1.webp'),
+              errorBuilder: (c, o, s) => new Image.asset('assets/images/default.1.jpg'),
             ),
           ),
         ),
@@ -459,7 +454,9 @@ class _ProfileState extends State<ProfilePage> {
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown error. Please try again later.';
+      final msg = 'Unknown profile load error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
 
       // Create unknown error message
       _error = ErrorMessage.custom(msg);
@@ -514,7 +511,9 @@ class _ProfileState extends State<ProfilePage> {
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown error. Please try again later.';
+      final msg = 'Unknown follow error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
 
       // Create unknown error message
       _error = ErrorMessage.custom(msg);
@@ -568,7 +567,9 @@ class _ProfileState extends State<ProfilePage> {
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown error. Please try again later.';
+      final msg = 'Unknown unfollow error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
 
       // Create unknown error message
       _error = ErrorMessage.custom(msg);
@@ -622,7 +623,9 @@ class _ProfileState extends State<ProfilePage> {
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown error. Please try again later.';
+      final msg = 'Unknown cancel error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
 
       // Create unknown error message
       _error = ErrorMessage.custom(msg);

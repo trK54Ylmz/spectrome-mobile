@@ -290,7 +290,9 @@ class _ForgotState extends State<ForgotPage> {
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown error. Please try again later.';
+      final msg = 'Unknown forgot password error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
 
       // Create unknown error message
       _error = ErrorMessage.custom(msg);

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:crypto/crypto.dart';
+import 'package:spectrome/util/const.dart';
 
 class Http {
   static const TOKEN_HEADER = 'x-authorization';
@@ -10,13 +11,17 @@ class Http {
 
   static const CONTENT_HEADER = 'content-type';
 
+  static const UA_HEADER = 'user-agent';
+
   static const FORM = 'application/x-www-form-urlencoded; charset=utf-8';
 
   static const MULTIPART = 'multipart/form-data; charset=utf-8';
 
   static const JSON = 'application/json; charset=utf-8';
 
-  static final client = new HttpClient();
+  static const UA = 'spectrome.app.agent - ${AppConst.version}';
+
+  static final client = new HttpClient()..autoUncompress = false;
 
   static final gzip = new GZipCodec();
 
@@ -34,20 +39,28 @@ class Http {
 
     final Uri url = new Uri.https(domain, path, params);
 
-    // Add gzip header
+    // Add gzip header and user agent
     if (headers == null) {
       headers = {
         Http.ACCEPT_HEADER: 'gzip',
+        Http.UA_HEADER: Http.UA,
       };
     } else {
       headers[Http.ACCEPT_HEADER] = 'gzip';
+      headers[Http.UA_HEADER] = Http.UA;
     }
 
     // Http request and response callback
     final c = (HttpClientRequest r) {
       // Update request headers if headers parameter is present
       for (String k in headers.keys) {
-        r.headers.add(k, headers[k]);
+        if (r.headers.value(k) == null) {
+          // Add new header if header does not exists
+          r.headers.add(k, headers[k]);
+        } else {
+          // Set header if header is already exists
+          r.headers.set(k, headers[k]);
+        }
       }
 
       // Add http request content type header
@@ -80,20 +93,28 @@ class Http {
 
     final Uri url = new Uri.https(domain, path, params);
 
-    // Add gzip header
+    // Add gzip header and user agent
     if (headers == null) {
       headers = {
         Http.ACCEPT_HEADER: 'gzip',
+        Http.UA_HEADER: Http.UA,
       };
     } else {
       headers[Http.ACCEPT_HEADER] = 'gzip';
+      headers[Http.UA_HEADER] = Http.UA;
     }
 
     // Http request and response callback
     final c = (HttpClientRequest r) {
       // Update request headers if headers parameter is present
       for (String k in headers.keys) {
-        r.headers.add(k, headers[k]);
+        if (r.headers.value(k) == null) {
+          // Add new header if header does not exists
+          r.headers.add(k, headers[k]);
+        } else {
+          // Set header if header is already exists
+          r.headers.set(k, headers[k]);
+        }
       }
 
       // Add http request content type header
@@ -169,10 +190,12 @@ class Http {
 
               r.write('\n');
             } else {
+              final v = body[key] is bool ? body[key] ? 1 : 0 : body[key];
+
               // Write plain text data
               r.write('Content-Disposition: form-data; name="$key"\n');
               r.write('\n');
-              r.write(body[key]);
+              r.write(v.toString());
               r.write('\n');
             }
           }
@@ -194,13 +217,17 @@ class Http {
               int i = 0;
 
               // Iterate over list params
-              for (var v in body[key] as List) {
+              for (var value in body[key] as List) {
+                final v = value is bool ? value ? 1 : 0 : value;
+
                 form.add('$k-$i=$v');
                 i++;
               }
             } else {
-              final v = Uri.encodeQueryComponent(body[key].toString());
-              form.add('$k=$v');
+              final v = body[key] is bool ? body[key] ? 1 : 0 : body[key];
+              final value = Uri.encodeQueryComponent(v);
+
+              form.add('$k=$value');
             }
           }
 
@@ -224,12 +251,10 @@ class Http {
 
     res.headers.forEach((f, s) => headers[f.toLowerCase()] = s[0]);
 
-    bool gzip = false;
-    if (headers.containsKey('content-encoding')) {
-      gzip = headers['content-encoding'] == 'gzip';
-    }
+    // Check if content encoding is gzip
+    final gzip = res.headers.value('content-encoding') == 'gzip';
 
-    // Decode gzip encoding
+    // Decode gzip if content compressed
     final t = gzip ? res.transform(Http.gzip.decoder) : res;
 
     return t.transform(utf8.decoder).join().then((content) {
@@ -242,9 +267,12 @@ class DebugHttpOverrides extends HttpOverrides {
   /// Override current http client
   @override
   HttpClient createHttpClient(SecurityContext context) {
-    Http.client.badCertificateCallback = (c, h, p) => true;
+    final c = Http.client;
 
-    return Http.client;
+    c.connectionTimeout = Duration(seconds: 10);
+    c.badCertificateCallback = (c, h, p) => true;
+
+    return c;
   }
 }
 

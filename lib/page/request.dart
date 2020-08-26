@@ -1,6 +1,5 @@
 import 'dart:developer' as dev;
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -176,15 +175,13 @@ class _RequestState extends State<RequestPage> {
         child: new Container(
           width: 40.0,
           height: 40.0,
-          child: new CachedNetworkImage(
+          child: new Image.network(
+            _requests[i].user.photoUrl,
+            headers: h,
             width: 40.0,
             height: 40.0,
-            imageUrl: _requests[i].user.photoUrl,
-            httpHeaders: h,
-            fadeInDuration: Duration.zero,
-            filterQuality: FilterQuality.high,
-            placeholder: (c, u) => new Loading(width: 40.0, height: 40.0),
-            errorWidget: (c, u, e) => new Image.asset('assets/images/default.1.webp'),
+            loadingBuilder: (b, w, i) => new Loading(width: 40.0, height: 40.0),
+            errorBuilder: (c, o, s) => new Image.asset('assets/images/default.1.jpg'),
           ),
         ),
       ),
@@ -341,7 +338,9 @@ class _RequestState extends State<RequestPage> {
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown error. Please try again later.';
+      final msg = 'Unknown request count error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
 
       // Create unknown error message
       _error = ErrorMessage.custom(msg);
@@ -421,7 +420,9 @@ class _RequestState extends State<RequestPage> {
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown error. Please try again later.';
+      final msg = 'Unknown following accept error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
 
       // Create unknown error message
       _error = ErrorMessage.custom(msg);
