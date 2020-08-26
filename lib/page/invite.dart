@@ -8,6 +8,7 @@ import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/form.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/loading.dart';
+import 'package:spectrome/page/view.dart';
 import 'package:spectrome/page/waterfall.dart';
 import 'package:spectrome/service/user/invite.dart';
 import 'package:spectrome/theme/color.dart';
@@ -347,8 +348,8 @@ class _InviteState extends State<InvitePage> {
         return;
       }
 
-      // Move to activation page
-      await Navigator.of(context).pushReplacementNamed(WaterFallPage.tag);
+      // Move to view page
+      await Navigator.of(context).pushReplacementNamed(ViewPage.tag);
     };
 
     // Error callback
