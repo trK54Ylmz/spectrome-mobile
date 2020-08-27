@@ -27,7 +27,7 @@ class ForgotPage extends StatefulWidget {
 
 class _ForgotState extends State<ForgotPage> {
   // Form validation key
-  final _formKey = GlobalKey<FormValidationState>();
+  final _fk = new GlobalKey<FormValidationState>();
 
   // Username input controller
   final _username = new TextEditingController();
@@ -224,7 +224,7 @@ class _ForgotState extends State<ForgotPage> {
 
     // Create main container
     return new FormValidation(
-      key: _formKey,
+      key: _fk,
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -257,6 +257,14 @@ class _ForgotState extends State<ForgotPage> {
     _message = null;
 
     if (_loading) {
+      return;
+    }
+
+    // Validate form key
+    if (!_fk.currentState.validate()) {
+      // Create custom error
+      setState(() => _message = _fk.currentState.errors.first);
+
       return;
     }
 

@@ -13,7 +13,7 @@ class ShareService extends Service {
     bool disposible,
     bool restricted,
     String comment,
-    double device,
+    String message,
     int size,
     List<File> files,
     List<double> scales,
@@ -27,7 +27,7 @@ class ShareService extends Service {
       'disposible': disposible,
       'restricted': restricted,
       'comment': comment,
-      'device': device,
+      'message': message,
       'size': size,
     };
 

@@ -26,7 +26,7 @@ class ResetPage extends StatefulWidget {
 
 class _ResetState extends State<ResetPage> {
   // Form validation key
-  final _formKey = GlobalKey<FormValidationState>();
+  final _fk = new GlobalKey<FormValidationState>();
 
   // Code input controller group
   final _inputs = <TextEditingController>[];
@@ -289,7 +289,7 @@ class _ResetState extends State<ResetPage> {
 
     // Create main container
     return new FormValidation(
-      key: _formKey,
+      key: _fk,
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -322,6 +322,14 @@ class _ResetState extends State<ResetPage> {
     _message = null;
 
     if (_loading) {
+      return;
+    }
+
+    // Validate form key
+    if (!_fk.currentState.validate()) {
+      // Create custom error
+      setState(() => _message = _fk.currentState.errors.first);
+
       return;
     }
 

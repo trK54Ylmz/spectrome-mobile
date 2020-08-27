@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/button.dart';
+import 'package:spectrome/item/form.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/item/video.dart';
@@ -28,6 +29,9 @@ class SharePage extends StatefulWidget {
 }
 
 class _ShareState extends State<SharePage> {
+  // Form validation key
+  final _fk = new GlobalKey<FormValidationState>();
+
   // Scaffold key
   final _sk = new GlobalKey<ScaffoldState>();
 
@@ -434,6 +438,17 @@ class _ShareState extends State<SharePage> {
         maxLines: null,
         minLines: null,
         size: 4000,
+        validator: (String i) {
+          if (i.length == 0) {
+            return 'The message should be entered.';
+          }
+
+          if (i.runes.length < 10) {
+            return 'The message requires at least 10 characters.';
+          }
+
+          return null;
+        },
       ),
     );
 
@@ -441,20 +456,23 @@ class _ShareState extends State<SharePage> {
       child: new SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
         child: new Container(
-          child: new Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              pt,
-              ds,
-              ptl,
-              i,
-              ptl,
-              sf,
-              pt,
-              ct,
-              pt,
-            ],
+          child: new FormValidation(
+            key: _fk,
+            child: new Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                pt,
+                ds,
+                ptl,
+                i,
+                ptl,
+                sf,
+                pt,
+                ct,
+                pt,
+              ],
+            ),
           ),
         ),
       ),
@@ -1089,6 +1107,13 @@ class _ShareState extends State<SharePage> {
   Future<void> _share(List<File> files) async {
     dev.log('Share button clicked.');
 
+    // Validate form
+    if (!_fk.currentState.validate()) {
+      _loading = false;
+      _showSnackBar(_fk.currentState.errors.first);
+      return;
+    }
+
     final c = (SharePostResponse r) async {
       dev.log('Share post request sent.');
 
@@ -1130,8 +1155,6 @@ class _ShareState extends State<SharePage> {
       setState(() => _loading = false);
     };
 
-    final width = MediaQuery.of(context).size.width;
-
     // Create http request
     final r = ShareService.call(
       session: _session,
@@ -1142,7 +1165,7 @@ class _ShareState extends State<SharePage> {
       files: files,
       scales: _scales,
       users: _users,
-      device: width,
+      message: _cc.text,
     );
 
     return r.then(c).catchError(e).whenComplete(cc);
