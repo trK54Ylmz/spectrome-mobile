@@ -69,12 +69,14 @@ class _SessionState extends State<SessionPage> {
 
         // Detect location and send by using session code
         final language = ui.window.locale.languageCode;
-        final country = ui.window.locale.countryCode?.toLowerCase();
+        final country = ui.window.locale.countryCode;
 
-        dev.log('Location request sent.');
+        if (language != null && country != null) {
+          dev.log('Location request sent.');
 
-        // Update location by using session
-        LocationService.call(res.session, country, language);
+          // Update location by using session
+          LocationService.call(res.session, country.toLowerCase(), language);
+        }
       }
 
       final route = new DefaultRoute(r);

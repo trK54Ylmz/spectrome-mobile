@@ -33,6 +33,11 @@ class FormValidationState extends State<FormValidation> {
   // Error messages
   final List<String> errors = <String>[];
 
+  /// Update generation
+  void _forceRebuild() {
+    setState(() => ++_generation);
+  }
+
   /// Register field to form
   void register(TextInputState field) {
     _fields.add(field);
@@ -47,6 +52,8 @@ class FormValidationState extends State<FormValidation> {
 
   /// Validate form according to given fields
   bool validate() {
+    _forceRebuild();
+
     // Clear errors list
     errors.clear();
 
