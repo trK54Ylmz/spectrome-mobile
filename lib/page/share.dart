@@ -35,6 +35,9 @@ class _ShareState extends State<SharePage> {
   // Scaffold key
   final _sk = new GlobalKey<ScaffoldState>();
 
+  // Tab controller
+  final _tc = new CupertinoTabController(initialIndex: 1);
+
   // Page view controller
   final _pc = new PageController();
 
@@ -181,6 +184,7 @@ class _ShareState extends State<SharePage> {
     }
 
     return new CupertinoTabScaffold(
+      controller: _tc,
       tabBar: CupertinoTabBar(
         backgroundColor: ColorConst.white,
         border: Border(
@@ -212,7 +216,12 @@ class _ShareState extends State<SharePage> {
         items: items,
       ),
       tabBuilder: (context, index) {
-        return _getForm(_files);
+        switch (index) {
+          case 1:
+            return _getForm(_files);
+          default:
+            return new Container(color: ColorConst.white);
+        }
       },
     );
   }
@@ -440,7 +449,7 @@ class _ShareState extends State<SharePage> {
         size: 4000,
         validator: (String i) {
           if (i.length == 0) {
-            return 'The message should be entered.';
+            return 'The message is required.';
           }
 
           if (i.runes.length < 10) {

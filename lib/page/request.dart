@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/button.dart';
-import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/page/profile.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/service/user/accept.dart';
@@ -180,7 +179,6 @@ class _RequestState extends State<RequestPage> {
             headers: h,
             width: 40.0,
             height: 40.0,
-            loadingBuilder: (b, w, i) => new Loading(width: 40.0, height: 40.0),
             errorBuilder: (c, o, s) => new Image.asset('assets/images/default.1.jpg'),
           ),
         ),
