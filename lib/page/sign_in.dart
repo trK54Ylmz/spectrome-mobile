@@ -30,7 +30,7 @@ class SignInPage extends StatefulWidget {
 
 class _SignInState extends State<SignInPage> {
   // Form validation key
-  final _formKey = GlobalKey<FormValidationState>();
+  final _fk = new GlobalKey<FormValidationState>();
 
   // Username or e-mail input controller
   final _loginId = new TextEditingController();
@@ -246,7 +246,7 @@ class _SignInState extends State<SignInPage> {
 
     // Create main container
     return new FormValidation(
-      key: _formKey,
+      key: _fk,
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -280,9 +280,9 @@ class _SignInState extends State<SignInPage> {
     }
 
     // Validate form key
-    if (!_formKey.currentState.validate()) {
+    if (!_fk.currentState.validate()) {
       // Create custom error
-      setState(() => _message = _formKey.currentState.errors.first);
+      setState(() => _message = _fk.currentState.errors.first);
 
       return;
     }

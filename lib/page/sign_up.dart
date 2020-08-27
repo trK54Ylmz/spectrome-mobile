@@ -28,7 +28,7 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpState extends State<SignUpPage> {
   // Form validation key
-  final _formKey = GlobalKey<FormValidationState>();
+  final _fk = new GlobalKey<FormValidationState>();
 
   // Phone number input controller
   final _phone = new TextEditingController();
@@ -324,7 +324,7 @@ class _SignUpState extends State<SignUpPage> {
 
     // Create main container
     return new FormValidation(
-      key: _formKey,
+      key: _fk,
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -366,9 +366,9 @@ class _SignUpState extends State<SignUpPage> {
     }
 
     // Validate form key
-    if (!_formKey.currentState.validate()) {
+    if (!_fk.currentState.validate()) {
       // Create custom error
-      setState(() => _message = _formKey.currentState.errors.first);
+      setState(() => _message = _fk.currentState.errors.first);
 
       return;
     }

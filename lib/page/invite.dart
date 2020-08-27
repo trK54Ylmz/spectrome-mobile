@@ -9,7 +9,6 @@ import 'package:spectrome/item/form.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/page/view.dart';
-import 'package:spectrome/page/waterfall.dart';
 import 'package:spectrome/service/user/invite.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
@@ -28,7 +27,7 @@ class InvitePage extends StatefulWidget {
 
 class _InviteState extends State<InvitePage> {
   // Form validation key
-  final _formKey = GlobalKey<FormValidationState>();
+  final _fk = new GlobalKey<FormValidationState>();
 
   // First e-mail input controller
   final _first = new TextEditingController();
@@ -257,7 +256,7 @@ class _InviteState extends State<InvitePage> {
 
     // Skip button
     final skip = new GestureDetector(
-      onTap: () => Navigator.of(context).pushReplacementNamed(WaterFallPage.tag),
+      onTap: () => Navigator.of(context).pushReplacementNamed(ViewPage.tag),
       child: new Padding(
         padding: const EdgeInsets.symmetric(
           vertical: 8.0,
@@ -279,7 +278,7 @@ class _InviteState extends State<InvitePage> {
 
     // Create main container
     return new FormValidation(
-      key: _formKey,
+      key: _fk,
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -320,9 +319,9 @@ class _InviteState extends State<InvitePage> {
     setState(() => _message = null);
 
     // Validate form key
-    if (!_formKey.currentState.validate()) {
+    if (!_fk.currentState.validate()) {
       // Create custom error
-      setState(() => _message = _formKey.currentState.errors.first);
+      setState(() => _message = _fk.currentState.errors.first);
 
       return;
     }
