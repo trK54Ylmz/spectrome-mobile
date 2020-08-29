@@ -39,9 +39,6 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
   // Loading indicator
   bool _loading = true;
 
-  // Is scroll operation has made or not
-  bool _scrolled = false;
-
   // Account session key
   String _session;
 
@@ -54,8 +51,6 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
 
     // Posts list view scroll controller
     _sc.addListener(() {
-      setState(() => _scrolled = (_sc.position.pixels > 1.0));
-
       // Load more posts
       if (_sc.offset == _sc.position.maxScrollExtent) {
         _getPosts();
@@ -180,17 +175,6 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
       ),
     );
 
-    final eb = Border(
-      bottom: BorderSide.none,
-    );
-
-    final gb = new Border(
-      bottom: BorderSide(
-        color: ColorConst.lightGray,
-        width: 0.5,
-      ),
-    );
-
     return new Scaffold(
       key: _sk,
       backgroundColor: ColorConst.white,
@@ -202,14 +186,18 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
         ),
         transitionBetweenRoutes: false,
         backgroundColor: ColorConst.white,
-        border: _scrolled ? gb : eb,
+        border: Border(
+          bottom: BorderSide.none,
+        ),
         leading: l,
         trailing: t,
       ),
-      body: new Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: items,
+      body: new SafeArea(
+        child: new Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: items,
+        ),
       ),
     );
   }

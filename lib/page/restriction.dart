@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/input.dart';
-import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/model/profile/simple.dart';
 import 'package:spectrome/service/query/following.dart';
 import 'package:spectrome/theme/color.dart';
@@ -255,7 +254,6 @@ class _RestrictionState extends State<RestrictionPage> {
             headers: h,
             width: 40.0,
             height: 40.0,
-            loadingBuilder: (b, w, i) => new Loading(width: 40.0, height: 40.0),
             errorBuilder: (c, o, s) => new Image.asset('assets/images/default.1.jpg'),
           ),
         ),
@@ -373,7 +371,6 @@ class _RestrictionState extends State<RestrictionPage> {
             headers: h,
             width: 40.0,
             height: 40.0,
-            loadingBuilder: (b, w, i) => new Loading(width: 40.0, height: 40.0),
             errorBuilder: (c, o, s) => new Image.asset('assets/images/default.1.jpg'),
           ),
         ),

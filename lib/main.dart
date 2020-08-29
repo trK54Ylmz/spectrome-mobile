@@ -8,6 +8,7 @@ import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/page/activation.dart';
+import 'package:spectrome/page/detail.dart';
 import 'package:spectrome/page/edit.dart';
 import 'package:spectrome/page/forgot.dart';
 import 'package:spectrome/page/guide.dart';
@@ -37,6 +38,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() => runApp(MainPage());
 
 final routes = <String, WidgetBuilder>{
+  DetailPage.tag: (c) => new DetailPage(),
   EditPage.tag: (c) => new EditPage(),
   ForgotPage.tag: (c) => new ForgotPage(),
   GuidePage.tag: (c) => new GuidePage(),
