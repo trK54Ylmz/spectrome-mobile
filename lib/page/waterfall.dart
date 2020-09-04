@@ -43,7 +43,7 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
   String _session;
 
   // Cursor timestamp value
-  double _timestamp;
+  String _timestamp;
 
   @override
   void initState() {
@@ -230,9 +230,24 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
         _showSnackBar(r.message, isError: false);
         return;
       }
+ 
+      if (r.posts.length == 0) {
+        return;
+      }
 
       // Add posts into the posts sequence
       _posts.addAll(r.posts);
+
+      // Create date format
+      final iso = _posts.last.post.createTime.toIso8601String();
+      final dt = iso.substring(0, iso.length - 1);
+
+      // Create timezone difference as hours
+      final offset = _posts.last.post.createTime.timeZoneOffset;
+      final zone = offset.inHours.toString().padLeft(2, '0');
+      
+      // Update timestamp
+      _timestamp = '$dt+$zone:00';
     };
 
     // Error callback

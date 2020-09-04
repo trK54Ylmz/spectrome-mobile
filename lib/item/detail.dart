@@ -45,7 +45,6 @@ class _PostDetailState extends State<PostDetailCard> {
     // Http headers for profile image request
     final h = {Http.TOKEN_HEADER: widget.session};
 
-    final pts = new Padding(padding: EdgeInsets.only(top: 8.0));
     final pt = new Padding(padding: EdgeInsets.only(top: 16.0));
     final ptx = new Padding(padding: EdgeInsets.only(top: 32.0));
 
@@ -188,7 +187,7 @@ class _PostDetailState extends State<PostDetailCard> {
       smi.add(new TextSpan(text: widget.detail.users[0].username, style: tsb));
       smi.add(new TextSpan(text: ' and ', style: tsn));
       smi.add(new TextSpan(text: widget.detail.users[1].username, style: tsb));
-    } else {
+    } else if (widget.detail.users.length == 1) {
       smi.add(new TextSpan(text: widget.detail.users[0].username, style: tsb));
     }
 
@@ -214,6 +213,7 @@ class _PostDetailState extends State<PostDetailCard> {
       padding: EdgeInsets.only(
         left: 8.0,
         right: 8.0,
+        bottom: 8.0,
       ),
       child: new Row(
         children: [
@@ -265,7 +265,6 @@ class _PostDetailState extends State<PostDetailCard> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           widget.detail.post.restricted ? ru : ec,
-          pts,
           cu,
         ],
       ),

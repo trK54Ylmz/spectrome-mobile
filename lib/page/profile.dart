@@ -287,7 +287,8 @@ class _ProfileState extends State<ProfilePage> {
     final fl = new Button(
       text: 'Follow',
       disabled: _action,
-      padding: EdgeInsets.all(8.0),
+      fontSize: 13.0,
+      padding: EdgeInsets.all(6.0),
       background: ColorConst.button,
       color: ColorConst.white,
       border: new Border.all(
@@ -299,7 +300,8 @@ class _ProfileState extends State<ProfilePage> {
     final rq = new Button(
       text: 'Request sent',
       disabled: _action,
-      padding: EdgeInsets.all(8.0),
+      fontSize: 13.0,
+      padding: EdgeInsets.all(6.0),
       background: ColorConst.transparent,
       color: ColorConst.darkGray,
       border: new Border.all(
@@ -311,7 +313,8 @@ class _ProfileState extends State<ProfilePage> {
     final uf = new Button(
       text: 'Unfollow',
       disabled: _action,
-      padding: EdgeInsets.all(8.0),
+      fontSize: 13.0,
+      padding: EdgeInsets.all(6.0),
       background: ColorConst.button,
       color: ColorConst.white,
       border: new Border.all(
@@ -341,7 +344,7 @@ class _ProfileState extends State<ProfilePage> {
 
     // User detail container
     final u = new Container(
-      height: 172.0,
+      height: 168.0,
       decoration: new BoxDecoration(
         border: Border(
           bottom: BorderSide(

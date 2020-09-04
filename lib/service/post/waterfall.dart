@@ -9,7 +9,7 @@ import 'package:spectrome/util/http.dart';
 
 class WaterFallService extends Service {
   /// Get waterfall posts
-  static Future<WaterFallResponse> call(String session, double timestamp) {
+  static Future<WaterFallResponse> call(String session, String timestamp) {
     final path = '/posts/waterfall';
     final headers = {Http.TOKEN_HEADER: session};
     final body = {'session': session};

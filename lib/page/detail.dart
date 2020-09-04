@@ -33,17 +33,11 @@ class _DetailState extends State<DetailPage> {
   // Owned comment
   Comment _owned;
 
-  // Action loading indicator
-  bool _action = false;
-
   // Account session key
   String _session;
 
   // Error message
   ErrorMessage _error;
-
-  // Last time comment request sent
-  DateTime _last;
 
   @override
   void initState() {
@@ -110,6 +104,19 @@ class _DetailState extends State<DetailPage> {
       session: _session,
     );
 
+    final ci = <Widget>[];
+    if (_owned != null) {
+      final ct = new Text(
+        _owned.message,
+      );
+
+      ci.add(ct);
+    }
+
+    final c = new Column(
+      children: ci,
+    );
+
     return new CupertinoPageScaffold(
       backgroundColor: ColorConst.white,
       navigationBar: new CupertinoNavigationBar(
@@ -133,6 +140,7 @@ class _DetailState extends State<DetailPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               p,
+              c,
             ],
           ),
         ),

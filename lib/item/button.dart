@@ -30,12 +30,16 @@ class Button extends StatefulWidget {
   // Button is disabled or not
   final bool disabled;
 
+  // Font size of button
+  final double fontSize;
+
   const Button({
     Key key,
     this.text,
     this.onPressed,
     this.border,
     this.disabled = false,
+    this.fontSize = 14.0,
     this.width = double.infinity,
     this.color = ColorConst.white,
     this.background = ColorConst.button,
@@ -102,7 +106,7 @@ class _ButtonState extends State<Button> {
               style: new TextStyle(
                 color: c ? widget.color.withOpacity(0.67) : widget.color,
                 fontFamily: FontConst.primary,
-                fontSize: 14.0,
+                fontSize: widget.fontSize,
               ),
             ),
           ),
