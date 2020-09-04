@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:spectrome/page/message.dart';
 import 'package:spectrome/page/search.dart';
 import 'package:spectrome/page/waterfall.dart';
 import 'package:spectrome/theme/color.dart';
@@ -105,6 +106,9 @@ class _HomeState extends State<HomePage> {
         switch (index) {
           case 0:
             return new SearchPage();
+            break;
+          case 2:
+            return new MessagePage();
             break;
           default:
             return new WaterFallPage(

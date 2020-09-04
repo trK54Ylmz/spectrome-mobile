@@ -8,11 +8,13 @@ import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/page/activation.dart';
+import 'package:spectrome/page/detail.dart';
 import 'package:spectrome/page/edit.dart';
 import 'package:spectrome/page/forgot.dart';
 import 'package:spectrome/page/guide.dart';
 import 'package:spectrome/page/home.dart';
 import 'package:spectrome/page/me.dart';
+import 'package:spectrome/page/message.dart';
 import 'package:spectrome/page/profile.dart';
 import 'package:spectrome/page/request.dart';
 import 'package:spectrome/page/restriction.dart';
@@ -37,12 +39,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() => runApp(MainPage());
 
 final routes = <String, WidgetBuilder>{
+  DetailPage.tag: (c) => new DetailPage(),
   EditPage.tag: (c) => new EditPage(),
   ForgotPage.tag: (c) => new ForgotPage(),
   GuidePage.tag: (c) => new GuidePage(),
   HomePage.tag: (c) => new HomePage(),
   InvitePage.tag: (c) => new InvitePage(),
   MePage.tag: (c) => new MePage(),
+  MessagePage.tag: (c) => new MessagePage(),
   ProfilePage.tag: (c) => new ProfilePage(),
   RequestPage.tag: (c) => new RequestPage(),
   ResetPage.tag: (c) => new ResetPage(),

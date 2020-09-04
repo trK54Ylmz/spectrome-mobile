@@ -383,7 +383,10 @@ class _InviteState extends State<InvitePage> {
       emails.add(_third.text);
     }
 
+    // Prepare request
+    final r = InviteService.call(_session, emails);
+
     // Send sign up request
-    InviteService.call(_session, emails).then(sc).catchError(e).whenComplete(cc);
+    r.then(sc).catchError(e).whenComplete(cc);
   }
 }

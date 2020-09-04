@@ -1,9 +1,7 @@
 import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
-import 'package:spectrome/item/photo.dart';
 import 'package:spectrome/model/post/detail.dart';
-import 'package:spectrome/page/detail.dart';
 import 'package:spectrome/page/me.dart';
 import 'package:spectrome/page/profile.dart';
 import 'package:spectrome/theme/color.dart';
@@ -12,24 +10,24 @@ import 'package:spectrome/util/const.dart';
 import 'package:spectrome/util/date.dart';
 import 'package:spectrome/util/http.dart';
 
-class PostCard extends StatefulWidget {
+class PostDetailCard extends StatefulWidget {
   // Account session key
   final String session;
 
   // Post item
   final PostDetail detail;
 
-  PostCard({
+  PostDetailCard({
     Key key,
     this.session,
     this.detail,
   });
 
   @override
-  _PostState createState() => new _PostState();
+  _PostDetailState createState() => new _PostDetailState();
 }
 
-class _PostState extends State<PostCard> {
+class _PostDetailState extends State<PostDetailCard> {
   // Page controller for multiple items
   final _pc = new PageController();
 
@@ -48,6 +46,7 @@ class _PostState extends State<PostCard> {
     final h = {Http.TOKEN_HEADER: widget.session};
 
     final pt = new Padding(padding: EdgeInsets.only(top: 16.0));
+    final ptx = new Padding(padding: EdgeInsets.only(top: 32.0));
 
     // User profile callback
     final uc = () async {
@@ -162,29 +161,59 @@ class _PostState extends State<PostCard> {
       ],
     );
 
+    final tsn = new TextStyle(
+      fontFamily: FontConst.primary,
+      color: ColorConst.black,
+      fontSize: 14.0,
+      letterSpacing: 0.33,
+    );
+
+    final tsb = new TextStyle(
+      fontFamily: FontConst.primary,
+      color: ColorConst.black,
+      fontSize: 14.0,
+      letterSpacing: 0.33,
+      fontWeight: FontWeight.bold,
+    );
+
+    final smi = <InlineSpan>[];
+    if (widget.detail.users.length > 3) {
+      smi.add(new TextSpan(text: widget.detail.users[0].username, style: tsb));
+      smi.add(new TextSpan(text: ', ', style: tsn));
+      smi.add(new TextSpan(text: widget.detail.users[1].username, style: tsb));
+      smi.add(new TextSpan(text: ' and ', style: tsn));
+      smi.add(new TextSpan(text: '${widget.detail.users.length - 2} more', style: tsb));
+    } else if (widget.detail.users.length == 2) {
+      smi.add(new TextSpan(text: widget.detail.users[0].username, style: tsb));
+      smi.add(new TextSpan(text: ' and ', style: tsn));
+      smi.add(new TextSpan(text: widget.detail.users[1].username, style: tsb));
+    } else if (widget.detail.users.length == 1) {
+      smi.add(new TextSpan(text: widget.detail.users[0].username, style: tsb));
+    }
+
+    final rt = new Padding(
+      padding: EdgeInsets.only(left: 6.0),
+      child: new RichText(
+        overflow: TextOverflow.ellipsis,
+        text: new TextSpan(
+          text: 'shared with ',
+          style: tsn,
+          children: smi,
+        ),
+      ),
+    );
+
     final ri = new Icon(
       new IconData(0xf007, fontFamily: FontConst.fal),
       color: ColorConst.darkerGray,
       size: 16.0,
     );
 
-    final rt = new Padding(
-      padding: EdgeInsets.only(left: 6.0),
-      child: new Text(
-        widget.detail.post.users.toString(),
-        style: new TextStyle(
-          fontFamily: FontConst.primary,
-          fontSize: 14.0,
-          letterSpacing: 0.33,
-          color: ColorConst.black,
-        ),
-      ),
-    );
-
     final ru = new Padding(
       padding: EdgeInsets.only(
         left: 8.0,
         right: 8.0,
+        bottom: 8.0,
       ),
       child: new Row(
         children: [
@@ -227,27 +256,16 @@ class _PostState extends State<PostCard> {
       ),
     );
 
-    final rw = new Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        widget.detail.post.restricted ? ru : ec,
-        cu,
-      ],
-    );
-
-    final wg = new GestureDetector(
-      onTap: () async {
-        // Move to detail page
-        await Navigator.of(context).pushNamed(DetailPage.tag, arguments: widget.detail);
-      },
+    final wg = new Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 4.0,
+      ),
       child: new Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          pt,
-          rw,
-          pt,
+          widget.detail.post.restricted ? ru : ec,
+          cu,
         ],
       ),
     );
@@ -291,8 +309,9 @@ class _PostState extends State<PostCard> {
         i,
         pt,
         p,
-        wg,
         pt,
+        wg,
+        ptx,
       ],
     );
   }
@@ -311,12 +330,16 @@ class _PostState extends State<PostCard> {
     // Http headers for image request
     final h = {Http.TOKEN_HEADER: widget.session};
 
-    return new Photo(
-      key: new ValueKey(widget.detail.post.items[index].large),
-      url: widget.detail.post.items[index].large,
+    final i = new Image.network(
+      widget.detail.post.items[index].large,
       headers: h,
+      errorBuilder: (c, o, s) => new Image.asset('assets/images/default.1.jpg'),
+    );
+
+    return new Container(
       width: pw,
       height: ph,
+      child: i,
     );
   }
 

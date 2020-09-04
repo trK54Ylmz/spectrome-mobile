@@ -298,16 +298,18 @@ class _MeState extends State<MePage> {
       ],
     );
 
+    // Share button
     final fl = new Expanded(
       flex: 1,
       child: new Padding(
         padding: EdgeInsets.only(top: 8.0),
         child: new Button(
           text: 'Share',
-          color: ColorConst.success,
-          background: ColorConst.transparent,
-          padding: EdgeInsets.all(8.0),
-          border: new Border.all(color: ColorConst.success),
+          fontSize: 13.0,
+          color: ColorConst.darkerGray,
+          background: ColorConst.lightGray,
+          padding: EdgeInsets.all(6.0),
+          border: new Border.all(color: ColorConst.transparent),
           onPressed: () => Navigator.of(context).pushNamed(SelectPage.tag),
         ),
       ),
@@ -325,7 +327,7 @@ class _MeState extends State<MePage> {
 
     // User detail container
     final u = new Container(
-      height: 172.0,
+      height: 168.0,
       decoration: new BoxDecoration(
         border: Border(
           bottom: BorderSide(
