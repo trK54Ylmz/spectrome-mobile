@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:better_player/better_player.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:spectrome/util/const.dart';
@@ -55,11 +57,16 @@ class _VideoState extends State<Video> {
     // Create data source
     final ds = new BetterPlayerDataSource(type, widget.path);
 
+    final cc = new BetterPlayerControlsConfiguration(
+      showControls: false,
+    );
+
     // Create better player configuration
     final cfg = new BetterPlayerConfiguration(
       aspectRatio: r,
       autoPlay: true,
       looping: true,
+      controlsConfiguration: cc,
       showControlsOnInitialize: false,
       fullScreenByDefault: false,
     );
@@ -69,16 +76,10 @@ class _VideoState extends State<Video> {
 
     _vol = _cc.videoPlayerController.value.volume;
 
+    // Set event listener
+    _cc.addEventsListener(_listener);
+
     setState(() => _loading = false);
-  }
-
-  @override
-  void dispose() {
-    if (_cc != null) {
-      _cc.dispose();
-    }
-
-    super.dispose();
   }
 
   @override
@@ -103,5 +104,14 @@ class _VideoState extends State<Video> {
       },
       child: new BetterPlayer(controller: _cc),
     );
+  }
+
+  /// Better player event listener
+  void _listener(event) {
+    final type = event.betterPlayerEventType as BetterPlayerEventType;
+
+    if (type == BetterPlayerEventType.SET_VOLUME) {
+      dev.log('Volume has set to ${_cc.videoPlayerController.value.volume}');
+    }
   }
 }
