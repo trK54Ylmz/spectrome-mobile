@@ -15,8 +15,7 @@ dependencies:
   photo_manager: ^0.5.6
   crypto: ^2.1.5
   path_provider: ^1.6.11
-  chewie: ^0.9.10
-  video_player: ^0.10.11+2
+  better_player: ^0.0.13
   flutter_local_notifications: ^1.4.4+2
 
 
