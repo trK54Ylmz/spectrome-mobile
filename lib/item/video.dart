@@ -1,9 +1,8 @@
-import 'dart:io';
+import 'dart:developer' as dev;
 
-import 'package:chewie/chewie.dart';
+import 'package:better_player/better_player.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:spectrome/item/loading.dart';
-import 'package:video_player/video_player.dart';
+import 'package:spectrome/util/const.dart';
 
 enum VideoType { FILE, NETWORK }
 
@@ -30,11 +29,8 @@ class Video extends StatefulWidget {
 }
 
 class _VideoState extends State<Video> {
-  // Video player controller
-  VideoPlayerController _vc;
-
   // Chewie player controller
-  ChewieController _cc;
+  BetterPlayerController _cc;
 
   // Default volume level
   double _vol = 0;
@@ -46,77 +42,58 @@ class _VideoState extends State<Video> {
   void initState() {
     super.initState();
 
+    BetterPlayerDataSourceType type;
+    switch (widget.type) {
+      case VideoType.NETWORK:
+        type = BetterPlayerDataSourceType.NETWORK;
+        break;
+      case VideoType.FILE:
+        type = BetterPlayerDataSourceType.FILE;
+        break;
+    }
+
+    final r = widget.width > 0 && widget.height > 0 ? widget.width / widget.height : null;
+
+    // Create data source
+    final ds = new BetterPlayerDataSource(type, widget.path);
+
+    final cc = new BetterPlayerControlsConfiguration(
+      showControls: false,
+    );
+
+    // Create better player configuration
+    final cfg = new BetterPlayerConfiguration(
+      aspectRatio: r,
+      autoPlay: true,
+      looping: true,
+      controlsConfiguration: cc,
+      showControlsOnInitialize: false,
+      fullScreenByDefault: false,
+    );
+
     // Create video controller
-    if (widget.type == VideoType.NETWORK) {
-      _vc = new VideoPlayerController.network(widget.path);
-    } else {
-      _vc = new VideoPlayerController.file(new File(widget.path));
-    }
+    _cc = new BetterPlayerController(cfg, betterPlayerDataSource: ds);
 
-    if (widget.width == 0 && widget.height == 0) {
-      final c = (_) {
-        // Create chewie controller
-        _cc = new ChewieController(
-          videoPlayerController: _vc,
-          aspectRatio: _vc.value.aspectRatio,
-          autoPlay: true,
-          looping: true,
-          showControls: false,
-          showControlsOnInitialize: false,
-          allowFullScreen: false,
-          allowMuting: true,
-        );
+    _vol = _cc.videoPlayerController.value.volume;
 
-        _vol = _cc.videoPlayerController.value.volume;
+    // Set event listener
+    _cc.addEventsListener(_listener);
 
-        _loading = false;
-      };
-
-      _vc.initialize().then(c);
-    } else {
-      // Create chewie controller
-      _cc = new ChewieController(
-        videoPlayerController: _vc,
-        aspectRatio: widget.width / widget.height,
-        autoPlay: true,
-        looping: true,
-        showControls: false,
-        showControlsOnInitialize: false,
-        allowFullScreen: false,
-        allowMuting: true,
-      );
-
-      _vol = _cc.videoPlayerController.value.volume;
-
-      _loading = false;
-    }
-  }
-
-  @override
-  void dispose() {
-    if (_vc != null) {
-      _vc.dispose();
-    }
-
-    if (_cc != null) {
-      _cc.dispose();
-    }
-
-    super.dispose();
+    setState(() => _loading = false);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
-      final width = MediaQuery.of(context).size.width;
+    return new Container(
+      child: AppConst.loader(
+        argument: _loading,
+        callback: _getPage,
+      ),
+    );
+  }
 
-      return new Container(
-        width: width,
-        height: width,
-        child: const Loading(),
-      );
-    }
-
+  /// Get video widget
+  Widget _getPage() {
     return new GestureDetector(
       onTap: () {
         if (_cc.videoPlayerController.value.volume > 0) {
@@ -125,7 +102,16 @@ class _VideoState extends State<Video> {
           _cc.videoPlayerController.setVolume(_vol);
         }
       },
-      child: new Chewie(controller: _cc),
+      child: new BetterPlayer(controller: _cc),
     );
+  }
+
+  /// Better player event listener
+  void _listener(event) {
+    final type = event.betterPlayerEventType as BetterPlayerEventType;
+
+    if (type == BetterPlayerEventType.SET_VOLUME) {
+      dev.log('Volume has set to ${_cc.videoPlayerController.value.volume}');
+    }
   }
 }
