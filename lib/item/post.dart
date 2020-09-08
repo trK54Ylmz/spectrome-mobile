@@ -164,7 +164,7 @@ class _PostState extends State<PostCard> {
 
     final ri = new Icon(
       new IconData(0xf007, fontFamily: FontConst.fal),
-      color: ColorConst.darkerGray,
+      color: ColorConst.gray,
       size: 16.0,
     );
 
@@ -181,12 +181,11 @@ class _PostState extends State<PostCard> {
       ),
     );
 
-    final ru = new Padding(
-      padding: EdgeInsets.only(
-        left: 8.0,
-        right: 8.0,
-      ),
+    final ru = new Expanded(
+      flex: 1,
       child: new Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           ri,
           rt,
@@ -196,7 +195,7 @@ class _PostState extends State<PostCard> {
 
     final ci = new Icon(
       new IconData(0xf4ad, fontFamily: FontConst.fal),
-      color: ColorConst.darkerGray,
+      color: ColorConst.gray,
       size: 16.0,
     );
 
@@ -214,12 +213,11 @@ class _PostState extends State<PostCard> {
       ),
     );
 
-    final cu = new Padding(
-      padding: EdgeInsets.only(
-        left: 8.0,
-        right: 8.0,
-      ),
+    final cu = new Expanded(
+      flex: 1,
       child: new Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           ci,
           ct,

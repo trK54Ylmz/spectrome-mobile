@@ -244,7 +244,11 @@ class _ShareState extends State<SharePage> {
 
     // Disposibility text
     final dt = new Padding(
-      padding: EdgeInsets.all(8.0),
+      padding: EdgeInsets.only(
+        top: 8.0,
+        bottom: 8.0,
+        right: 8.0,
+      ),
       child: new Text(
         'Make this post disappear in 24 hours?',
         style: new TextStyle(
@@ -269,7 +273,7 @@ class _ShareState extends State<SharePage> {
         setState(() => _disposible = !_disposible);
       },
       padding: EdgeInsets.all(6.0),
-      color: _disposible ? ColorConst.white : ColorConst.gray,
+      color: _disposible ? ColorConst.white : ColorConst.darkGray,
       background: _disposible ? ColorConst.button : ColorConst.white,
       border: Border.all(
         color: _disposible ? ColorConst.button : ColorConst.gray,
@@ -280,7 +284,7 @@ class _ShareState extends State<SharePage> {
     final ds = new Padding(
       padding: EdgeInsets.symmetric(
         horizontal: hp,
-        vertical: 8.0,
+        vertical: 4.0,
       ),
       child: new Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -394,7 +398,7 @@ class _ShareState extends State<SharePage> {
         }
       },
       padding: EdgeInsets.all(6.0),
-      color: _restricted ? ColorConst.white : ColorConst.gray,
+      color: _restricted ? ColorConst.white : ColorConst.darkGray,
       background: _restricted ? ColorConst.button : ColorConst.white,
       border: Border.all(
         color: _restricted ? ColorConst.button : ColorConst.gray,
@@ -405,7 +409,7 @@ class _ShareState extends State<SharePage> {
     final sf = new Padding(
       padding: EdgeInsets.symmetric(
         horizontal: hp,
-        vertical: 8.0,
+        vertical: 4.0,
       ),
       child: new Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -436,7 +440,7 @@ class _ShareState extends State<SharePage> {
     final ct = new Padding(
       padding: EdgeInsets.symmetric(
         horizontal: hp,
-        vertical: 8.0,
+        vertical: 4.0,
       ),
       child: new FormText(
         controller: _cc,
@@ -471,11 +475,10 @@ class _ShareState extends State<SharePage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                pt,
-                ds,
                 ptl,
                 i,
-                ptl,
+                pt,
+                ds,
                 sf,
                 pt,
                 ct,
