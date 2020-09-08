@@ -86,14 +86,16 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
   Widget build(BuildContext context) {
     super.build(context);
 
-    final sh = new Shimmer();
-
     // Use multiple widgets to show shimmer
     final items = <Widget>[];
 
     final builder = (context, index) {
-      // Create post card
-      return new PostCard(detail: _posts[index], session: _session);
+      if (index >= _posts.length) {
+        return new Shimmer();
+      } else {
+        // Create post card
+        return new PostCard(detail: _posts[index], session: _session);
+      }
     };
 
     final b = new Expanded(
@@ -101,17 +103,12 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
         controller: _sc,
         physics: const ClampingScrollPhysics(),
         padding: new EdgeInsets.only(top: 8.0, bottom: 8.0),
-        itemCount: _posts.length,
+        itemCount: _loading ? _posts.length + 1 : _posts.length,
         itemBuilder: builder,
       ),
     );
 
     items.add(b);
-
-    // Add shimmer in case of loading state
-    if (_loading) {
-      items.add(sh);
-    }
 
     // Share post button callback
     final sc = () {
@@ -217,6 +214,8 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
 
   /// Get waterfall posts
   void _getPosts() {
+    setState(() => _loading = true);
+
     dev.log('Waterfall posts request sent.');
 
     // Log timestamp value for debugging
@@ -230,7 +229,7 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
         _showSnackBar(r.message, isError: false);
         return;
       }
- 
+
       if (r.posts.length == 0) {
         return;
       }
@@ -245,7 +244,7 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
       // Create timezone difference as hours
       final offset = _posts.last.post.createTime.timeZoneOffset;
       final zone = offset.inHours.toString().padLeft(2, '0');
-      
+
       // Update timestamp
       _timestamp = '$dt+$zone:00';
     };
