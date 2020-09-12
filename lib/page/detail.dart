@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spectrome/item/comment.dart';
 import 'package:spectrome/item/detail.dart';
 import 'package:spectrome/model/post/comment.dart';
 import 'package:spectrome/model/post/detail.dart';
@@ -106,8 +107,12 @@ class _DetailState extends State<DetailPage> {
 
     final ci = <Widget>[];
     if (_owned != null) {
-      final ct = new Text(
-        _owned.message,
+      // Create owned comment
+      final ct = new CommentRow(
+        user: _post.user,
+        comment: _owned,
+        session: _session,
+        me: _post.me,
       );
 
       ci.add(ct);
@@ -136,7 +141,7 @@ class _DetailState extends State<DetailPage> {
         child: new Padding(
           padding: new EdgeInsets.only(top: 8.0, bottom: 8.0),
           child: new Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               p,

@@ -46,7 +46,6 @@ class _PostDetailState extends State<PostDetailCard> {
     final h = {Http.TOKEN_HEADER: widget.session};
 
     final pt = new Padding(padding: EdgeInsets.only(top: 16.0));
-    final ptx = new Padding(padding: EdgeInsets.only(top: 32.0));
 
     // User profile callback
     final uc = () async {
@@ -87,13 +86,14 @@ class _PostDetailState extends State<PostDetailCard> {
 
     final ur = new Container(
       width: 120.0,
-      height: 22.0,
+      height: 20.0,
+      alignment: Alignment.centerLeft,
       child: new Text(
         widget.detail.user.username,
         style: new TextStyle(
-          fontFamily: FontConst.primary,
+          fontFamily: FontConst.bold,
           color: ColorConst.black,
-          fontSize: 16.0,
+          fontSize: 14.0,
           letterSpacing: 0.33,
         ),
       ),
@@ -225,7 +225,7 @@ class _PostDetailState extends State<PostDetailCard> {
 
     final ci = new Icon(
       new IconData(0xf4ad, fontFamily: FontConst.fal),
-      color: ColorConst.darkerGray,
+      color: ColorConst.gray,
       size: 16.0,
     );
 
@@ -259,6 +259,7 @@ class _PostDetailState extends State<PostDetailCard> {
     final wg = new Padding(
       padding: EdgeInsets.symmetric(
         horizontal: 4.0,
+        vertical: 16.0,
       ),
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -305,13 +306,13 @@ class _PostDetailState extends State<PostDetailCard> {
     }
 
     return new Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         i,
         pt,
         p,
-        pt,
         wg,
-        ptx,
       ],
     );
   }
