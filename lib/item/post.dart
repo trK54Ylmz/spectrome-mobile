@@ -88,13 +88,14 @@ class _PostState extends State<PostCard> {
 
     final ur = new Container(
       width: 120.0,
-      height: 22.0,
+      height: 20.0,
+      alignment: Alignment.centerLeft,
       child: new Text(
         widget.detail.user.username,
         style: new TextStyle(
-          fontFamily: FontConst.primary,
+          fontFamily: FontConst.bold,
           color: ColorConst.black,
-          fontSize: 16.0,
+          fontSize: 14.0,
           letterSpacing: 0.33,
         ),
       ),

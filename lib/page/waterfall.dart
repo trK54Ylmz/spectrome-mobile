@@ -112,7 +112,7 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
 
     // Share post button callback
     final sc = () {
-      final d = new Duration(milliseconds: 500);
+      final d = new Duration(milliseconds: 250);
       final c = Curves.easeInOut;
 
       // Move to profile page
@@ -143,7 +143,7 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
 
     // Profile button callback
     final pc = () {
-      final d = new Duration(milliseconds: 500);
+      final d = new Duration(milliseconds: 250);
       final c = Curves.easeInOut;
 
       // Move to profile page
