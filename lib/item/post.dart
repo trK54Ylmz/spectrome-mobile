@@ -93,10 +93,11 @@ class _PostState extends State<PostCard> {
       child: new Text(
         widget.detail.user.username,
         style: new TextStyle(
-          fontFamily: FontConst.bold,
+          fontFamily: FontConst.primary,
           color: ColorConst.black,
           fontSize: 14.0,
           letterSpacing: 0.33,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
