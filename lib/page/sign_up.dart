@@ -130,7 +130,7 @@ class _SignUpState extends State<SignUpPage> {
     );
 
     final logo = new Image.asset(
-      'assets/images/logo@2x.png',
+      'assets/images/logo-alt@2x.png',
       width: 128.0,
     );
 
