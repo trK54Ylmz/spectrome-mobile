@@ -30,6 +30,8 @@ flutter:
     - assets/images/icon.png
     - assets/images/logo.png
     - assets/images/logo@2x.png
+    - assets/images/logo-alt.png
+    - assets/images/logo-alt@2x.png
     - assets/images/loading.gif
     - assets/images/default.1.jpg
     - assets/images/default.2.jpg
