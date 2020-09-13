@@ -91,10 +91,11 @@ class _PostDetailState extends State<PostDetailCard> {
       child: new Text(
         widget.detail.user.username,
         style: new TextStyle(
-          fontFamily: FontConst.bold,
+          fontFamily: FontConst.primary,
           color: ColorConst.black,
           fontSize: 14.0,
           letterSpacing: 0.33,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
@@ -205,7 +206,7 @@ class _PostDetailState extends State<PostDetailCard> {
 
     final ri = new Icon(
       new IconData(0xf007, fontFamily: FontConst.fal),
-      color: ColorConst.darkerGray,
+      color: ColorConst.gray,
       size: 16.0,
     );
 

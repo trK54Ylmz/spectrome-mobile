@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/comment.dart';
 import 'package:spectrome/item/detail.dart';
+import 'package:spectrome/item/input.dart';
 import 'package:spectrome/model/post/comment.dart';
 import 'package:spectrome/model/post/detail.dart';
 import 'package:spectrome/page/sign_in.dart';
@@ -90,6 +91,11 @@ class _DetailState extends State<DetailPage> {
 
   /// Get page widget
   Widget _getPage() {
+    final th = MediaQuery.of(context).size.height;
+    final sp = MediaQuery.of(context).padding.top;
+
+    final h = th - sp;
+
     // Back button
     final l = new GestureDetector(
       onTap: () => Navigator.of(context).pop(),
@@ -122,6 +128,64 @@ class _DetailState extends State<DetailPage> {
       children: ci,
     );
 
+    final ts = new TextStyle(
+      fontFamily: FontConst.primary,
+      fontSize: 14.0,
+      letterSpacing: 0.33,
+    );
+
+    final hs = new TextStyle(
+      fontFamily: FontConst.primary,
+      fontSize: 14.0,
+      letterSpacing: 0.33,
+      color: ColorConst.gray,
+    );
+
+    // Comment box
+    final b = new Padding(
+      padding: EdgeInsets.all(8.0),
+      child: FormText(
+        expands: true,
+        maxLines: null,
+        minLines: null,
+        size: 4000,
+        style: ts,
+        hintStyle: hs,
+        hint: 'Type your comment ...',
+        validator: (String i) {
+          if (i.length == 0) {
+            return 'The message is required.';
+          }
+
+          if (i.runes.length < 10) {
+            return 'The message requires at least 10 characters.';
+          }
+
+          return null;
+        },
+      ),
+    );
+
+    final m = new Padding(
+      padding: EdgeInsets.symmetric(vertical: 8.0),
+      child: new Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          p,
+          c,
+        ],
+      ),
+    );
+
+    final s = new Stack(
+      alignment: Alignment.bottomLeft,
+      children: [
+        m,
+        b,
+      ],
+    );
+
     return new CupertinoPageScaffold(
       backgroundColor: ColorConst.white,
       navigationBar: new CupertinoNavigationBar(
@@ -137,18 +201,9 @@ class _DetailState extends State<DetailPage> {
         ),
         leading: l,
       ),
-      child: new SingleChildScrollView(
-        child: new Padding(
-          padding: new EdgeInsets.only(top: 8.0, bottom: 8.0),
-          child: new Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              p,
-              c,
-            ],
-          ),
-        ),
+      child: new Container(
+        height: h,
+        child: s,
       ),
     );
   }

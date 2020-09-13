@@ -70,10 +70,11 @@ class _CommentRowState extends State<CommentRow> {
       child: new Text(
         widget.user.username,
         style: new TextStyle(
-          fontFamily: FontConst.bold,
+          fontFamily: FontConst.primary,
+          color: ColorConst.black,
           fontSize: 14.0,
           letterSpacing: 0.33,
-          color: ColorConst.black,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
