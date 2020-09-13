@@ -351,8 +351,8 @@ class _SignInState extends State<SignInPage> {
       setState(() => _loading = false);
     };
 
-    final l = _loginId.text;
-    final p = _password.text;
+    final l = _loginId.text.trim();
+    final p = _password.text.trim();
 
     // Send sign in request
     SignInService.call(l, p).then(sc).catchError(e).whenComplete(cc);
