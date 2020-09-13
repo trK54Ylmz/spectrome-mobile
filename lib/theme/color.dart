@@ -13,6 +13,8 @@ class ColorConst {
 
   static const button = const Color(0xff007bff);
 
+  static const secondary = const Color(0xff4071b8);
+
   static const darkGray = const Color(0xff999999);
 
   static const darkerGray = const Color(0xff666666);

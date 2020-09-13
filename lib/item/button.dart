@@ -67,7 +67,7 @@ class _ButtonState extends State<Button> {
       c = _active || widget.disabled;
     } else {
       b = _active || widget.disabled;
-      c = true;
+      c = false;
     }
 
     return new GestureDetector(
@@ -104,9 +104,10 @@ class _ButtonState extends State<Button> {
               maxLines: 1,
               textAlign: TextAlign.center,
               style: new TextStyle(
-                color: c ? widget.color.withOpacity(0.67) : widget.color,
+                color: c ? widget.color.withOpacity(0.22) : widget.color,
                 fontFamily: FontConst.primary,
                 fontSize: widget.fontSize,
+                letterSpacing: 0.33,
               ),
             ),
           ),
