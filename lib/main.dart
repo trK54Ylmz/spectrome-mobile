@@ -102,12 +102,11 @@ class _MainState extends State<MainPage> {
     if (Platform.isIOS) {
       SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     } else {
-      const w = const Color(0xffffffff);
       SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(
-          systemNavigationBarColor: w,
-          systemNavigationBarDividerColor: w,
-          statusBarColor: w,
+          systemNavigationBarColor: ColorConst.white,
+          systemNavigationBarDividerColor: ColorConst.white,
+          statusBarColor: ColorConst.white,
           systemNavigationBarIconBrightness: Brightness.light,
           statusBarIconBrightness: Brightness.dark,
           statusBarBrightness: Brightness.dark,
@@ -151,114 +150,110 @@ class _MainState extends State<MainPage> {
 
   /// Get develop widgets for main page
   Widget _getDevelop() {
-    // Show loading indicator if any tag have not selected yet
-    if (_tag == null) {
-      return const Loading();
+    if (_domain) {
+      // Select route and redirect
+      return routes[_tag](context);
     }
 
     // Show domain name selector widgets
     // This will be used only for development purposes
-    if (!_domain) {
-      final pt = const Padding(
-        padding: EdgeInsets.only(top: 8.0),
-      );
 
-      final t = new Text(
-        'Please select API domain',
-        style: new TextStyle(
-          fontFamily: FontConst.primary,
-          color: ColorConst.darkGray,
-          fontSize: 14.0,
-          letterSpacing: 0.33,
-        ),
-      );
+    final pt = const Padding(
+      padding: EdgeInsets.only(top: 8.0),
+    );
 
-      // Default API domain button
-      final b = new Button(
-        text: 'Default',
-        onPressed: () {
-          Http.domain = 'api.spectrome.app';
+    final t = new Text(
+      'Please select API domain',
+      style: new TextStyle(
+        fontFamily: FontConst.primary,
+        color: ColorConst.darkGray,
+        fontSize: 14.0,
+        letterSpacing: 0.33,
+      ),
+    );
 
-          setState(() => _domain = true);
-        },
-      );
+    // Default API domain button
+    final b = new Button(
+      text: 'Default',
+      onPressed: () {
+        Http.domain = 'api.spectrome.app';
 
-      final controller = new TextEditingController();
-      final cb = (i) {
-        if (i == null || i.length == 0) {
-          controller.text = '192.168.1.';
+        setState(() => _domain = true);
+      },
+    );
+
+    final controller = new TextEditingController();
+    final cb = (i) {
+      if (i == null || i.length == 0) {
+        controller.text = '192.168.1.';
+      }
+    };
+
+    // Fill IP controller after 1 second if empty
+    Future.delayed(Duration(seconds: 1)).then(cb);
+
+    final ip = FormText(
+      hint: '192.168.X.Y',
+      inputType: TextInputType.number,
+      controller: controller,
+      style: new TextStyle(
+        fontFamily: FontConst.primary,
+        fontSize: 14.0,
+        letterSpacing: 0.33,
+      ),
+      hintStyle: new TextStyle(
+        fontFamily: FontConst.primary,
+        fontSize: 14.0,
+        letterSpacing: 0.33,
+        color: ColorConst.gray,
+      ),
+      borderColor: _error ? ColorConst.darkRed : ColorConst.gray,
+    );
+
+    // Default API domain button
+    final ib = new Button(
+      text: 'Custom',
+      onPressed: () {
+        if (ip.controller.text.length == 0) {
+          setState(() => _error = true);
+          return;
         }
-      };
 
-      // Fill IP controller after 3 seconds if empty
-      Future.delayed(Duration(seconds: 2)).then(cb);
+        setState(() => _error = false);
 
-      final ip = FormText(
-        hint: '192.168.X.Y',
-        inputType: TextInputType.number,
-        controller: controller,
-        style: new TextStyle(
-          fontFamily: FontConst.primary,
-          fontSize: 14.0,
-          letterSpacing: 0.33,
+        // Set custom http client parameters
+        Http.domain = ip.controller.text;
+        Http.client.badCertificateCallback = (c, h, p) => true;
+
+        // Override current http client
+        HttpOverrides.global = new DebugHttpOverrides();
+
+        setState(() => _domain = true);
+      },
+    );
+
+    return new Container(
+      color: ColorConst.white,
+      child: new Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: 100.0,
+          vertical: 16.0,
         ),
-        hintStyle: new TextStyle(
-          fontFamily: FontConst.primary,
-          fontSize: 14.0,
-          letterSpacing: 0.33,
-          color: ColorConst.gray,
+        child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            t,
+            pt,
+            b,
+            pt,
+            pt,
+            ip,
+            pt,
+            ib,
+          ],
         ),
-        borderColor: _error ? ColorConst.darkRed : ColorConst.gray,
-      );
-
-      // Default API domain button
-      final ib = new Button(
-        text: 'Custom',
-        onPressed: () {
-          if (ip.controller.text.length == 0) {
-            setState(() => _error = true);
-            return;
-          }
-
-          setState(() => _error = false);
-
-          // Set custom http client parameters
-          Http.domain = ip.controller.text;
-          Http.client.badCertificateCallback = (c, h, p) => true;
-
-          // Override current http client
-          HttpOverrides.global = new DebugHttpOverrides();
-
-          setState(() => _domain = true);
-        },
-      );
-
-      return new Container(
-        color: ColorConst.white,
-        child: new Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: 100.0,
-            vertical: 16.0,
-          ),
-          child: new Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              t,
-              pt,
-              b,
-              pt,
-              pt,
-              ip,
-              pt,
-              ib,
-            ],
-          ),
-        ),
-      );
-    }
-
-    // Select route and redirect
-    return routes[_tag](context);
+      ),
+    );
   }
 }
