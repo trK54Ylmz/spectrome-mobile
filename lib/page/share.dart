@@ -9,13 +9,15 @@ import 'package:spectrome/item/form.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/item/video.dart';
-import 'package:spectrome/page/restriction.dart';
+import 'package:spectrome/model/profile/simple.dart';
 import 'package:spectrome/page/view.dart';
+import 'package:spectrome/service/query/following.dart';
 import 'package:spectrome/service/share/share.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
 import 'package:spectrome/util/error.dart';
+import 'package:spectrome/util/http.dart';
 import 'package:spectrome/util/storage.dart';
 import 'package:vector_math/vector_math_64.dart';
 
@@ -35,6 +37,12 @@ class _ShareState extends State<SharePage> {
   // Scaffold key
   final _sk = new GlobalKey<ScaffoldState>();
 
+  // Search input controller
+  final _sc = new TextEditingController();
+
+  // User typing or not
+  final _typing = new ValueNotifier<bool>(false);
+
   // Tab controller
   final _tc = new CupertinoTabController(initialIndex: 1);
 
@@ -50,8 +58,11 @@ class _ShareState extends State<SharePage> {
   // Scale group of items
   final _scales = <double>[];
 
-  // List of shared users
-  final _users = <String>[];
+  // List of selected users
+  final _users = <SimpleProfile>[];
+
+  // List of suggestions
+  final _suggests = <SimpleProfile>[];
 
   // Post screen size
   int _size = 2;
@@ -61,6 +72,9 @@ class _ShareState extends State<SharePage> {
 
   // Loading indicator
   bool _loading = false;
+
+  // Action loading indicator
+  bool _action = false;
 
   // Post is disposible
   bool _disposible = false;
@@ -329,17 +343,17 @@ class _ShareState extends State<SharePage> {
       final smi = <InlineSpan>[];
 
       if (_users.length > 3) {
-        smi.add(new TextSpan(text: _users[0], style: tsb));
+        smi.add(new TextSpan(text: _users[0].username, style: tsb));
         smi.add(new TextSpan(text: ', ', style: tsn));
-        smi.add(new TextSpan(text: _users[1], style: tsb));
+        smi.add(new TextSpan(text: _users[1].username, style: tsb));
         smi.add(new TextSpan(text: ' and ', style: tsn));
         smi.add(new TextSpan(text: '${_users.length - 2} more', style: tsb));
       } else if (_users.length == 2) {
-        smi.add(new TextSpan(text: _users[0], style: tsb));
+        smi.add(new TextSpan(text: _users[0].username, style: tsb));
         smi.add(new TextSpan(text: ' and ', style: tsn));
-        smi.add(new TextSpan(text: _users[1], style: tsb));
+        smi.add(new TextSpan(text: _users[1].username, style: tsb));
       } else {
-        smi.add(new TextSpan(text: _users[0], style: tsb));
+        smi.add(new TextSpan(text: _users[0].username, style: tsb));
       }
 
       sm = new RichText(
@@ -383,15 +397,15 @@ class _ShareState extends State<SharePage> {
 
           setState(() => _restricted = false);
         } else {
-          // Open new screen to add or remove users from restriction
-          final u = await Navigator.of(context).pushNamed(RestrictionPage.tag);
+          final b = (BuildContext context) {
+            // State builder for bottom sheet
+            return new StatefulBuilder(builder: (context, setState) {
+              return _getBottomSheet(context, setState);
+            });
+          };
 
-          // Check if users is null because maybe users swipes by themselves
-          if (u != null) {
-            // Clear users and populate new selection
-            _users.clear();
-            _users.addAll(u as List<String>);
-          }
+          // Show restriction bottom sheet to add or remove users
+          showCupertinoModalPopup(context: context, builder: b);
 
           // Update restriction
           setState(() => _restricted = _users.isEmpty ? false : true);
@@ -1070,6 +1084,363 @@ class _ShareState extends State<SharePage> {
     );
   }
 
+  /// Show restricted users bottom sheet
+  Widget _getBottomSheet(BuildContext context, StateSetter setState) {
+    final height = MediaQuery.of(context).size.height;
+    final pt = const Padding(padding: EdgeInsets.only(top: 8.0));
+
+    // Share title text
+    final tt = new Text(
+      'Share',
+      style: new TextStyle(
+        fontFamily: FontConst.bold,
+        fontSize: 16.0,
+        color: ColorConst.black,
+        letterSpacing: 0.33,
+      ),
+    );
+
+    // Close button
+    final cb = new Semantics(
+      focusable: true,
+      button: true,
+      child: new GestureDetector(
+        onTap: () => Navigator.pop(context),
+        child: new Container(
+          decoration: new BoxDecoration(
+            color: ColorConst.lightGray,
+            borderRadius: BorderRadius.circular(30.0),
+          ),
+          child: new Padding(
+            padding: EdgeInsets.all(4.0),
+            child: new Icon(
+              IconData(0xf00d, fontFamily: FontConst.fal),
+              color: ColorConst.darkGray,
+              size: 16.0,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // Title row
+    final tr = new Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        tt,
+        cb,
+      ],
+    );
+
+    final ts = new TextStyle(
+      fontFamily: FontConst.primary,
+      fontSize: 14.0,
+      letterSpacing: 0.33,
+    );
+
+    final hs = new TextStyle(
+      fontFamily: FontConst.primary,
+      fontSize: 14.0,
+      letterSpacing: 0.33,
+      color: ColorConst.gray,
+      fontWeight: FontWeight.normal,
+    );
+
+    final sb = new FormText(
+      hint: 'Type something',
+      hintStyle: hs,
+      style: ts,
+      controller: _sc,
+      borderColor: ColorConst.gray,
+      onChange: (t) {
+        if (t.length < 2) {
+          _suggests.clear();
+          setState(() => _typing.value = false);
+
+          return null;
+        }
+
+        setState(() => _typing.value = true);
+
+        // Send request and collect suggestions
+        _searchFollowers();
+
+        return null;
+      },
+    );
+
+    // Suggested users list view
+    final sg = new Expanded(
+      child: new ListView.builder(
+        padding: EdgeInsets.symmetric(vertical: 8.0),
+        itemCount: _suggests.length,
+        itemBuilder: _suggestedBuilder,
+      ),
+    );
+
+    final st = new Text(
+      'You can select up to 16 users',
+      style: new TextStyle(
+        fontFamily: FontConst.primary,
+        fontSize: 12.0,
+        color: ColorConst.gray,
+      ),
+    );
+
+    // Selected users list view
+    final sl = new Expanded(
+      child: new ListView.builder(
+        padding: EdgeInsets.symmetric(vertical: 8.0),
+        itemCount: _users.length,
+        itemBuilder: _selectedBuilder,
+      ),
+    );
+
+    // Selected users container
+    final su = new Expanded(
+      child: new Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          st,
+          sl,
+        ],
+      ),
+    );
+
+    final c = new Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        tr,
+        pt,
+        sb,
+        pt,
+        _typing.value ? sg : su,
+      ],
+    );
+
+    return new Container(
+      decoration: new BoxDecoration(
+        color: ColorConst.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(8.0),
+          topRight: Radius.circular(8.0),
+        ),
+      ),
+      child: new Padding(
+        padding: EdgeInsets.all(8.0),
+        child: new Container(
+          height: (height / 3) * 2,
+          child: c,
+        ),
+      ),
+    );
+  }
+
+  /// Get suggested users builder
+  Widget _suggestedBuilder(BuildContext context, int index) {
+    // Http headers for profile image request
+    final h = {Http.TOKEN_HEADER: _session};
+
+    // Profile photo
+    final pp = new Container(
+      width: 40.0,
+      height: 40.0,
+      decoration: new BoxDecoration(
+        color: ColorConst.gray,
+        border: new Border.all(
+          width: 0.5,
+          color: ColorConst.gray.withOpacity(0.5),
+        ),
+        borderRadius: BorderRadius.all(
+          Radius.circular(20.0),
+        ),
+      ),
+      child: new ClipRRect(
+        borderRadius: BorderRadius.circular(30.0),
+        child: new Image.network(
+          _suggests[index].photoUrl,
+          headers: h,
+          width: 40.0,
+          height: 40.0,
+          errorBuilder: (c, o, s) => new Image.asset('assets/images/default.1.jpg'),
+        ),
+      ),
+    );
+
+    final ur = new Container(
+      width: 120.0,
+      height: 20.0,
+      alignment: Alignment.centerLeft,
+      child: new Text(
+        _suggests[index].username,
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          color: ColorConst.black,
+          fontSize: 14.0,
+          letterSpacing: 0.33,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+
+    final un = new Container(
+      width: 120.0,
+      height: 14.0,
+      child: new Text(
+        _suggests[index].name,
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          color: ColorConst.darkGray,
+          fontSize: 12.0,
+          letterSpacing: 0.33,
+        ),
+      ),
+    );
+
+    final uu = new Padding(
+      padding: EdgeInsets.only(left: 8.0),
+      child: new Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ur,
+          un,
+        ],
+      ),
+    );
+
+    final c = () {
+      for (int i = 0; i < _users.length; i++) {
+        if (_users[i].username == _users[index].username) {
+          return;
+        }
+      }
+
+      // Populate selected users
+      _users.add(_suggests[index]);
+
+      // Clear text field
+      _sc.clear();
+
+      setState(() => _typing.value = false);
+    };
+
+    return new GestureDetector(
+      onTap: c,
+      child: new Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          pp,
+          uu,
+        ],
+      ),
+    );
+  }
+
+  /// Get selected users builder
+  Widget _selectedBuilder(BuildContext context, int index) {
+    // Http headers for profile image request
+    final h = {Http.TOKEN_HEADER: _session};
+
+    // Profile photo
+    final pp = new GestureDetector(
+      onTap: () => null,
+      child: new Container(
+        width: 40.0,
+        height: 40.0,
+        decoration: new BoxDecoration(
+          color: ColorConst.gray,
+          border: new Border.all(
+            width: 0.5,
+            color: ColorConst.gray.withOpacity(0.5),
+          ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(20.0),
+          ),
+        ),
+        child: new ClipRRect(
+          borderRadius: BorderRadius.circular(30.0),
+          child: new Image.network(
+            _users[index].photoUrl,
+            headers: h,
+            width: 40.0,
+            height: 40.0,
+            errorBuilder: (c, o, s) => new Image.asset('assets/images/default.1.jpg'),
+          ),
+        ),
+      ),
+    );
+
+    final ur = new Container(
+      width: 120.0,
+      height: 20.0,
+      alignment: Alignment.centerLeft,
+      child: new Text(
+        _users[index].username,
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          color: ColorConst.black,
+          fontSize: 14.0,
+          letterSpacing: 0.33,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+
+    final un = new Container(
+      width: 120.0,
+      height: 14.0,
+      child: new Text(
+        _users[index].name,
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          color: ColorConst.darkGray,
+          fontSize: 12.0,
+          letterSpacing: 0.33,
+        ),
+      ),
+    );
+
+    final uu = new GestureDetector(
+      onTap: () => null,
+      child: new Padding(
+        padding: EdgeInsets.only(left: 8.0),
+        child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ur,
+            un,
+          ],
+        ),
+      ),
+    );
+
+    return new Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        pp,
+        uu,
+      ],
+    );
+  }
+
+  /// Get file widget according to it's type
+  Widget _getItem(File file) {
+    final type = file.path.split('.').last == 'jpg' ? AppConst.photo : AppConst.video;
+
+    if (type == AppConst.video) {
+      return new Video(path: file.path, type: VideoType.FILE);
+    } else {
+      return new Image.file(file);
+    }
+  }
+
   /// Show error when error not empty
   void _showSnackBar(String message, {bool isError = true}) {
     final snackBar = SnackBar(
@@ -1104,15 +1475,66 @@ class _ShareState extends State<SharePage> {
     setState(() => _scale = false);
   }
 
-  /// Get file widget according to it's type
-  Widget _getItem(File file) {
-    final type = file.path.split('.').last == 'jpg' ? AppConst.photo : AppConst.video;
+  /// Fetch users by using query filter
+  void _searchFollowers() {
+    dev.log('User search triggered.');
 
-    if (type == AppConst.video) {
-      return new Video(path: file.path, type: VideoType.FILE);
-    } else {
-      return new Image.file(file);
+    if (_action) {
+      return;
     }
+
+    dev.log('User search request sending for "${_sc.text}".');
+
+    // Set loading true
+    setState(() => _action = true);
+
+    // Handle HTTP response
+    final c = (FollowingQueryResponse r) async {
+      dev.log('User search request sent.');
+
+      if (!r.status) {
+        if (r.isNetErr ?? false) {
+          // Create network error
+          final error = ErrorMessage.network();
+
+          // Show error message
+          _showSnackBar(error.error, isError: true);
+        } else {
+          // Create custom error
+          _showSnackBar(r.message, isError: true);
+        }
+
+        return;
+      }
+
+      // Clear current list
+      _suggests.clear();
+
+      // Add all users
+      _suggests.addAll(r.users);
+    };
+
+    // Error callback
+    final e = (e, s) {
+      final msg = 'Unknown suggestion error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
+    };
+
+    // Complete callback
+    final cc = () {
+      // Skip if dispose method called from application
+      if (!this.mounted) {
+        return;
+      }
+
+      setState(() => _action = false);
+    };
+
+    // Prepare request
+    final s = FollowingQueryService.call(_session, _sc.text);
+
+    s.then(c).catchError(e).whenComplete(cc);
   }
 
   /// Create new post
@@ -1167,6 +1589,12 @@ class _ShareState extends State<SharePage> {
       setState(() => _loading = false);
     };
 
+    // Populate user names
+    final users = <String>[];
+    for (int i = 0; i < _users.length; i++) {
+      users.add(_users[i].username);
+    }
+
     // Create http request
     final r = ShareService.call(
       session: _session,
@@ -1176,8 +1604,8 @@ class _ShareState extends State<SharePage> {
       size: _size,
       files: files,
       scales: _scales,
-      users: _users,
       message: _cc.text,
+      users: users,
     );
 
     return r.then(c).catchError(e).whenComplete(cc);
