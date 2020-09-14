@@ -31,6 +31,9 @@ class SharePage extends StatefulWidget {
 }
 
 class _ShareState extends State<SharePage> {
+  // Tab controller
+  final _tc = new CupertinoTabController(initialIndex: 1);
+
   // Form validation key
   final _fk = new GlobalKey<FormValidationState>();
 
@@ -40,14 +43,11 @@ class _ShareState extends State<SharePage> {
   // Search input controller
   final _sc = new TextEditingController();
 
-  // User typing or not
-  final _typing = new ValueNotifier<bool>(false);
-
-  // Tab controller
-  final _tc = new CupertinoTabController(initialIndex: 1);
-
   // Page view controller
   final _pc = new PageController();
+
+  // Suggestion page view controller
+  final _spc = new PageController();
 
   // Comment input controller
   final _cc = new TextEditingController();
@@ -392,24 +392,20 @@ class _ShareState extends State<SharePage> {
           return;
         }
 
-        if (_restricted) {
-          _users.clear();
+        final b = (BuildContext context) {
+          // State builder for bottom sheet
+          return new StatefulBuilder(builder: (context, setState) {
+            return _getBottomSheet(context, setState);
+          });
+        };
 
-          setState(() => _restricted = false);
-        } else {
-          final b = (BuildContext context) {
-            // State builder for bottom sheet
-            return new StatefulBuilder(builder: (context, setState) {
-              return _getBottomSheet(context, setState);
-            });
-          };
-
-          // Show restriction bottom sheet to add or remove users
-          showCupertinoModalPopup(context: context, builder: b);
-
+        final c = (_) {
           // Update restriction
           setState(() => _restricted = _users.isEmpty ? false : true);
-        }
+        };
+
+        // Show restriction bottom sheet to add or remove users
+        showCupertinoModalPopup(context: context, builder: b).then(c);
       },
       padding: EdgeInsets.all(6.0),
       color: _restricted ? ColorConst.white : ColorConst.darkGray,
@@ -1154,29 +1150,60 @@ class _ShareState extends State<SharePage> {
       controller: _sc,
       borderColor: ColorConst.gray,
       onChange: (t) {
+        const d = const Duration(milliseconds: 250);
+
         if (t.length < 2) {
           _suggests.clear();
-          setState(() => _typing.value = false);
+
+          // Move to selected users
+          _spc.animateToPage(0, duration: d, curve: Curves.ease);
+
+          setState(() => null);
 
           return null;
         }
 
-        setState(() => _typing.value = true);
+        if (_spc.page.round() == 0) {
+          // Move to suggestion users
+          _spc.animateToPage(1, duration: d, curve: Curves.ease);
+        }
 
         // Send request and collect suggestions
         _searchFollowers();
+
+        setState(() => null);
 
         return null;
       },
     );
 
+    final gt = new Text(
+      'Your can search in your followers',
+      style: new TextStyle(
+        fontFamily: FontConst.primary,
+        fontSize: 12.0,
+        color: ColorConst.gray,
+      ),
+    );
+
     // Suggested users list view
-    final sg = new Expanded(
+    final gl = new Expanded(
       child: new ListView.builder(
+        physics: const ClampingScrollPhysics(),
         padding: EdgeInsets.symmetric(vertical: 8.0),
         itemCount: _suggests.length,
         itemBuilder: _suggestedBuilder,
       ),
+    );
+
+    // Suggested users container
+    final sg = new Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        gt,
+        gl,
+      ],
     );
 
     final st = new Text(
@@ -1191,6 +1218,7 @@ class _ShareState extends State<SharePage> {
     // Selected users list view
     final sl = new Expanded(
       child: new ListView.builder(
+        physics: const ClampingScrollPhysics(),
         padding: EdgeInsets.symmetric(vertical: 8.0),
         itemCount: _users.length,
         itemBuilder: _selectedBuilder,
@@ -1198,13 +1226,25 @@ class _ShareState extends State<SharePage> {
     );
 
     // Selected users container
-    final su = new Expanded(
-      child: new Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
+    final su = new Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        st,
+        sl,
+      ],
+    );
+
+    // Suggestion and selected users page view
+    final pv = new Expanded(
+      child: new PageView(
+        physics: const NeverScrollableScrollPhysics(),
+        controller: _spc,
+        pageSnapping: false,
+        onPageChanged: (_) => setState(() => null),
         children: [
-          st,
-          sl,
+          su,
+          sg,
         ],
       ),
     );
@@ -1217,7 +1257,7 @@ class _ShareState extends State<SharePage> {
         pt,
         sb,
         pt,
-        _typing.value ? sg : su,
+        pv,
       ],
     );
 
@@ -1313,19 +1353,26 @@ class _ShareState extends State<SharePage> {
     );
 
     final c = () {
+      bool exists = false;
       for (int i = 0; i < _users.length; i++) {
         if (_users[i].username == _users[index].username) {
-          return;
+          exists = true;
+          break;
         }
       }
 
-      // Populate selected users
-      _users.add(_suggests[index]);
+      if (!exists) {
+        // Populate selected users
+        _users.insert(0, _suggests[index]);
+      }
 
       // Clear text field
       _sc.clear();
 
-      setState(() => _typing.value = false);
+      const d = const Duration(milliseconds: 500);
+
+      // Move to selected users
+      _spc.animateToPage(0, duration: d, curve: Curves.ease);
     };
 
     return new GestureDetector(
@@ -1347,30 +1394,27 @@ class _ShareState extends State<SharePage> {
     final h = {Http.TOKEN_HEADER: _session};
 
     // Profile photo
-    final pp = new GestureDetector(
-      onTap: () => null,
-      child: new Container(
-        width: 40.0,
-        height: 40.0,
-        decoration: new BoxDecoration(
-          color: ColorConst.gray,
-          border: new Border.all(
-            width: 0.5,
-            color: ColorConst.gray.withOpacity(0.5),
-          ),
-          borderRadius: BorderRadius.all(
-            Radius.circular(20.0),
-          ),
+    final pp = new Container(
+      width: 40.0,
+      height: 40.0,
+      decoration: new BoxDecoration(
+        color: ColorConst.gray,
+        border: new Border.all(
+          width: 0.5,
+          color: ColorConst.gray.withOpacity(0.5),
         ),
-        child: new ClipRRect(
-          borderRadius: BorderRadius.circular(30.0),
-          child: new Image.network(
-            _users[index].photoUrl,
-            headers: h,
-            width: 40.0,
-            height: 40.0,
-            errorBuilder: (c, o, s) => new Image.asset('assets/images/default.1.jpg'),
-          ),
+        borderRadius: BorderRadius.all(
+          Radius.circular(20.0),
+        ),
+      ),
+      child: new ClipRRect(
+        borderRadius: BorderRadius.circular(30.0),
+        child: new Image.network(
+          _users[index].photoUrl,
+          headers: h,
+          width: 40.0,
+          height: 40.0,
+          errorBuilder: (c, o, s) => new Image.asset('assets/images/default.1.jpg'),
         ),
       ),
     );
@@ -1405,18 +1449,15 @@ class _ShareState extends State<SharePage> {
       ),
     );
 
-    final uu = new GestureDetector(
-      onTap: () => null,
-      child: new Padding(
-        padding: EdgeInsets.only(left: 8.0),
-        child: new Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ur,
-            un,
-          ],
-        ),
+    final uu = new Padding(
+      padding: EdgeInsets.only(left: 8.0),
+      child: new Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ur,
+          un,
+        ],
       ),
     );
 
