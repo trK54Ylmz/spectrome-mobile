@@ -234,7 +234,7 @@ class _ShareState extends State<SharePage> {
           case 1:
             return _getForm(_files);
           default:
-            return new Container(color: ColorConst.white);
+            return new Loading();
         }
       },
     );
@@ -1192,7 +1192,7 @@ class _ShareState extends State<SharePage> {
         physics: const ClampingScrollPhysics(),
         padding: EdgeInsets.symmetric(vertical: 8.0),
         itemCount: _suggests.length,
-        itemBuilder: _suggestedBuilder,
+        itemBuilder: (c, i) => _suggestedBuilder(c, i, setState),
       ),
     );
 
@@ -1221,7 +1221,7 @@ class _ShareState extends State<SharePage> {
         physics: const ClampingScrollPhysics(),
         padding: EdgeInsets.symmetric(vertical: 8.0),
         itemCount: _users.length,
-        itemBuilder: _selectedBuilder,
+        itemBuilder: (c, i) => _selectedBuilder(c, i, setState),
       ),
     );
 
@@ -1280,7 +1280,7 @@ class _ShareState extends State<SharePage> {
   }
 
   /// Get suggested users builder
-  Widget _suggestedBuilder(BuildContext context, int index) {
+  Widget _suggestedBuilder(BuildContext context, int index, StateSetter setState) {
     // Http headers for profile image request
     final h = {Http.TOKEN_HEADER: _session};
 
@@ -1389,7 +1389,7 @@ class _ShareState extends State<SharePage> {
   }
 
   /// Get selected users builder
-  Widget _selectedBuilder(BuildContext context, int index) {
+  Widget _selectedBuilder(BuildContext context, int index, StateSetter setState) {
     // Http headers for profile image request
     final h = {Http.TOKEN_HEADER: _session};
 
@@ -1449,15 +1449,37 @@ class _ShareState extends State<SharePage> {
       ),
     );
 
-    final uu = new Padding(
-      padding: EdgeInsets.only(left: 8.0),
-      child: new Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ur,
-          un,
-        ],
+    // User information container
+    final uu = new Expanded(
+      child: new Padding(
+        padding: EdgeInsets.only(left: 8.0),
+        child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ur,
+            un,
+          ],
+        ),
+      ),
+    );
+
+    // Close button
+    final cb = new GestureDetector(
+      onTap: () => setState(() => _users.removeAt(index)),
+      child: new Container(
+        decoration: new BoxDecoration(
+          color: ColorConst.lightGray,
+          borderRadius: BorderRadius.circular(30.0),
+        ),
+        child: new Padding(
+          padding: EdgeInsets.all(4.0),
+          child: new Icon(
+            IconData(0xf00d, fontFamily: FontConst.fal),
+            color: ColorConst.darkGray,
+            size: 16.0,
+          ),
+        ),
       ),
     );
 
@@ -1467,6 +1489,7 @@ class _ShareState extends State<SharePage> {
       children: [
         pp,
         uu,
+        cb,
       ],
     );
   }
