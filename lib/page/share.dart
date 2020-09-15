@@ -438,12 +438,12 @@ class _ShareState extends State<SharePage> {
       if (_users.length > 2) {
         um = _users.sublist(0, 2).join(', ') + ' and others.';
       } else {
-        um = _users.join(' and ');
+        um = _users.map((e) => e.username).join(' and ');
       }
 
-      cm = 'message $um';
+      cm = 'message will be seen by $um';
     } else {
-      cm = 'share message with your friends';
+      cm = 'share a message with your friends';
     }
 
     // Comment text field
@@ -1086,13 +1086,16 @@ class _ShareState extends State<SharePage> {
     final pt = const Padding(padding: EdgeInsets.only(top: 8.0));
 
     // Share title text
-    final tt = new Text(
-      'Share',
-      style: new TextStyle(
-        fontFamily: FontConst.bold,
-        fontSize: 16.0,
-        color: ColorConst.black,
-        letterSpacing: 0.33,
+    final tt = new Padding(
+      padding: EdgeInsets.symmetric(vertical: 8.0),
+      child: new Text(
+        'Share',
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          fontSize: 16.0,
+          color: ColorConst.black,
+          letterSpacing: 0.33,
+        ),
       ),
     );
 
@@ -1473,11 +1476,11 @@ class _ShareState extends State<SharePage> {
           borderRadius: BorderRadius.circular(30.0),
         ),
         child: new Padding(
-          padding: EdgeInsets.all(4.0),
+          padding: EdgeInsets.all(6.0),
           child: new Icon(
             IconData(0xf00d, fontFamily: FontConst.fal),
             color: ColorConst.darkGray,
-            size: 16.0,
+            size: 12.0,
           ),
         ),
       ),

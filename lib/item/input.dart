@@ -23,6 +23,8 @@ class FormText extends StatefulWidget {
 
   final CallbackFunc<String> onChange;
 
+  final Widget suffix;
+
   final String hint;
 
   final TextStyle style;
@@ -67,6 +69,7 @@ class FormText extends StatefulWidget {
     this.hint,
     this.style,
     this.hintStyle,
+    this.suffix,
     this.inputType = TextInputType.text,
     this.onChange,
     this.maxLines = 1,
@@ -122,7 +125,7 @@ class TextInputState extends State<FormText> {
 
   @override
   Widget build(BuildContext context) {
-    Widget suffix = new Container(width: 0.0, height: 0.0);
+    var suffix;
 
     // Create password to text field conversion
     if (widget.showObscure) {
@@ -139,6 +142,10 @@ class TextInputState extends State<FormText> {
           ),
         ),
       );
+    } else if (widget.suffix == null) {
+      suffix = new Container(width: 0.0, height: 0.0);
+    } else {
+      suffix = widget.suffix;
     }
 
     return new CupertinoTextField(

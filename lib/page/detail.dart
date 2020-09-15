@@ -29,6 +29,9 @@ class _DetailState extends State<DetailPage> {
   // Scaffold key
   final _sk = new GlobalKey<ScaffoldState>();
 
+  // Comment box controller
+  final _cc = new TextEditingController();
+
   // List of selected users
   PostDetail _post;
 
@@ -91,11 +94,6 @@ class _DetailState extends State<DetailPage> {
 
   /// Get page widget
   Widget _getPage() {
-    final th = MediaQuery.of(context).size.height;
-    final sp = MediaQuery.of(context).padding.top;
-
-    final h = th - sp;
-
     // Back button
     final l = new GestureDetector(
       onTap: () => Navigator.of(context).pop(),
@@ -142,27 +140,31 @@ class _DetailState extends State<DetailPage> {
     );
 
     // Comment box
-    final b = new Padding(
-      padding: EdgeInsets.all(8.0),
-      child: FormText(
-        expands: true,
-        maxLines: null,
-        minLines: null,
-        size: 4000,
-        style: ts,
-        hintStyle: hs,
-        hint: 'Type your comment ...',
-        validator: (String i) {
-          if (i.length == 0) {
-            return 'The message is required.';
-          }
+    final b = new Container(
+      color: ColorConst.white,
+      child: new Padding(
+        padding: EdgeInsets.all(8.0),
+        child: FormText(
+          expands: true,
+          maxLines: null,
+          minLines: null,
+          size: 4000,
+          style: ts,
+          hintStyle: hs,
+          controller: _cc,
+          hint: 'Type your comment ...',
+          validator: (String i) {
+            if (i.length == 0) {
+              return 'The message is required.';
+            }
 
-          if (i.runes.length < 10) {
-            return 'The message requires at least 10 characters.';
-          }
+            if (i.runes.length < 10) {
+              return 'The message requires at least 10 characters.';
+            }
 
-          return null;
-        },
+            return null;
+          },
+        ),
       ),
     );
 
@@ -179,7 +181,7 @@ class _DetailState extends State<DetailPage> {
     );
 
     final s = new Stack(
-      alignment: Alignment.bottomLeft,
+      alignment: Alignment.bottomCenter,
       children: [
         m,
         b,
@@ -201,10 +203,7 @@ class _DetailState extends State<DetailPage> {
         ),
         leading: l,
       ),
-      child: new Container(
-        height: h,
-        child: s,
-      ),
+      child: s,
     );
   }
 
