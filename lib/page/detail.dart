@@ -143,7 +143,7 @@ class _DetailState extends State<DetailPage> {
     }
 
     // Add show comments button
-    if (_post.post.comments > 2) {
+    if (_post.post.comments >= 2) {
       final mt = new Text(
         'show all ${_post.post.comments} comments',
         style: new TextStyle(
@@ -248,11 +248,10 @@ class _DetailState extends State<DetailPage> {
       ),
     );
 
-    final m = new Padding(
-      padding: EdgeInsets.symmetric(vertical: 8.0),
-      child: new Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
+    final m = new Expanded(
+      child: new ListView(
+        physics: const ClampingScrollPhysics(),
+        padding: EdgeInsets.symmetric(vertical: 8.0),
         children: [
           p,
           c,
@@ -260,8 +259,9 @@ class _DetailState extends State<DetailPage> {
       ),
     );
 
-    final s = new Stack(
-      alignment: Alignment.bottomCenter,
+    final s = new Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         m,
         b,

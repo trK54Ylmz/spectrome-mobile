@@ -2,8 +2,10 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/comment.dart';
+import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/model/comment/detail.dart';
 import 'package:spectrome/model/post/detail.dart';
@@ -27,6 +29,9 @@ class CommentPage extends StatefulWidget {
 class _CommentState extends State<CommentPage> {
   // Scaffold key
   final _sk = new GlobalKey<ScaffoldState>();
+
+  // Comment box controller
+  final _cc = new TextEditingController();
 
   // List of post comments
   final _comments = <CommentDetail>[];
@@ -105,9 +110,53 @@ class _CommentState extends State<CommentPage> {
       ),
     );
 
-    final s = new ListView.builder(
-      itemCount: _loading ? _comments.length + 1 : _comments.length,
-      itemBuilder: _builder,
+    final s = new Expanded(
+      child: new ListView.builder(
+        itemCount: _loading ? _comments.length + 1 : _comments.length,
+        itemBuilder: _builder,
+      ),
+    );
+
+    final ts = new TextStyle(
+      fontFamily: FontConst.primary,
+      fontSize: 14.0,
+      letterSpacing: 0.33,
+    );
+
+    final hs = new TextStyle(
+      fontFamily: FontConst.primary,
+      fontSize: 14.0,
+      letterSpacing: 0.33,
+      color: ColorConst.gray,
+    );
+
+    // Comment box
+    final b = new Container(
+      color: ColorConst.white,
+      child: new Padding(
+        padding: EdgeInsets.all(8.0),
+        child: FormText(
+          expands: true,
+          maxLines: null,
+          minLines: null,
+          size: 4000,
+          style: ts,
+          hintStyle: hs,
+          controller: _cc,
+          hint: 'Type your comment ...',
+          validator: (String i) {
+            if (i.length == 0) {
+              return 'The message is required.';
+            }
+
+            if (i.runes.length < 10) {
+              return 'The message requires at least 10 characters.';
+            }
+
+            return null;
+          },
+        ),
+      ),
     );
 
     return new CupertinoPageScaffold(
@@ -133,7 +182,14 @@ class _CommentState extends State<CommentPage> {
         ),
         leading: l,
       ),
-      child: s,
+      child: new Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          s,
+          b,
+        ],
+      ),
     );
   }
 
@@ -143,11 +199,46 @@ class _CommentState extends State<CommentPage> {
       return new Loading();
     }
 
-    return new CommentRow(
-      comment: _comments[index].comment,
-      user: _comments[index].user,
-      me: _comments[index].me,
-      session: _session,
+    final actions = <SwipeAction>[];
+
+    final report = new SwipeAction(
+      icon: new Icon(
+        new IconData(0xf74c, fontFamily: FontConst.fal),
+        color: ColorConst.white,
+        size: 16.0,
+      ),
+      onTap: (CompletionHandler handler) async {},
+      color: ColorConst.darkGray,
+    );
+
+    actions.add(report);
+
+    if (_comments[index].me) {
+      final remove = new SwipeAction(
+        icon: new Icon(
+          new IconData(0xf2ed, fontFamily: FontConst.fal),
+          color: ColorConst.white,
+          size: 16.0,
+        ),
+        onTap: (CompletionHandler handler) async {
+          // Remove comment from array
+          setState(() => _comments.removeAt(index));
+        },
+        color: ColorConst.darkRed,
+      );
+
+      actions.add(remove);
+    }
+
+    return new SwipeActionCell(
+      key: ObjectKey(_comments[index].comment),
+      actions: actions,
+      child: new CommentRow(
+        comment: _comments[index].comment,
+        user: _comments[index].user,
+        me: _comments[index].me,
+        session: _session,
+      ),
     );
   }
 
@@ -196,6 +287,8 @@ class _CommentState extends State<CommentPage> {
 
         return;
       }
+
+      setState(() => _comments.addAll(r.comments));
     };
 
     // Error callback

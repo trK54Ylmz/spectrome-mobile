@@ -79,7 +79,7 @@ class CommentRecentResponse extends BasicResponse {
       return new CommentDetail(
         me: i['me'] as bool,
         comment: cc(i['comment'] as Map<String, dynamic>),
-        user: uc(i['comment'] as Map<String, dynamic>),
+        user: uc(i['user'] as Map<String, dynamic>),
       );
     };
 
