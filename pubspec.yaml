@@ -8,16 +8,16 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  device_info: ^0.4.1+5
-  shared_preferences: ^0.5.6+2
-  email_validator: ^1.0.4
-  camera: ^0.5.8+2
-  photo_manager: ^0.5.6
+  device_info: ^0.4.2+7
+  shared_preferences: ^0.5.10
+  email_validator: ^1.0.5
+  camera: ^0.5.8+5
+  photo_manager: ^0.5.8
   crypto: ^2.1.5
-  path_provider: ^1.6.11
+  path_provider: ^1.6.14
   better_player: ^0.0.13
   flutter_local_notifications: ^1.4.4+2
-
+  flutter_swipe_action_cell: ^1.0.8
 
 dev_dependencies:
   flutter_test:

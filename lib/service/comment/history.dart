@@ -44,9 +44,11 @@ class CommentHistoryService extends Service {
       return Service.handleError<CommentHistoryResponse>(e, s, r);
     };
 
-    final r = Http.doGet(
+    final r = Http.doPost(
       path: path,
       headers: headers,
+      body: body,
+      type: Http.FORM,
     );
 
     return r.then(c).catchError(e);
@@ -91,7 +93,7 @@ class CommentHistoryResponse extends BasicResponse {
       return new CommentDetail(
         me: i['me'] as bool,
         comment: cc(i['comment'] as Map<String, dynamic>),
-        user: uc(i['comment'] as Map<String, dynamic>),
+        user: uc(i['user'] as Map<String, dynamic>),
       );
     };
 
