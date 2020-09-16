@@ -6,10 +6,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/comment.dart';
 import 'package:spectrome/item/detail.dart';
 import 'package:spectrome/item/input.dart';
-import 'package:spectrome/model/post/comment.dart';
+import 'package:spectrome/item/loading.dart';
+import 'package:spectrome/model/comment/comment.dart';
+import 'package:spectrome/model/comment/detail.dart';
 import 'package:spectrome/model/post/detail.dart';
+import 'package:spectrome/page/comment.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/service/comment/owned.dart';
+import 'package:spectrome/service/comment/recent.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
@@ -32,7 +36,13 @@ class _DetailState extends State<DetailPage> {
   // Comment box controller
   final _cc = new TextEditingController();
 
-  // List of selected users
+  // List of recent comments
+  final _comments = <CommentDetail>[];
+
+  // Loading indicator
+  bool _loading = false;
+
+  // Post detail object
   PostDetail _post;
 
   // Owned comment
@@ -57,6 +67,14 @@ class _DetailState extends State<DetailPage> {
 
       // Get owned comment
       _getOwned();
+
+      // Load comment if there are comments
+      if (_post.post.comments > 0) {
+        _loading = true;
+
+        // Load comments
+        _getComments();
+      }
     };
 
     // Post detail callback
@@ -120,6 +138,68 @@ class _DetailState extends State<DetailPage> {
       );
 
       ci.add(ct);
+    } else {
+      ci.add(new Loading());
+    }
+
+    // Add show comments button
+    if (_post.post.comments > 2) {
+      final mt = new Text(
+        'show all ${_post.post.comments} comments',
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          fontSize: 14.0,
+          letterSpacing: 0.33,
+          color: ColorConst.gray,
+        ),
+      );
+
+      final mi = new Padding(
+        padding: EdgeInsets.only(left: 4.0, top: 2.0),
+        child: new Icon(
+          new IconData(0xf178, fontFamily: FontConst.fal),
+          color: ColorConst.gray,
+          size: 14.0,
+        ),
+      );
+
+      final mb = new Semantics(
+        focusable: true,
+        button: true,
+        child: new GestureDetector(
+          onTap: () => Navigator.of(context).pushNamed(CommentPage.tag, arguments: _post),
+          child: new Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+            child: new Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                mt,
+                mi,
+              ],
+            ),
+          ),
+        ),
+      );
+
+      ci.add(mb);
+    }
+
+    // Create list of recent comments
+    if (!_loading) {
+      for (int i = 0; i < _comments.length; i++) {
+        // Create user comment
+        final ct = new CommentRow(
+          user: _comments[i].user,
+          comment: _comments[i].comment,
+          session: _session,
+          me: _comments[i].me,
+        );
+
+        ci.add(ct);
+      }
+    } else {
+      ci.add(new Loading());
     }
 
     final c = new Column(
@@ -191,7 +271,7 @@ class _DetailState extends State<DetailPage> {
     return new CupertinoPageScaffold(
       backgroundColor: ColorConst.white,
       navigationBar: new CupertinoNavigationBar(
-        heroTag: 4,
+        heroTag: 3,
         transitionBetweenRoutes: false,
         padding: EdgeInsetsDirectional.only(
           top: 4.0,
@@ -200,6 +280,14 @@ class _DetailState extends State<DetailPage> {
         backgroundColor: ColorConst.white,
         border: new Border(
           bottom: BorderSide.none,
+        ),
+        middle: new Text(
+          'Post',
+          style: new TextStyle(
+            fontFamily: FontConst.primary,
+            letterSpacing: 0.33,
+            fontSize: 16.0,
+          ),
         ),
         leading: l,
       ),
@@ -259,7 +347,7 @@ class _DetailState extends State<DetailPage> {
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown profile load error. Please try again later.';
+      final msg = 'Unknown comment load error. Please try again later.';
 
       dev.log(msg, stackTrace: s);
 
@@ -271,5 +359,58 @@ class _DetailState extends State<DetailPage> {
     final r = CommentOwnedService.call(_session, _post.post.code);
 
     await r.then(sc).catchError(e);
+  }
+
+  /// Get recent comments
+  void _getComments() async {
+    // Handle HTTP response
+    final sc = (CommentRecentResponse r) async {
+      dev.log('Recent comment request sent.');
+
+      if (!r.status) {
+        // Route to sign page, if session is expired
+        if (r.expired) {
+          final r = (Route<dynamic> route) => false;
+          await Navigator.of(context).pushNamedAndRemoveUntil(SignInPage.tag, r);
+          return;
+        }
+
+        if (r.isNetErr ?? false) {
+          // Create network error
+          _error = ErrorMessage.network();
+        } else {
+          // Create custom error
+          _showSnackBar(r.message, isError: true);
+        }
+
+        return;
+      }
+
+      // Update profile instance
+      setState(() => _comments.addAll(r.comments));
+    };
+
+    // Error callback
+    final e = (e, s) {
+      final msg = 'Unknown comments load error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
+
+      // Create unknown error message
+      _error = ErrorMessage.custom(msg);
+    };
+
+    final cc = () {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() => _loading = false);
+    };
+
+    // Prepare request
+    final r = CommentRecentService.call(_session, _post.post.code);
+
+    await r.then(sc).catchError(e).whenComplete(cc);
   }
 }

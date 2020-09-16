@@ -1,22 +1,15 @@
+import 'package:spectrome/model/comment/comment.dart';
 import 'package:spectrome/model/profile/simple.dart';
 
-class Comment {
-  final String message;
-
-  final DateTime createTime;
-
-  const Comment({
-    this.message,
-    this.createTime,
-  });
-}
-
 class CommentDetail {
+  final bool me;
+
   final Comment comment;
 
   final SimpleProfile user;
 
   const CommentDetail({
+    this.me,
     this.comment,
     this.user,
   });

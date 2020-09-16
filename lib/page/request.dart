@@ -127,7 +127,7 @@ class _RequestState extends State<RequestPage> {
     return new CupertinoPageScaffold(
       backgroundColor: ColorConst.white,
       navigationBar: new CupertinoNavigationBar(
-        heroTag: 2,
+        heroTag: 6,
         transitionBetweenRoutes: false,
         padding: EdgeInsetsDirectional.only(
           top: 4.0,

@@ -1,12 +1,12 @@
 import 'dart:developer' as dev;
 
-import 'package:spectrome/model/post/comment.dart';
+import 'package:spectrome/model/comment/comment.dart';
 import 'package:spectrome/service/base.dart';
 import 'package:spectrome/service/response.dart';
 import 'package:spectrome/util/http.dart';
 
 class CommentOwnedService extends Service {
-  /// Activate account by using activation code and session token
+  /// Get owned comment of post
   static Future<CommentOwnedResponse> call(String session, String code) {
     final path = '/comments/owned/$code';
     final headers = {Http.TOKEN_HEADER: session};

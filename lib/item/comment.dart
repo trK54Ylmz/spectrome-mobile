@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:spectrome/model/post/comment.dart';
+import 'package:spectrome/model/comment/comment.dart';
 import 'package:spectrome/model/profile/simple.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';

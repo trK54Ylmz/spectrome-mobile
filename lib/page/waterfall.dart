@@ -176,7 +176,7 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
       key: _sk,
       backgroundColor: ColorConst.white,
       appBar: new CupertinoNavigationBar(
-        heroTag: 3,
+        heroTag: 8,
         padding: EdgeInsetsDirectional.only(
           top: 4.0,
           bottom: 4.0,

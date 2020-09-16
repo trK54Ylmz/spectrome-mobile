@@ -377,7 +377,7 @@ class _ProfileState extends State<ProfilePage> {
     return new CupertinoPageScaffold(
       backgroundColor: ColorConst.white,
       navigationBar: new CupertinoNavigationBar(
-        heroTag: 4,
+        heroTag: 5,
         transitionBetweenRoutes: false,
         padding: EdgeInsetsDirectional.only(
           top: 4.0,
