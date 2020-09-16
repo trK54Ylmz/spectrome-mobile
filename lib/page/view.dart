@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -39,7 +38,7 @@ class _ViewState extends State<ViewPage> {
     final sc = (SharedPreferences sp) {
       _session = sp.getString('_session');
 
-            // Load number of requests
+      // Load number of requests
       _getRequests();
 
       // Set periodic tasks for follow requests
@@ -84,7 +83,7 @@ class _ViewState extends State<ViewPage> {
       }
 
       // Clear items
-      _request.value  = r.count;
+      _request.value = r.count;
     };
 
     // Error callback

@@ -64,7 +64,7 @@ class PostDetailResponse extends BasicResponse {
     if (json['post'] != null) {
       final p = json['post'] as Map<String, dynamic>;
 
-      // Post assets callback
+      // Post user callback
       final u = (Map<String, dynamic> u) {
         return new SimpleProfile(
           name: u['name'],
@@ -74,7 +74,7 @@ class PostDetailResponse extends BasicResponse {
       };
 
       // Post item callback
-      final i = (Map<String,dynamic> i) {
+      final i = (Map<String, dynamic> i) {
         return new PostItem(
           large: i['large'],
           thumb: i['thumb'],
@@ -105,11 +105,7 @@ class PostDetailResponse extends BasicResponse {
         );
 
         // Post owner details
-        final user = new SimpleProfile(
-          name: us['name'],
-          username: us['username'],
-          photoUrl: us['photo_url'],
-        );
+        final user = u(us);
 
         // Restricted users
         final users = ul.map((e) => u(e as Map<String, dynamic>)).toList();

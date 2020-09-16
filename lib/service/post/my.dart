@@ -81,7 +81,7 @@ class MySharedPostResponse extends BasicResponse {
       };
 
       // Post item callback
-      final i = (Map<String,dynamic> i) {
+      final i = (Map<String, dynamic> i) {
         return new PostItem(
           large: i['large'],
           thumb: i['thumb'],
