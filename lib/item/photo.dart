@@ -51,16 +51,7 @@ class _PhotoState extends State<Photo> {
   void initState() {
     super.initState();
 
-    _image = new Image(
-      width: widget.width,
-      height: widget.height,
-      key: new ValueKey(widget.url),
-      errorBuilder: _callback,
-      image: new NetworkImage(
-        widget.url,
-        headers: widget.headers,
-      ),
-    );
+    _load();
   }
 
   @override
@@ -74,6 +65,20 @@ class _PhotoState extends State<Photo> {
   @override
   Widget build(BuildContext context) {
     return _image;
+  }
+
+  /// Get image from network
+  void _load() {
+    _image = new Image(
+      width: widget.width,
+      height: widget.height,
+      key: new ValueKey(widget.url),
+      errorBuilder: _callback,
+      image: new NetworkImage( 
+        widget.url,
+        headers: widget.headers,
+      ),
+    );
   }
 
   /// Network image error callback widget
@@ -137,6 +142,8 @@ class _PhotoState extends State<Photo> {
 
   /// For image to retry
   void _retry() {
+    _load();
+
     setState(() => _retried += 1);
   }
 }

@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/comment.dart';
 import 'package:spectrome/item/detail.dart';
 import 'package:spectrome/item/input.dart';
@@ -12,6 +13,7 @@ import 'package:spectrome/model/comment/detail.dart';
 import 'package:spectrome/model/post/detail.dart';
 import 'package:spectrome/page/comment.dart';
 import 'package:spectrome/page/sign_in.dart';
+import 'package:spectrome/service/comment/add.dart';
 import 'package:spectrome/service/comment/owned.dart';
 import 'package:spectrome/service/comment/recent.dart';
 import 'package:spectrome/theme/color.dart';
@@ -41,6 +43,9 @@ class _DetailState extends State<DetailPage> {
 
   // Loading indicator
   bool _loading = false;
+
+  // Status of comment box and text
+  bool _disabled = true;
 
   // Post detail object
   PostDetail _post;
@@ -228,18 +233,23 @@ class _DetailState extends State<DetailPage> {
           expands: true,
           maxLines: null,
           minLines: null,
-          size: 4000,
+          size: 1024,
           style: ts,
           hintStyle: hs,
           controller: _cc,
           hint: 'Type your comment ...',
+          onChange: (String i) {
+            setState(() => _disabled = i.length < 2);
+
+            return i.replaceAll('\n', ' ');
+          },
           validator: (String i) {
             if (i.length == 0) {
               return 'The message is required.';
             }
 
-            if (i.runes.length < 10) {
-              return 'The message requires at least 10 characters.';
+            if (i.runes.length < 2) {
+              return 'The message requires at least 2 characters.';
             }
 
             return null;
@@ -248,6 +258,7 @@ class _DetailState extends State<DetailPage> {
       ),
     );
 
+    // Group of post and comments
     final m = new Expanded(
       child: new ListView(
         physics: const ClampingScrollPhysics(),
@@ -259,12 +270,31 @@ class _DetailState extends State<DetailPage> {
       ),
     );
 
+    final ec = new Container(width: 0, height: 0);
+
+    // Create comment button
+    final a = new Padding(
+      padding: EdgeInsets.only(
+        left: 8.0,
+        right: 8.0,
+        bottom: 8.0,
+      ),
+      child: new Button(
+        text: 'Send',
+        background: ColorConst.darkGray,
+        padding: EdgeInsets.all(8.0),
+        disabled: _disabled,
+        onPressed: _addComment,
+      ),
+    );
+
     final s = new Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         m,
         b,
+        _disabled ? ec : a,
       ],
     );
 
@@ -410,6 +440,74 @@ class _DetailState extends State<DetailPage> {
 
     // Prepare request
     final r = CommentRecentService.call(_session, _post.post.code);
+
+    await r.then(sc).catchError(e).whenComplete(cc);
+  }
+
+  /// Add new comment
+  void _addComment() async {
+    dev.log('Comment create triggered.');
+
+    if (_cc.text.length < 2) {
+      return;
+    }
+
+    // Handle HTTP response
+    final sc = (CommentAddResponse r) async {
+      dev.log('Create comment request sent.');
+
+      if (!r.status) {
+        // Route to sign page, if session is expired
+        if (r.expired) {
+          final r = (Route<dynamic> route) => false;
+          await Navigator.of(context).pushNamedAndRemoveUntil(SignInPage.tag, r);
+          return;
+        }
+
+        if (r.isNetErr ?? false) {
+          // Create network error
+          _error = ErrorMessage.network();
+        } else {
+          // Create custom error
+          _showSnackBar(r.message, isError: true);
+        }
+
+        return;
+      }
+
+      // Populate with new comment
+      _comments.add(r.comment);
+
+      if (_comments.length > 2) {
+        // Remove first comment
+        setState(() => _comments.removeAt(0));
+      }
+    };
+
+    // Error callback
+    final e = (e, s) {
+      final msg = 'Unknown comments add error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
+
+      // Create unknown error message
+      _error = ErrorMessage.custom(msg);
+    };
+
+    final cc = () {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() => _loading = false);
+    };
+
+    // Prepare request
+    final r = CommentAddService.call(
+      session: _session,
+      code: _post.post.code,
+      message: _cc.text,
+    );
 
     await r.then(sc).catchError(e).whenComplete(cc);
   }

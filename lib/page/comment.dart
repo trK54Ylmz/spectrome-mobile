@@ -4,12 +4,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/comment.dart';
 import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/model/comment/detail.dart';
 import 'package:spectrome/model/post/detail.dart';
 import 'package:spectrome/page/sign_in.dart';
+import 'package:spectrome/service/comment/add.dart';
 import 'package:spectrome/service/comment/history.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
@@ -38,6 +40,9 @@ class _CommentState extends State<CommentPage> {
 
   // Loading indicator
   bool _loading = true;
+
+  // Status of comment box and text
+  bool _disabled = true;
 
   // Post object
   PostDetail _post;
@@ -159,6 +164,24 @@ class _CommentState extends State<CommentPage> {
       ),
     );
 
+    final ec = new Container(width: 0, height: 0);
+
+    // Create comment button
+    final a = new Padding(
+      padding: EdgeInsets.only(
+        left: 8.0,
+        right: 8.0,
+        bottom: 8.0,
+      ),
+      child: new Button(
+        text: 'Send',
+        background: ColorConst.darkGray,
+        padding: EdgeInsets.all(8.0),
+        disabled: _disabled,
+        onPressed: _addComment,
+      ),
+    );
+
     return new CupertinoPageScaffold(
       backgroundColor: ColorConst.white,
       navigationBar: new CupertinoNavigationBar(
@@ -188,6 +211,7 @@ class _CommentState extends State<CommentPage> {
         children: [
           s,
           b,
+          _disabled ? ec : a,
         ],
       ),
     );
@@ -314,6 +338,74 @@ class _CommentState extends State<CommentPage> {
       session: _session,
       code: _post.post.code,
       timestamp: _timestamp,
+    );
+
+    await r.then(sc).catchError(e).whenComplete(cc);
+  }
+
+  /// Add new comment
+  void _addComment() async {
+    dev.log('Comment create triggered.');
+
+    if (_cc.text.length < 2) {
+      return;
+    }
+
+    // Handle HTTP response
+    final sc = (CommentAddResponse r) async {
+      dev.log('Create comment request sent.');
+
+      if (!r.status) {
+        // Route to sign page, if session is expired
+        if (r.expired) {
+          final r = (Route<dynamic> route) => false;
+          await Navigator.of(context).pushNamedAndRemoveUntil(SignInPage.tag, r);
+          return;
+        }
+
+        if (r.isNetErr ?? false) {
+          // Create network error
+          _error = ErrorMessage.network();
+        } else {
+          // Create custom error
+          _showSnackBar(r.message, isError: true);
+        }
+
+        return;
+      }
+
+      // Populate with new comment
+      _comments.add(r.comment);
+
+      if (_comments.length > 2) {
+        // Remove first comment
+        setState(() => _comments.removeAt(0));
+      }
+    };
+
+    // Error callback
+    final e = (e, s) {
+      final msg = 'Unknown comments add error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
+
+      // Create unknown error message
+      _error = ErrorMessage.custom(msg);
+    };
+
+    final cc = () {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() => _loading = false);
+    };
+
+    // Prepare request
+    final r = CommentAddService.call(
+      session: _session,
+      code: _post.post.code,
+      message: _cc.text,
     );
 
     await r.then(sc).catchError(e).whenComplete(cc);

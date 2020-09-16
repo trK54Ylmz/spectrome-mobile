@@ -241,6 +241,7 @@ class _PostState extends State<PostCard> {
         // Move to detail page
         await Navigator.of(context).pushNamed(DetailPage.tag, arguments: widget.detail);
       },
+      behavior: HitTestBehavior.translucent,
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
