@@ -117,7 +117,7 @@ class _SearchState extends State<SearchPage> {
     return new CupertinoPageScaffold(
       backgroundColor: ColorConst.white,
       navigationBar: new CupertinoNavigationBar(
-        heroTag: 2,
+        heroTag: 7,
         transitionBetweenRoutes: false,
         padding: EdgeInsetsDirectional.only(
           top: 4.0,
