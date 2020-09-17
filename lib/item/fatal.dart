@@ -21,7 +21,7 @@ class Fatal extends StatelessWidget {
   Widget build(BuildContext context) {
     final ts = new TextStyle(
       fontFamily: FontConst.primary,
-      fontSize: 14.0,
+      fontSize: 13.0,
       letterSpacing: 0.33,
     );
 
@@ -35,7 +35,7 @@ class Fatal extends StatelessWidget {
     );
 
     final message = new Padding(
-      padding: EdgeInsets.only(top: 8.0),
+      padding: EdgeInsets.only(top: 24.0),
       child: new Text(this.error.error, style: ts),
     );
 
@@ -46,6 +46,7 @@ class Fatal extends StatelessWidget {
     final button = new Padding(
       padding: EdgeInsets.only(top: 16.0),
       child: new Button(
+        width: 120.0,
         background: ColorConst.gray,
         onPressed: () => Navigator.of(context).pushReplacement(route),
         text: 'Try again',
@@ -53,14 +54,16 @@ class Fatal extends StatelessWidget {
     );
 
     // Handle error
-    return new Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        icon,
-        message,
-        button,
-      ],
+    return new Center(
+      child: new Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          icon,
+          message,
+          button,
+        ],
+      ),
     );
   }
 }

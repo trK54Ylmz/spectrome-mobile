@@ -9,7 +9,7 @@ import 'package:spectrome/util/http.dart';
 
 class MySharedPostService extends Service {
   /// Get my posts
-  static Future<MySharedPostResponse> call(String session, double timestamp) {
+  static Future<MySharedPostResponse> call(String session, String timestamp) {
     final path = '/posts/user/me';
     final headers = {Http.TOKEN_HEADER: session};
     final body = {'session': session};
