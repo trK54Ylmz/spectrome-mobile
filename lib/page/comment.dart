@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:flutter/cupertino.dart';
@@ -35,6 +36,9 @@ class _CommentState extends State<CommentPage> {
   // Comment box controller
   final _cc = new TextEditingController();
 
+  // Scroll controller
+  final _sc = new ScrollController();
+
   // List of post comments
   final _comments = <CommentDetail>[];
 
@@ -43,6 +47,9 @@ class _CommentState extends State<CommentPage> {
 
   // Status of comment box and text
   bool _disabled = true;
+
+  // Timer for periodically loading comments
+  Timer _timer;
 
   // Post object
   PostDetail _post;
@@ -71,6 +78,11 @@ class _CommentState extends State<CommentPage> {
       _getComments();
     };
 
+    // Timer callback
+    final tc = (_) {
+      _timer = Timer.periodic(const Duration(seconds: 30), (_) => _getComments());
+    };
+
     // Post detail callback
     final ac = (_) {
       final post = ModalRoute.of(context).settings.arguments as PostDetail;
@@ -81,11 +93,21 @@ class _CommentState extends State<CommentPage> {
       }
 
       // Get storage kv
-      Storage.load().then(sc);
+      Storage.load().then(sc).then(tc);
     };
 
     // Add callback for argument
     WidgetsBinding.instance.addPostFrameCallback(ac);
+  }
+
+  @override
+  void dispose() {
+    // Cancel timer after widget dispose
+    if (_timer != null && _timer.isActive) {
+      _timer.cancel();
+    }
+
+    super.dispose();
   }
 
   @override
@@ -117,6 +139,8 @@ class _CommentState extends State<CommentPage> {
 
     final s = new Expanded(
       child: new ListView.builder(
+        controller: _sc,
+        physics: const ClampingScrollPhysics(),
         itemCount: _loading ? _comments.length + 1 : _comments.length,
         itemBuilder: _builder,
       ),
@@ -178,7 +202,7 @@ class _CommentState extends State<CommentPage> {
         background: ColorConst.darkGray,
         padding: EdgeInsets.all(8.0),
         disabled: _disabled,
-        onPressed: _addComment,
+        onPressed: () => _addComment().then((_) => _getComments()),
       ),
     );
 
@@ -313,6 +337,12 @@ class _CommentState extends State<CommentPage> {
       }
 
       setState(() => _comments.addAll(r.comments));
+
+      final d = new Duration(milliseconds: 100 * _comments.length);
+      final c = Curves.ease;
+
+      // Move to end of the page
+      _sc.animateTo(_sc.position.maxScrollExtent, duration: d, curve: c);
     };
 
     // Error callback
@@ -344,7 +374,7 @@ class _CommentState extends State<CommentPage> {
   }
 
   /// Add new comment
-  void _addComment() async {
+  Future<void> _addComment() async {
     dev.log('Comment create triggered.');
 
     if (_cc.text.length < 2) {
@@ -372,14 +402,6 @@ class _CommentState extends State<CommentPage> {
         }
 
         return;
-      }
-
-      // Populate with new comment
-      _comments.add(r.comment);
-
-      if (_comments.length > 2) {
-        // Remove first comment
-        setState(() => _comments.removeAt(0));
       }
     };
 

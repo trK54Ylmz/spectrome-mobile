@@ -11,6 +11,7 @@ import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/model/comment/comment.dart';
 import 'package:spectrome/model/comment/detail.dart';
 import 'package:spectrome/model/post/detail.dart';
+import 'package:spectrome/model/profile/simple.dart';
 import 'package:spectrome/page/comment.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/service/comment/add.dart';
@@ -20,6 +21,7 @@ import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
 import 'package:spectrome/util/error.dart';
+import 'package:spectrome/util/http.dart';
 import 'package:spectrome/util/storage.dart';
 
 class DetailPage extends StatefulWidget {
@@ -40,6 +42,9 @@ class _DetailState extends State<DetailPage> {
 
   // List of recent comments
   final _comments = <CommentDetail>[];
+
+  // List of suggested users
+  final _suggests = <SimpleProfile>[];
 
   // Loading indicator
   bool _loading = false;
@@ -241,6 +246,11 @@ class _DetailState extends State<DetailPage> {
           onChange: (String i) {
             setState(() => _disabled = i.length < 2);
 
+            // Check if autocomplete is usable
+            if (i[0] == '@') {
+
+            }
+
             return i.replaceAll('\n', ' ');
           },
           validator: (String i) {
@@ -272,6 +282,12 @@ class _DetailState extends State<DetailPage> {
 
     final ec = new Container(width: 0, height: 0);
 
+    // Suggested users
+    final u = new ListView.builder(
+      itemCount: _suggests.length,
+      itemBuilder: _suggestionBuilder,
+    );
+
     // Create comment button
     final a = new Padding(
       padding: EdgeInsets.only(
@@ -293,6 +309,7 @@ class _DetailState extends State<DetailPage> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         m,
+        _suggests.isNotEmpty ? u : ec,
         b,
         _disabled ? ec : a,
       ],
@@ -322,6 +339,94 @@ class _DetailState extends State<DetailPage> {
         leading: l,
       ),
       child: s,
+    );
+  }
+
+  /// Get suggested users
+  Widget _suggestionBuilder(BuildContext context, int index) {
+    // Http headers for profile image request
+    final h = {Http.TOKEN_HEADER: _session};
+
+    // Profile photo
+    final pp = new Container(
+      width: 40.0,
+      height: 40.0,
+      decoration: new BoxDecoration(
+        color: ColorConst.gray,
+        border: new Border.all(
+          width: 0.5,
+          color: ColorConst.gray.withOpacity(0.5),
+        ),
+        borderRadius: BorderRadius.all(
+          Radius.circular(20.0),
+        ),
+      ),
+      child: new ClipRRect(
+        borderRadius: BorderRadius.circular(30.0),
+        child: new Image.network(
+          _suggests[index].photoUrl,
+          headers: h,
+          width: 40.0,
+          height: 40.0,
+          errorBuilder: (c, o, s) => new Image.asset('assets/images/default.1.jpg'),
+        ),
+      ),
+    );
+
+    final ur = new Container(
+      width: 120.0,
+      height: 20.0,
+      alignment: Alignment.centerLeft,
+      child: new Text(
+        _suggests[index].username,
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          color: ColorConst.black,
+          fontSize: 14.0,
+          letterSpacing: 0.33,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+
+    final un = new Container(
+      width: 120.0,
+      height: 14.0,
+      child: new Text(
+        _suggests[index].name,
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          color: ColorConst.darkGray,
+          fontSize: 12.0,
+          letterSpacing: 0.33,
+        ),
+      ),
+    );
+
+    final uu = new Padding(
+      padding: EdgeInsets.only(left: 8.0),
+      child: new Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ur,
+          un,
+        ],
+      ),
+    );
+
+    final c = () {};
+
+    return new GestureDetector(
+      onTap: c,
+      child: new Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          pp,
+          uu,
+        ],
+      ),
     );
   }
 

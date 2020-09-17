@@ -5,12 +5,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/button.dart';
+import 'package:spectrome/item/grid.dart';
+import 'package:spectrome/item/thumb.dart';
+import 'package:spectrome/model/post/detail.dart';
 import 'package:spectrome/model/profile/me.dart';
 import 'package:spectrome/page/edit.dart';
 import 'package:spectrome/page/request.dart';
 import 'package:spectrome/page/select.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/service/account/sign_out.dart';
+import 'package:spectrome/service/post/my.dart';
 import 'package:spectrome/service/profile/me.dart';
 import 'package:spectrome/service/response.dart';
 import 'package:spectrome/service/user/count.dart';
@@ -34,8 +38,14 @@ class _MeState extends State<MePage> {
   // Scaffold key
   final _sk = new GlobalKey<ScaffoldState>();
 
+  // List of my posts
+  final _posts = <PostDetail>[];
+
   // Loading indicator
   bool _loading = true;
+
+  // Action loading indicator
+  bool _action = true;
 
   // Has username
   bool _hu = false;
@@ -45,6 +55,9 @@ class _MeState extends State<MePage> {
 
   // Account session key
   String _session;
+
+  // Cursor timestamp value
+  String _timestamp;
 
   // Error message
   ErrorMessage _error;
@@ -71,16 +84,16 @@ class _MeState extends State<MePage> {
       _sp = s;
 
       // Load profile if exists in the cache
-      _loadProfile();
+      _getProfile();
 
       // Load profile from API
-      _getProfile();
+      _loadProfile();
 
       // Load number of follow requests
       _getRequests();
 
       // Set periodic tasks for prefile updates
-      Timer.periodic(Duration(seconds: 60), (_) => _getProfile());
+      Timer.periodic(Duration(seconds: 60), (_) => _loadProfile());
     };
 
     Storage.load().then(spc);
@@ -317,13 +330,14 @@ class _MeState extends State<MePage> {
 
     // Follow button container
     final b = new Container(
-        child: new Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        fl,
-      ],
-    ));
+      child: new Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          fl,
+        ],
+      ),
+    );
 
     // User detail container
     final u = new Container(
@@ -389,6 +403,32 @@ class _MeState extends State<MePage> {
     );
 
     final ec = new Container();
+    final dg = const SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 2,
+      childAspectRatio: 1 / 1,
+    );
+
+    // List of my posts
+    final s = new Expanded(
+      child: new GridView.builder(
+        scrollDirection: Axis.vertical,
+        gridDelegate: dg,
+        physics: const ClampingScrollPhysics(),
+        itemCount: _posts.length,
+        itemBuilder: _postBuilder,
+      ),
+    );
+
+    // Shimmer loading
+    final a = new Expanded(
+      child: new GridView.builder(
+        scrollDirection: Axis.vertical,
+        gridDelegate: dg,
+        physics: const ClampingScrollPhysics(),
+        itemCount: 6,
+        itemBuilder: _shimmerBuilder,
+      ),
+    );
 
     return new CupertinoPageScaffold(
       backgroundColor: ColorConst.white,
@@ -409,8 +449,38 @@ class _MeState extends State<MePage> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           u,
+          _action ? a : s,
         ],
       ),
+    );
+  }
+
+  /// Get post content
+  Widget _postBuilder(BuildContext context, int index) {
+    // Get thumbnail card
+    return new Padding(
+      padding: EdgeInsets.only(
+        left: index % 2 == 1 ? 0.5 : 0.0,
+        right: index % 2 == 0 ? 0.5 : 0.0,
+        top: index > 1 ? 1.0 : 0.0,
+      ),
+      child: new PostThumbCard(
+        key: new Key(_posts[index].post.code),
+        detail: _posts[index],
+        session: _session,
+      ),
+    );
+  }
+
+  /// Get shimmer loading
+  Widget _shimmerBuilder(BuildContext context, int index) {
+    return new Padding(
+      padding: EdgeInsets.only(
+        left: index % 2 == 1 ? 0.5 : 0.0,
+        right: index % 2 == 0 ? 0.5 : 0.0,
+        top: index > 1 ? 1.0 : 0.0,
+      ),
+      child: new GridShimmer(),
     );
   }
 
@@ -583,8 +653,8 @@ class _MeState extends State<MePage> {
     _oe = null;
   }
 
-  /// Load profile data from cache
-  void _loadProfile() {
+  /// Get profile data from cache
+  void _getProfile() {
     // Check if profile is in the cache
     if (!_sp.containsKey('_me')) {
       return;
@@ -599,8 +669,8 @@ class _MeState extends State<MePage> {
     setState(() => _loading = false);
   }
 
-  /// Get profile from API
-  void _getProfile() {
+  /// Load profile from API
+  void _loadProfile() {
     dev.log('Profile is loading.');
 
     // Handle HTTP response
@@ -629,6 +699,13 @@ class _MeState extends State<MePage> {
       // Update profile instance
       _profile = r.profile;
 
+      // Load posts if number of posts are greater then zero
+      if (_profile.posts > 0) {
+        _loadPosts();
+      } else {
+        _action = false;
+      }
+
       // Update profile cache
       _sp.setString('_me', r.profile.toJson());
     };
@@ -654,6 +731,66 @@ class _MeState extends State<MePage> {
     };
 
     MyProfileService.call(_session).then(sc).catchError(e).whenComplete(cc);
+  }
+
+  /// Load my posts
+  void _loadPosts() async {
+    dev.log('My posts are loading.');
+
+    // Handle HTTP response
+    final sc = (MySharedPostResponse r) async {
+      dev.log('My posts request sent.');
+
+      if (!r.status) {
+        // Route to sign page, if session is expired
+        if (r.expired) {
+          final r = (Route<dynamic> route) => false;
+          await Navigator.of(context).pushNamedAndRemoveUntil(SignInPage.tag, r);
+          return;
+        }
+
+        if (r.isNetErr ?? false) {
+          // Create network error
+          _error = ErrorMessage.network();
+        } else {
+          // Create custom error
+          _showSnackBar(r.message, isError: true);
+        }
+
+        return;
+      }
+
+      // Clear posts
+      _posts.clear();
+
+      // Populate my posts
+      _posts.addAll(r.posts);
+    };
+
+    // Error callback
+    final e = (e, s) {
+      final msg = 'Unknown my posts load error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
+
+      // Create unknown error message
+      _error = ErrorMessage.custom(msg);
+    };
+
+    // Complete callback
+    final cc = () {
+      // Skip if dispose method called from application
+      if (!this.mounted) {
+        return;
+      }
+
+      setState(() => _action = false);
+    };
+
+    // Prepare request
+    final request = MySharedPostService.call(_session, _timestamp);
+
+    request.then(sc).catchError(e).whenComplete(cc);
   }
 
   /// Go to profile edit page

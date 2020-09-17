@@ -11,11 +11,13 @@ class _ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
   // Animation controller for mask
   AnimationController _ac;
 
+  // Animation curve
   CurvedAnimation _ca;
 
   @override
   void initState() {
     super.initState();
+
     _ac = new AnimationController(
       lowerBound: 0.0,
       upperBound: 1.0,

@@ -14,7 +14,7 @@ class CommentAddService extends Service {
     String code,
     String message,
   }) {
-    final path = '/comments/history';
+    final path = '/comments/add';
     final headers = {Http.TOKEN_HEADER: session};
     final body = {
       'code': code,
@@ -87,7 +87,7 @@ class CommentAddResponse extends BasicResponse {
     // Comment callback
     final c = (Map<String, dynamic> i) {
       return new CommentDetail(
-        me: i['me'] as bool,
+        me: true,
         comment: cc(i['comment'] as Map<String, dynamic>),
         user: uc(i['user'] as Map<String, dynamic>),
       );
