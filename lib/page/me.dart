@@ -11,7 +11,6 @@ import 'package:spectrome/model/post/detail.dart';
 import 'package:spectrome/model/profile/me.dart';
 import 'package:spectrome/page/edit.dart';
 import 'package:spectrome/page/request.dart';
-import 'package:spectrome/page/select.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/service/account/sign_out.dart';
 import 'package:spectrome/service/post/my.dart';
@@ -28,7 +27,10 @@ import 'package:spectrome/util/storage.dart';
 class MePage extends StatefulWidget {
   static final tag = 'me';
 
-  MePage() : super();
+  // View page controller
+  final PageController controller;
+
+  MePage({this.controller}) : super();
 
   @override
   _MeState createState() => new _MeState();
@@ -311,6 +313,15 @@ class _MeState extends State<MePage> {
       ],
     );
 
+    // Share post button callback
+    final sc = () {
+      final d = new Duration(milliseconds: 250);
+      final c = Curves.easeInOut;
+
+      // Move to share page
+      widget.controller.animateToPage(0, duration: d, curve: c);
+    };
+
     // Share button
     final fl = new Expanded(
       flex: 1,
@@ -323,7 +334,7 @@ class _MeState extends State<MePage> {
           background: ColorConst.lightGray,
           padding: EdgeInsets.all(6.0),
           border: new Border.all(color: ColorConst.transparent),
-          onPressed: () => Navigator.of(context).pushNamed(SelectPage.tag),
+          onPressed: sc,
         ),
       ),
     );
