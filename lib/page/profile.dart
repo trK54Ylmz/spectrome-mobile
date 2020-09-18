@@ -4,8 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/button.dart';
+import 'package:spectrome/item/grid.dart';
+import 'package:spectrome/item/thumb.dart';
+import 'package:spectrome/model/post/detail.dart';
 import 'package:spectrome/model/profile/user.dart';
 import 'package:spectrome/page/sign_in.dart';
+import 'package:spectrome/service/post/shared.dart';
 import 'package:spectrome/service/profile/user.dart';
 import 'package:spectrome/service/user/cancel.dart';
 import 'package:spectrome/service/user/follow.dart';
@@ -30,17 +34,8 @@ class _ProfileState extends State<ProfilePage> {
   // Scaffold key
   final _sk = new GlobalKey<ScaffoldState>();
 
-  // Account session key
-  String _session;
-
-  // Username of current user
-  String _username;
-
-  // Error message
-  ErrorMessage _error;
-
-  // Profile object
-  UserProfile _profile;
+  // List of my posts
+  final _posts = <PostDetail>[];
 
   // Is user following
   bool _followed = false;
@@ -53,6 +48,21 @@ class _ProfileState extends State<ProfilePage> {
 
   // Action loading indicator
   bool _action = false;
+
+  // Account session key
+  String _session;
+
+  // Username of current user
+  String _username;
+
+  // Error message
+  ErrorMessage _error;
+
+  // Profile object
+  UserProfile _profile;
+
+  // Cursor timestamp value
+  String _timestamp;
 
   @override
   void initState() {
@@ -374,6 +384,33 @@ class _ProfileState extends State<ProfilePage> {
       ),
     );
 
+    final dg = const SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 2,
+      childAspectRatio: 1 / 1,
+    );
+
+    // List of my posts
+    final s = new Expanded(
+      child: new GridView.builder(
+        scrollDirection: Axis.vertical,
+        gridDelegate: dg,
+        physics: const ClampingScrollPhysics(),
+        itemCount: _posts.length,
+        itemBuilder: _postBuilder,
+      ),
+    );
+
+    // Shimmer loading
+    final a = new Expanded(
+      child: new GridView.builder(
+        scrollDirection: Axis.vertical,
+        gridDelegate: dg,
+        physics: const ClampingScrollPhysics(),
+        itemCount: 6,
+        itemBuilder: _shimmerBuilder,
+      ),
+    );
+
     return new CupertinoPageScaffold(
       backgroundColor: ColorConst.white,
       navigationBar: new CupertinoNavigationBar(
@@ -398,8 +435,38 @@ class _ProfileState extends State<ProfilePage> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           u,
+          _action ? a : s,
         ],
       ),
+    );
+  }
+
+  /// Get post content
+  Widget _postBuilder(BuildContext context, int index) {
+    // Get thumbnail card
+    return new Padding(
+      padding: EdgeInsets.only(
+        left: index % 2 == 1 ? 0.5 : 0.0,
+        right: index % 2 == 0 ? 0.5 : 0.0,
+        top: index > 1 ? 1.0 : 0.0,
+      ),
+      child: new PostThumbCard(
+        key: new Key(_posts[index].post.code),
+        detail: _posts[index],
+        session: _session,
+      ),
+    );
+  }
+
+  /// Get shimmer loading
+  Widget _shimmerBuilder(BuildContext context, int index) {
+    return new Padding(
+      padding: EdgeInsets.only(
+        left: index % 2 == 1 ? 0.5 : 0.0,
+        right: index % 2 == 0 ? 0.5 : 0.0,
+        top: index > 1 ? 1.0 : 0.0,
+      ),
+      child: new GridShimmer(),
     );
   }
 
@@ -453,6 +520,13 @@ class _ProfileState extends State<ProfilePage> {
       _profile = r.profile;
       _requested = r.request;
       _followed = r.follow;
+
+      // Load posts if number of posts are greater then zero
+      if (_profile.posts > 0) {
+        _loadPosts();
+      } else {
+        _action = false;
+      }
     };
 
     // Error callback
@@ -479,6 +553,70 @@ class _ProfileState extends State<ProfilePage> {
     final s = UserProfileService.call(_session, _username);
 
     await s.then(sc).catchError(e).whenComplete(cc);
+  }
+
+  /// Load my posts
+  void _loadPosts() async {
+    dev.log('User posts are loading.');
+
+    // Handle HTTP response
+    final sc = (UserSharedPostResponse r) async {
+      dev.log('User posts request sent.');
+
+      if (!r.status) {
+        // Route to sign page, if session is expired
+        if (r.expired) {
+          final r = (Route<dynamic> route) => false;
+          await Navigator.of(context).pushNamedAndRemoveUntil(SignInPage.tag, r);
+          return;
+        }
+
+        if (r.isNetErr ?? false) {
+          // Create network error
+          _error = ErrorMessage.network();
+        } else {
+          // Create custom error
+          _showSnackBar(r.message, isError: true);
+        }
+
+        return;
+      }
+
+      // Clear posts
+      _posts.clear();
+
+      // Populate my posts
+      _posts.addAll(r.posts);
+    };
+
+    // Error callback
+    final e = (e, s) {
+      final msg = 'Unknown user posts load error. Please try again later.';
+
+      dev.log(msg, stackTrace: s);
+
+      // Create unknown error message
+      _error = ErrorMessage.custom(msg);
+    };
+
+    // Complete callback
+    final cc = () {
+      // Skip if dispose method called from application
+      if (!this.mounted) {
+        return;
+      }
+
+      setState(() => _action = false);
+    };
+
+    // Prepare request
+    final request = UserSharedPostService.call(
+      session: _session,
+      username: _profile.username,
+      timestamp: _timestamp,
+    );
+
+    request.then(sc).catchError(e).whenComplete(cc);
   }
 
   /// Follow user

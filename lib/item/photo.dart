@@ -20,6 +20,8 @@ class Photo extends StatefulWidget {
 
   final LoadError onError;
 
+  final BoxFit fit;
+
   final int retry;
 
   final bool trace;
@@ -31,6 +33,7 @@ class Photo extends StatefulWidget {
     this.height,
     this.headers,
     this.onError,
+    this.fit,
     this.retry = 3,
     this.trace = false,
   })  : assert(width != null),
@@ -70,6 +73,7 @@ class _PhotoState extends State<Photo> {
   /// Get image from network
   void _load() {
     _image = new Image(
+      fit: widget.fit,
       width: widget.width,
       height: widget.height,
       key: new ValueKey(widget.url),

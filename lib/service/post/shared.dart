@@ -12,7 +12,7 @@ class UserSharedPostService extends Service {
   static Future<UserSharedPostResponse> call({
     String session,
     String username,
-    double timestamp,
+    String timestamp,
   }) {
     final path = '/posts/user/$username';
     final headers = {Http.TOKEN_HEADER: session};

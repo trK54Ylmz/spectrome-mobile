@@ -62,32 +62,26 @@ class _PostThumbState extends State<PostThumbCard> {
     final clipped = <Widget>[];
 
     if (items.length == 2) {
-      final i = new Container(
-        width: 200,
-        height: 400,
-        child: new ClipRect(
+      final i = new Expanded(
+        child: new Padding(
+          padding: EdgeInsets.only(left: 0.5),
           child: items[1],
         ),
       );
 
       clipped.add(i);
     } else {
-      final ii = new Container(
-        width: 200,
-        height: 200,
-        child: new ClipRect(
+      final ii = new Expanded(
+        child: new Padding(
+          padding: EdgeInsets.only(left: 0.5),
           child: items[1],
         ),
       );
 
       clipped.add(ii);
 
-      final ij = new Container(
-        width: 200,
-        height: 200,
-        child: new ClipRect(
-          child: items[2],
-        ),
+      final ij = new Expanded(
+        child: items[2],
       );
 
       clipped.add(ij);
@@ -98,21 +92,22 @@ class _PostThumbState extends State<PostThumbCard> {
       child: new Container(
         width: 400,
         height: 400,
-        child: new Column(
+        child: new Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            new Container(
-              width: 200,
-              height: 400,
-              child: new ClipRect(
+            new Expanded(
+              child: new Padding(
+                padding: EdgeInsets.only(right: 0.5),
                 child: items[0],
               ),
             ),
-            new Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: clipped,
+            new Expanded(
+              child: new Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: clipped,
+              ),
             ),
           ],
         ),
@@ -131,6 +126,7 @@ class _PostThumbState extends State<PostThumbCard> {
       headers: h,
       width: 400.0,
       height: 400.0,
+      fit: BoxFit.fitHeight,
     );
   }
 
@@ -145,6 +141,7 @@ class _PostThumbState extends State<PostThumbCard> {
       headers: h,
       width: 400.0,
       height: 400.0,
+      fit: BoxFit.fitHeight,
     );
   }
 }
