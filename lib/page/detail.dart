@@ -580,6 +580,12 @@ class _DetailState extends State<DetailPage> {
         return;
       }
 
+      // Clear comment text
+      _cc.clear();
+
+      // Hide comment send button
+      _disabled = true;
+
       // Populate with new comment
       _comments.add(r.comment);
 

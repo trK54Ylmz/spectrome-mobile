@@ -113,6 +113,7 @@ class _CommentRowState extends State<CommentRow> {
               fontSize: 14.0,
               letterSpacing: 0.33,
               color: ColorConst.black,
+              height: 1.0,
             ),
           ),
         ),

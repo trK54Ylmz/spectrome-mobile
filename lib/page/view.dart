@@ -58,7 +58,7 @@ class _ViewState extends State<ViewPage> {
         children: [
           new SelectPage(),
           new HomePage(controller: _pc, request: _request),
-          new MePage(),
+          new MePage(controller: _pc),
         ],
       ),
     );
