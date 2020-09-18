@@ -10,6 +10,7 @@ import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/page/activation.dart';
 import 'package:spectrome/page/sign_in.dart';
+import 'package:spectrome/page/term.dart';
 import 'package:spectrome/service/account/sign_up.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
@@ -283,6 +284,43 @@ class _SignUpState extends State<SignUpPage> {
       onPressed: _signUp,
     );
 
+    // Terms page button
+    final tb = new Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        new Text(
+          'by clicking Sign Up you accepting ',
+          style: new TextStyle(
+            fontFamily: FontConst.primary,
+            fontSize: 12.0,
+            letterSpacing: 0.33,
+            color: ColorConst.gray,
+          ),
+        ),
+        new GestureDetector(
+          onTap: () => Navigator.of(context).pushNamed(TermPage.tag),
+          child: new Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 8.0,
+              horizontal: 4.0,
+            ),
+            child: new Text(
+              'terms',
+              style: new TextStyle(
+                fontFamily: FontConst.primary,
+                fontSize: 12.0,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.33,
+                color: ColorConst.gray,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+
     // Already have an account text
     final sit = new Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -344,6 +382,8 @@ class _SignUpState extends State<SignUpPage> {
           password,
           pt,
           sub,
+          pt,
+          tb,
           ptl,
           sit,
           pt,

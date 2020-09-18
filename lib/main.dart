@@ -27,6 +27,7 @@ import 'package:spectrome/page/share.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/page/sign_up.dart';
 import 'package:spectrome/page/sign_up_done.dart';
+import 'package:spectrome/page/term.dart';
 import 'package:spectrome/page/view.dart';
 import 'package:spectrome/page/waterfall.dart';
 import 'package:spectrome/page/version.dart';
@@ -39,6 +40,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() => runApp(MainPage());
 
 final routes = <String, WidgetBuilder>{
+  ActivationPage.tag: (c) => new ActivationPage(),
   CommentPage.tag: (c) => new CommentPage(),
   DetailPage.tag: (c) => new DetailPage(),
   EditPage.tag: (c) => new EditPage(),
@@ -58,7 +60,7 @@ final routes = <String, WidgetBuilder>{
   SignInPage.tag: (c) => new SignInPage(),
   SignUpPage.tag: (c) => new SignUpPage(),
   SignUpDonePage.tag: (c) => new SignUpDonePage(),
-  ActivationPage.tag: (c) => new ActivationPage(),
+  TermPage.tag: (c) => new TermPage(),
   WaterFallPage.tag: (c) => new WaterFallPage(),
   VersionPage.tag: (c) => new VersionPage(),
   ViewPage.tag: (c) => new ViewPage(),
