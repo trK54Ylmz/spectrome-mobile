@@ -111,9 +111,6 @@ class _ProfileState extends State<ProfilePage> {
 
   /// Get page widget
   Widget _getPage() {
-    final width = MediaQuery.of(context).size.width;
-    final hp = width > 400.0 ? 64.0 : 32.0;
-
     final pts = const Padding(
       padding: EdgeInsets.only(top: 4.0),
     );
@@ -127,7 +124,7 @@ class _ProfileState extends State<ProfilePage> {
 
     // Profile picture
     final p = new Padding(
-      padding: EdgeInsets.all(8.0),
+      padding: EdgeInsets.only(bottom: 8.0),
       child: new Container(
         decoration: new BoxDecoration(
           border: new Border.all(
@@ -177,25 +174,21 @@ class _ProfileState extends State<ProfilePage> {
 
     // Profile details
     final i = new Padding(
-      padding: EdgeInsets.only(left: 20.0),
-      child: new Container(
-        width: width - ((hp * 3) + 38.0 + 1.0),
-        height: 48.0,
-        child: new Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            un,
-            pts,
-            nm,
-          ],
-        ),
+      padding: EdgeInsets.only(left: 20.0, bottom: 8.0),
+      child: new Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          un,
+          pts,
+          nm,
+        ],
       ),
     );
 
     final f = new Row(
       crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         p,
         i,
@@ -203,11 +196,10 @@ class _ProfileState extends State<ProfilePage> {
     );
 
     final ts = new TextStyle(
-      fontFamily: FontConst.primary,
+      fontFamily: FontConst.bold,
       fontSize: 14.0,
       letterSpacing: 0.33,
       color: ColorConst.darkerGray,
-      fontWeight: FontWeight.bold,
     );
 
     final sts = new TextStyle(

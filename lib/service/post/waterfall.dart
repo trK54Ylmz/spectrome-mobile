@@ -103,7 +103,6 @@ class WaterFallResponse extends BasicResponse {
           code: ps['code'],
           size: ps['size'] as int,
           disposible: ps['disposible'] as bool,
-          restricted: ps['restricted'] as bool,
           users: ps['number_of_users'] as int,
           comments: ps['number_of_comments'] as int,
           createTime: DateTime.parse(ps['create_time']),

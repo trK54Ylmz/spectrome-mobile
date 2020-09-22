@@ -266,7 +266,7 @@ class _PostDetailState extends State<PostDetailCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          widget.detail.post.restricted ? ru : ec,
+          ru,
           cu,
         ],
       ),

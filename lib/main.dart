@@ -28,6 +28,7 @@ import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/page/sign_up.dart';
 import 'package:spectrome/page/sign_up_done.dart';
 import 'package:spectrome/page/term.dart';
+import 'package:spectrome/page/update.dart';
 import 'package:spectrome/page/view.dart';
 import 'package:spectrome/page/waterfall.dart';
 import 'package:spectrome/page/version.dart';
@@ -61,6 +62,7 @@ final routes = <String, WidgetBuilder>{
   SignUpPage.tag: (c) => new SignUpPage(),
   SignUpDonePage.tag: (c) => new SignUpDonePage(),
   TermPage.tag: (c) => new TermPage(),
+  UpdatePage.tag: (c) => new UpdatePage(),
   WaterFallPage.tag: (c) => new WaterFallPage(),
   VersionPage.tag: (c) => new VersionPage(),
   ViewPage.tag: (c) => new ViewPage(),
