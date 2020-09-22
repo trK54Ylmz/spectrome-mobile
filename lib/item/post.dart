@@ -231,7 +231,7 @@ class _PostState extends State<PostCard> {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        widget.detail.post.restricted ? ru : ec,
+        ru,
         cu,
       ],
     );

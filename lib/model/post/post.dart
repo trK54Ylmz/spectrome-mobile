@@ -35,8 +35,6 @@ class Post {
 
   final bool disposible;
 
-  final bool restricted;
-
   final int users;
 
   final int comments;
@@ -52,7 +50,6 @@ class Post {
     this.code,
     this.size,
     this.disposible,
-    this.restricted,
     this.comments,
     this.users,
     this.items,

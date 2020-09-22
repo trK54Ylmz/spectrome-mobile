@@ -9,9 +9,9 @@ import 'package:spectrome/item/grid.dart';
 import 'package:spectrome/item/thumb.dart';
 import 'package:spectrome/model/post/detail.dart';
 import 'package:spectrome/model/profile/me.dart';
-import 'package:spectrome/page/edit.dart';
 import 'package:spectrome/page/request.dart';
 import 'package:spectrome/page/sign_in.dart';
+import 'package:spectrome/page/update.dart';
 import 'package:spectrome/service/account/sign_out.dart';
 import 'package:spectrome/service/post/my.dart';
 import 'package:spectrome/service/profile/me.dart';
@@ -130,9 +130,6 @@ class _MeState extends State<MePage> {
 
   /// Get page widget
   Widget _getPage() {
-    final width = MediaQuery.of(context).size.width;
-    final hp = width > 400.0 ? 64.0 : 32.0;
-
     final pts = const Padding(
       padding: EdgeInsets.only(top: 4.0),
     );
@@ -146,7 +143,7 @@ class _MeState extends State<MePage> {
 
     // Profile picture
     final p = new Padding(
-      padding: EdgeInsets.all(8.0),
+      padding: EdgeInsets.only(bottom: 8.0),
       child: new Container(
         decoration: new BoxDecoration(
           border: new Border.all(
@@ -196,25 +193,21 @@ class _MeState extends State<MePage> {
 
     // Profile details
     final i = new Padding(
-      padding: EdgeInsets.only(left: 20.0),
-      child: new Container(
-        width: width - ((hp * 3) + 38.0 + 1.0),
-        height: 48.0,
-        child: new Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            un,
-            pts,
-            nm,
-          ],
-        ),
+      padding: EdgeInsets.only(left: 20.0, bottom: 8.0),
+      child: new Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          un,
+          pts,
+          nm,
+        ],
       ),
     );
 
     final f = new Row(
       crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         p,
         i,
@@ -222,11 +215,10 @@ class _MeState extends State<MePage> {
     );
 
     final ts = new TextStyle(
-      fontFamily: FontConst.primary,
+      fontFamily: FontConst.bold,
       fontSize: 14.0,
       letterSpacing: 0.33,
       color: ColorConst.darkerGray,
-      fontWeight: FontWeight.bold,
     );
 
     final sts = new TextStyle(
@@ -352,7 +344,7 @@ class _MeState extends State<MePage> {
 
     // User detail container
     final u = new Container(
-      height: 168.0,
+      height: 158.0,
       decoration: new BoxDecoration(
         border: Border(
           bottom: BorderSide(
@@ -530,8 +522,8 @@ class _MeState extends State<MePage> {
         color: ColorConst.darkerGray,
         background: ColorConst.transparent,
         radius: BorderRadius.zero,
-        text: 'Edit profile',
-        onPressed: _editProfile,
+        text: 'Update profile',
+        onPressed: _updateProfile,
       );
 
       final sb = new Button(
@@ -591,6 +583,7 @@ class _MeState extends State<MePage> {
         focusable: true,
         child: new GestureDetector(
           onTap: _followRequests,
+          behavior: HitTestBehavior.opaque,
           child: new Container(
             height: 40.0,
             child: new Row(
@@ -804,9 +797,9 @@ class _MeState extends State<MePage> {
     request.then(sc).catchError(e).whenComplete(cc);
   }
 
-  /// Go to profile edit page
-  void _editProfile() async {
-    await Navigator.of(context).pushNamed(EditPage.tag);
+  /// Go to profile update page
+  void _updateProfile() async {
+    await Navigator.of(context).pushNamed(UpdatePage.tag);
   }
 
   /// Go to follow requests page
