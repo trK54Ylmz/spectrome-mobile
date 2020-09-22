@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/post.dart';
 import 'package:spectrome/item/shimmer.dart';
 import 'package:spectrome/model/post/detail.dart';
@@ -38,6 +39,9 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
 
   // Loading indicator
   bool _loading = true;
+
+  // If posts are empty or not
+  bool _empty = false;
 
   // Account session key
   String _session;
@@ -89,26 +93,33 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
     // Use multiple widgets to show shimmer
     final items = <Widget>[];
 
-    final builder = (context, index) {
-      if (index >= _posts.length) {
-        return new Shimmer();
-      } else {
-        // Create post card
-        return new PostCard(detail: _posts[index], session: _session);
-      }
-    };
+    if (_empty) {
+      // Get empty content widget
+      final e = _getEmpty();
 
-    final b = new Expanded(
-      child: new ListView.builder(
-        controller: _sc,
-        physics: const ClampingScrollPhysics(),
-        padding: new EdgeInsets.only(top: 8.0, bottom: 8.0),
-        itemCount: _loading ? _posts.length + 1 : _posts.length,
-        itemBuilder: builder,
-      ),
-    );
+      items.add(e);
+    } else {
+      final builder = (context, index) {
+        if (index >= _posts.length) {
+          return new Shimmer();
+        } else {
+          // Create post card
+          return new PostCard(detail: _posts[index], session: _session);
+        }
+      };
 
-    items.add(b);
+      final b = new Expanded(
+        child: new ListView.builder(
+          controller: _sc,
+          physics: const ClampingScrollPhysics(),
+          padding: new EdgeInsets.only(top: 8.0, bottom: 8.0),
+          itemCount: _loading ? _posts.length + 1 : _posts.length,
+          itemBuilder: builder,
+        ),
+      );
+
+      items.add(b);
+    }
 
     // Share post button callback
     final sc = () {
@@ -191,10 +202,99 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
       ),
       body: new SafeArea(
         child: new Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: _empty ? MainAxisAlignment.center : MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: items,
         ),
+      ),
+    );
+  }
+
+  /// Get empty posts widget
+  Widget _getEmpty() {
+    final pt = new Padding(
+      padding: EdgeInsets.only(top: 8.0),
+    );
+
+    final et = new Text(
+      'We could not find any posts',
+      style: new TextStyle(
+        fontFamily: FontConst.primary,
+        fontSize: 14.0,
+        letterSpacing: 0.33,
+        color: ColorConst.darkGray,
+      ),
+    );
+
+    final st = new Text(
+      'You can find and follow users by using',
+      style: new TextStyle(
+        fontFamily: FontConst.primary,
+        fontSize: 14.0,
+        letterSpacing: 0.33,
+        color: ColorConst.darkGray,
+      ),
+    );
+
+    final si = new Padding(
+      padding: EdgeInsets.only(left: 4.0),
+      child: new Icon(
+        new IconData(0xf002, fontFamily: FontConst.fal),
+        color: ColorConst.darkGray,
+        size: 14.0,
+      ),
+    );
+
+    final er = new Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        st,
+        si,
+      ],
+    );
+
+    final or = new Text(
+      'or',
+      style: new TextStyle(
+        fontFamily: FontConst.primary,
+        fontSize: 14.0,
+        letterSpacing: 0.33,
+        color: ColorConst.darkGray,
+      ),
+    );
+
+    // Share post button callback
+    final sc = () {
+      final d = new Duration(milliseconds: 250);
+      final c = Curves.easeInOut;
+
+      // Move to profile page
+      widget.controller.animateToPage(0, duration: d, curve: c);
+    };
+
+    // Share post button
+    final cb = new Button(
+      text: 'Share',
+      width: 60.0,
+      padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+      onPressed: sc,
+      background: ColorConst.darkGray,
+    );
+
+    return new Center(
+      child: new Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          et,
+          pt,
+          er,
+          pt,
+          or,
+          pt,
+          cb,
+        ],
       ),
     );
   }
@@ -229,6 +329,9 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
         _showSnackBar(r.message, isError: false);
         return;
       }
+
+      // Update status of according posts count
+      _empty = _posts.isEmpty;
 
       if (r.posts.length == 0) {
         return;
