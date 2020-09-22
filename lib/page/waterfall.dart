@@ -331,7 +331,7 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
       }
 
       // Update status of according posts count
-      _empty = _posts.isEmpty;
+      _empty = r.posts.isEmpty;
 
       if (r.posts.length == 0) {
         return;
