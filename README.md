@@ -15,14 +15,14 @@ The mobile application of Spectrome.
 Screens for the application
 
 <p align="center">
-    <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/1.jpg" width="264"></kbd>
-    <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/2.jpg" width="264"></kbd>
-    <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/3.jpg" width="264"></kbd>
+    <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/1.png" width="264"></kbd>
+    <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/2.png" width="264"></kbd>
+    <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/3.png" width="264"></kbd>
 </p>
 <p align="center">
-    <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/4.jpg" width="264"></kbd>
-    <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/5.jpg" width="264"></kbd>
-    <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/6.jpg" width="264"></kbd>
+    <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/4.png" width="264"></kbd>
+    <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/5.png" width="264"></kbd>
+    <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/6.png" width="264"></kbd>
 </p>
 <p align="center">
     <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/7.jpg" width="264"></kbd>
