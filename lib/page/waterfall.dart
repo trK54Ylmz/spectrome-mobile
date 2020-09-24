@@ -212,12 +212,15 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
 
   /// Get empty posts widget
   Widget _getEmpty() {
+    final width = MediaQuery.of(context).size.width;
+    final ph = width > 400 ? 64.0 : 32.0;
+
     final pt = new Padding(
-      padding: EdgeInsets.only(top: 8.0),
+      padding: EdgeInsets.only(top: 16.0),
     );
 
     final et = new Text(
-      'We could not find any posts',
+      'We could not find any posts yet.',
       style: new TextStyle(
         fontFamily: FontConst.primary,
         fontSize: 14.0,
@@ -226,41 +229,37 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
       ),
     );
 
-    final st = new Text(
-      'You can find and follow users by using',
-      style: new TextStyle(
-        fontFamily: FontConst.primary,
-        fontSize: 14.0,
-        letterSpacing: 0.33,
-        color: ColorConst.darkGray,
-      ),
-    );
-
-    final si = new Padding(
-      padding: EdgeInsets.only(left: 4.0),
-      child: new Icon(
-        new IconData(0xf002, fontFamily: FontConst.fal),
-        color: ColorConst.darkGray,
-        size: 14.0,
-      ),
-    );
-
-    final er = new Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        st,
-        si,
-      ],
-    );
-
-    final th = new Text(
-      'then you can share with close ones.',
-      style: new TextStyle(
-        fontFamily: FontConst.primary,
-        fontSize: 14.0,
-        letterSpacing: 0.33,
-        color: ColorConst.darkGray,
+    final er = new Padding(
+      padding: EdgeInsets.symmetric(horizontal: ph),
+      child: new Text.rich(
+        new TextSpan(
+          children: [
+            new TextSpan(
+              text: 'You can find and follow users by using',
+            ),
+            new WidgetSpan(
+              child: new Padding(
+                padding: EdgeInsets.only(left: 6.0, right: 6.0),
+                child: new Icon(
+                  new IconData(0xf002, fontFamily: FontConst.fal),
+                  color: ColorConst.gray,
+                  size: 14.0,
+                ),
+              ),
+            ),
+            new TextSpan(
+              text: 'then you can share moments with close ones.',
+            ),
+          ],
+        ),
+        textAlign: TextAlign.center,
+        style: new TextStyle(
+          fontFamily: FontConst.primary,
+          fontSize: 12.0,
+          letterSpacing: 0.33,
+          color: ColorConst.gray,
+          height: 1.6
+        ),
       ),
     );
 
@@ -290,8 +289,6 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
           et,
           pt,
           er,
-          pt,
-          th,
           pt,
           cb,
         ],
