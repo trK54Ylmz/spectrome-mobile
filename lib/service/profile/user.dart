@@ -67,13 +67,15 @@ class UserProfileResponse extends BasicResponse {
 
     final p = json['user'] as Map<String, dynamic>;
 
-    profile = new UserProfile(
-      username: p['username'] as String,
-      name: p['name'] as String,
-      photoUrl: p['photo_url'] as String,
-      posts: p['posts'] as int,
-      followers: p['followers'] as int,
-      followings: p['followings'] as int,
-    );
+    if (p != null) {
+      profile = new UserProfile(
+        username: p['username'] as String,
+        name: p['name'] as String,
+        photoUrl: p['photo_url'] as String,
+        posts: p['posts'] as int,
+        followers: p['followers'] as int,
+        followings: p['followings'] as int,
+      );
+    }
   }
 }

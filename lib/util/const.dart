@@ -45,12 +45,13 @@ class AppConst {
     bool argument,
     ErrorMessage error,
     Function callback,
+    dynamic arguments,
   }) {
     // Get loading indicator
     if (argument) return new Loading();
 
     // Get error page
-    if (error != null) return Fatal(error: error, page: page);
+    if (error != null) return Fatal(error: error, page: page, arguments: arguments);
 
     return callback.call();
   }

@@ -104,6 +104,7 @@ class _ProfileState extends State<ProfilePage> {
           argument: _loading,
           error: _error,
           callback: _getPage,
+          arguments: _username,
         ),
       ),
     );
@@ -502,7 +503,7 @@ class _ProfileState extends State<ProfilePage> {
           _error = ErrorMessage.network();
         } else {
           // Create custom error
-          _showSnackBar(r.message, isError: true);
+          _error = ErrorMessage.custom(r.message);
         }
 
         return;

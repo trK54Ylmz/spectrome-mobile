@@ -11,9 +11,12 @@ class Fatal extends StatelessWidget {
 
   final String page;
 
+  final dynamic arguments;
+
   const Fatal({
     this.error,
     this.page,
+    this.arguments,
   })  : assert(page != null),
         assert(error != null);
 
@@ -39,8 +42,13 @@ class Fatal extends StatelessWidget {
       child: new Text(this.error.error, style: ts),
     );
 
+    final settings = new RouteSettings(arguments: arguments);
+
     // Create route
-    final route = new DefaultRoute(routes[this.page](context));
+    final route = new DefaultRoute(
+      widget: routes[this.page](context),
+      settings: settings,
+    );
 
     // Add re-try button
     final button = new Padding(

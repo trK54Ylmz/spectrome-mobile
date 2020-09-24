@@ -48,7 +48,7 @@ class _VersionState extends State<VersionPage> {
 
       // Move to home page
       if (v.version == AppConst.version) {
-        final route = new DefaultRoute(routes[SessionPage.tag](context));
+        final route = new DefaultRoute(widget: routes[SessionPage.tag](context));
         await Navigator.of(context).pushReplacement(route);
       }
     };

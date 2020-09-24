@@ -79,7 +79,7 @@ class _SessionState extends State<SessionPage> {
         }
       }
 
-      final route = new DefaultRoute(r);
+      final route = new DefaultRoute(widget: r);
 
       // Replace page with sign in screen
       await Navigator.of(context).pushReplacement(route);
@@ -92,7 +92,7 @@ class _SessionState extends State<SessionPage> {
       // route page according to session information
       if (session == null) {
         final r = routes[SignInPage.tag](context);
-        final route = new DefaultRoute(r);
+        final route = new DefaultRoute(widget: r);
 
         // Replace page with sign in screen
         Navigator.of(context).pushReplacement(route);
