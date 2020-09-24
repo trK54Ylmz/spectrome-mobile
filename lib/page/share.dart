@@ -1358,7 +1358,7 @@ class _ShareState extends State<SharePage> {
     final c = () {
       bool exists = false;
       for (int i = 0; i < _users.length; i++) {
-        if (_users[i].username == _users[index].username) {
+        if (_users[i].username == _suggests[index].username) {
           exists = true;
           break;
         }
@@ -1378,15 +1378,18 @@ class _ShareState extends State<SharePage> {
       _spc.animateToPage(0, duration: d, curve: Curves.ease);
     };
 
-    return new GestureDetector(
-      onTap: c,
-      child: new Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          pp,
-          uu,
-        ],
+    return new Padding(
+      padding: EdgeInsets.only(bottom: 8.0),
+      child: new GestureDetector(
+        onTap: c,
+        child: new Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            pp,
+            uu,
+          ],
+        ),
       ),
     );
   }
@@ -1486,14 +1489,17 @@ class _ShareState extends State<SharePage> {
       ),
     );
 
-    return new Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        pp,
-        uu,
-        cb,
-      ],
+    return new Padding(
+      padding: EdgeInsets.only(bottom: 8.0),
+      child: new Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          pp,
+          uu,
+          cb,
+        ],
+      ),
     );
   }
 
