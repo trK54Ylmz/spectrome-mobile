@@ -18,8 +18,6 @@ class UserProfileService extends Service {
         return UserProfileResponse.bind(status: false, message: m);
       }
 
-      print(r.body);
-
       return UserProfileResponse.fromJson(r.body);
     };
 
