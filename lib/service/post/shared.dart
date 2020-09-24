@@ -30,6 +30,8 @@ class UserSharedPostService extends Service {
         return UserSharedPostResponse.bind(status: false, message: m);
       }
 
+      print(r.body);
+
       return UserSharedPostResponse.fromJson(r.body);
     };
 
