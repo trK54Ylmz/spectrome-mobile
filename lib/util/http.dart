@@ -34,7 +34,8 @@ class Http {
     Map<String, String> headers,
     String type,
     Duration timeout,
-  }) {
+    int retries,
+  }) async {
     assert(path != null);
 
     final Uri url = new Uri.https(domain, path, params);
@@ -77,7 +78,33 @@ class Http {
     };
 
     final t = timeout == null ? Duration(seconds: 10) : timeout;
-    return client.getUrl(url).timeout(t).then(c).then((r) => _toResponse(r));
+
+    if (retries == null || retries == 1) {
+      // Prepare request
+      final r = client.getUrl(url).timeout(t);
+
+      return r.then(c).then((r) => _toResponse(r));
+    } else {
+      for (int i = 0; i < retries; i++) {
+        // Prepare request
+        final r = client.getUrl(url).timeout(t);
+
+        try {
+          // Send request
+          return await r.then(c).then((r) => _toResponse(r));
+        } catch (e) {
+          if (e is SocketException) {
+            if (i == retries - 1) {
+              throw e;
+            }
+          } else {
+            throw e;
+          }
+        }
+      }
+
+      throw Exception('Too many retry error.');
+    }
   }
 
   /// Make a POST request to the remote server
@@ -88,7 +115,8 @@ class Http {
     Map<String, dynamic> body,
     String type,
     Duration timeout,
-  }) {
+    int retries,
+  }) async {
     assert(path != null);
 
     final Uri url = new Uri.https(domain, path, params);
@@ -240,7 +268,33 @@ class Http {
     };
 
     final t = timeout == null ? Duration(seconds: 10) : timeout;
-    return client.postUrl(url).timeout(t).then(c).then((r) => _toResponse(r));
+
+    if (retries == null || retries == 1) {
+      // Prepare request
+      final r = client.postUrl(url).timeout(t);
+
+      return r.then(c).then((r) => _toResponse(r));
+    } else {
+      for (int i = 0; i < retries; i++) {
+        // Prepare request
+        final r = client.postUrl(url).timeout(t);
+
+        try {
+          // Send request
+          return await r.then(c).then((r) => _toResponse(r));
+        } catch (e) {
+          if (e is SocketException) {
+            if (i == retries - 1) {
+              throw e;
+            }
+          } else {
+            throw e;
+          }
+        }
+      }
+
+      throw Exception('Too many retry error.');
+    }
   }
 
   /// Convert [HttpClientResponse] to Spectrome [HttpResponse] object
