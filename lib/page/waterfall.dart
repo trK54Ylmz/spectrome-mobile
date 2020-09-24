@@ -254,8 +254,8 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
       ],
     );
 
-    final or = new Text(
-      'or',
+    final th = new Text(
+      'then you can share with close ones.',
       style: new TextStyle(
         fontFamily: FontConst.primary,
         fontSize: 14.0,
@@ -291,7 +291,7 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
           pt,
           er,
           pt,
-          or,
+          th,
           pt,
           cb,
         ],
@@ -331,7 +331,7 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
       }
 
       // Update status of according posts count
-      _empty = r.posts.isEmpty;
+      _empty = r.posts.isEmpty && _posts.isEmpty;
 
       if (r.posts.length == 0) {
         return;

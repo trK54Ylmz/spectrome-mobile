@@ -43,6 +43,7 @@ class WaterFallService extends Service {
       body: body,
       headers: headers,
       type: Http.FORM,
+      retries: 3,
     );
 
     return r.then(c).catchError(e);
