@@ -359,7 +359,7 @@ class _ShareState extends State<SharePage> {
       sm = new RichText(
         overflow: TextOverflow.ellipsis,
         text: new TextSpan(
-          text: 'The post will be shared with ',
+          text: 'Share with ',
           style: tsn,
           children: smi,
         ),
