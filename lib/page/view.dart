@@ -7,7 +7,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/page/home.dart';
 import 'package:spectrome/page/me.dart';
 import 'package:spectrome/page/select.dart';
-import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/service/user/count.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/util/storage.dart';
@@ -58,7 +57,7 @@ class _ViewState extends State<ViewPage> {
         children: [
           new SelectPage(),
           new HomePage(controller: _pc, request: _request),
-          new MePage(controller: _pc),
+          new MePage(controller: _pc, request: _request),
         ],
       ),
     );
@@ -73,12 +72,6 @@ class _ViewState extends State<ViewPage> {
       dev.log('Follow request count request sent.');
 
       if (!r.status) {
-        // Route to sign page, if session is expired
-        if (r.expired) {
-          final r = (Route<dynamic> route) => false;
-          await Navigator.of(context).pushNamedAndRemoveUntil(SignInPage.tag, r);
-        }
-
         return;
       }
 

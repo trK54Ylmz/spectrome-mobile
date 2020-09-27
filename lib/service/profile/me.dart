@@ -8,7 +8,7 @@ import 'package:spectrome/util/http.dart';
 class MyProfileService extends Service {
   /// Get my profile by using session code
   static Future<MyProfileResponse> call(String session) {
-    final path = '/p/me';
+    final path = '/profile/user/me';
     final headers = {Http.TOKEN_HEADER: session};
 
     // Http response handle callback

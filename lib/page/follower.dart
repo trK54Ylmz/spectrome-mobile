@@ -3,12 +3,10 @@ import 'dart:developer' as dev;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:spectrome/item/button.dart';
-import 'package:spectrome/item/input.dart';
 import 'package:spectrome/model/profile/simple.dart';
-import 'package:spectrome/page/me.dart';
 import 'package:spectrome/page/profile.dart';
-import 'package:spectrome/service/query/user.dart';
+import 'package:spectrome/page/sign_in.dart';
+import 'package:spectrome/service/profile/follower.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
@@ -16,30 +14,30 @@ import 'package:spectrome/util/error.dart';
 import 'package:spectrome/util/http.dart';
 import 'package:spectrome/util/storage.dart';
 
-class SearchPage extends StatefulWidget {
-  static final tag = 'search';
+class FollowerPage extends StatefulWidget {
+  static final tag = 'follower';
 
-  SearchPage() : super();
+  FollowerPage() : super();
 
   @override
-  _SearchState createState() => new _SearchState();
+  _FollowerState createState() => new _FollowerState();
 }
 
-class _SearchState extends State<SearchPage> {
+class _FollowerState extends State<FollowerPage> {
   // Scaffold key
   final _sk = new GlobalKey<ScaffoldState>();
 
-  // Search input controller
-  final _sc = new TextEditingController();
+  // Scroll controller
+  final _sc = new ScrollController();
 
-  // List of suggestions
-  final _suggests = <SimpleProfile>[];
+  // List of follower users
+  final _followers = <SimpleProfile>[];
 
   // Loading indicator
-  bool _loading = false;
+  bool _loading = true;
 
-  // My username
-  String _me;
+  // User profile
+  SimpleProfile _profile;
 
   // Account session key
   String _session;
@@ -52,14 +50,29 @@ class _SearchState extends State<SearchPage> {
     super.initState();
 
     // Shared preferences callback
-    final sc = (SharedPreferences sp) {
-      final session = sp.getString('_session');
+    final spc = (SharedPreferences s) {
+      final session = s.getString('_session');
 
-      // Update session
-      setState(() => _session = session);
+      _session = session;
+
+      // Get follower users
+      _getFollowers();
     };
 
-    Storage.load().then(sc);
+    Storage.load().then(spc);
+
+    // Argument callback
+    final ac = (_) {
+      final profile = ModalRoute.of(context).settings.arguments;
+
+      // Set user profile
+      if (profile != null) {
+        _profile = profile;
+      }
+    };
+
+    // Add callback for argument
+    WidgetsBinding.instance.addPostFrameCallback(ac);
   }
 
   @override
@@ -69,8 +82,8 @@ class _SearchState extends State<SearchPage> {
       backgroundColor: ColorConst.white,
       body: new SafeArea(
         child: AppConst.loader(
-          page: SearchPage.tag,
-          argument: _session == null,
+          page: FollowerPage.tag,
+          argument: _loading,
           error: _error,
           callback: _getPage,
         ),
@@ -80,44 +93,19 @@ class _SearchState extends State<SearchPage> {
 
   /// Get page widget
   Widget _getPage() {
-    final ts = new TextStyle(
-      fontFamily: FontConst.primary,
-      fontSize: 14.0,
-      letterSpacing: 0.33,
-    );
-
-    final hs = new TextStyle(
-      fontFamily: FontConst.primary,
-      fontSize: 14.0,
-      letterSpacing: 0.33,
-      color: ColorConst.gray,
-      fontWeight: FontWeight.normal,
-    );
-
-    // Trailing button
-    final b = new Button(
-      background: ColorConst.transparent,
-      color: ColorConst.darkerGray,
-      width: 60.0,
-      text: 'Clear',
-      disabled: _sc.text.length == 0,
-      padding: EdgeInsets.symmetric(
-        vertical: 10.0,
-        horizontal: 4.0,
+    // Back button
+    final l = new GestureDetector(
+      onTap: () => Navigator.of(context).pop(),
+      child: new Icon(
+        IconData(0xf104, fontFamily: FontConst.fal),
+        color: ColorConst.darkerGray,
       ),
-      onPressed: () {
-        // Clear user results
-        _suggests.clear();
-
-        // Clear text field
-        setState(() => _sc.clear());
-      },
     );
 
     return new CupertinoPageScaffold(
       backgroundColor: ColorConst.white,
       navigationBar: new CupertinoNavigationBar(
-        heroTag: 7,
+        heroTag: 4,
         transitionBetweenRoutes: false,
         padding: EdgeInsetsDirectional.only(
           top: 4.0,
@@ -125,27 +113,15 @@ class _SearchState extends State<SearchPage> {
         ),
         backgroundColor: ColorConst.white,
         border: new Border(bottom: BorderSide.none),
-        middle: new FormText(
-          hint: 'Type something',
-          hintStyle: hs,
-          style: ts,
-          controller: _sc,
-          onChange: (t) {
-            if (t.length < 2) {
-              // Clear current list
-              setState(() => _suggests.clear());
-
-              return null;
-            }
-
-            // Send request and collect suggestions
-            _fetch();
-
-            return null;
-          },
-          borderColor: ColorConst.gray,
+        leading: l,
+        middle: new Text(
+          'Followers',
+          style: new TextStyle(
+            fontFamily: FontConst.primary,
+            letterSpacing: 0.33,
+            fontSize: 16.0,
+          ),
         ),
-        trailing: b,
       ),
       child: new Container(
         child: new Padding(
@@ -153,16 +129,18 @@ class _SearchState extends State<SearchPage> {
             vertical: 8.0,
           ),
           child: new ListView.builder(
-            itemCount: _suggests.length,
-            itemBuilder: _suggestBuilder,
+            controller: _sc,
+            physics: const ClampingScrollPhysics(),
+            itemCount: _followers.length,
+            itemBuilder: _followerBuilder,
           ),
         ),
       ),
     );
   }
 
-  /// Suggested users list builder
-  Widget _suggestBuilder(BuildContext context, int i) {
+  // Follower user widget builder
+  Widget _followerBuilder(BuildContext context, int index) {
     // Http headers for image request
     final h = {Http.TOKEN_HEADER: _session};
 
@@ -183,7 +161,7 @@ class _SearchState extends State<SearchPage> {
       child: new ClipRRect(
         borderRadius: BorderRadius.circular(30.0),
         child: new Image.network(
-          _suggests[i].photoUrl,
+          _followers[index].photoUrl,
           headers: h,
           width: 40.0,
           height: 40.0,
@@ -198,7 +176,7 @@ class _SearchState extends State<SearchPage> {
 
     // Username text
     final un = new Text(
-      _suggests[i].username,
+      _followers[index].username,
       style: new TextStyle(
         fontFamily: FontConst.primary,
         color: ColorConst.black,
@@ -209,7 +187,7 @@ class _SearchState extends State<SearchPage> {
 
     // Real name text
     final nm = new Text(
-      _suggests[i].name,
+      _followers[index].name,
       style: new TextStyle(
         fontFamily: FontConst.primary,
         color: ColorConst.darkGray,
@@ -240,13 +218,12 @@ class _SearchState extends State<SearchPage> {
       button: true,
       child: new GestureDetector(
         onTap: () async {
-          dev.log('User "${_suggests[i].username}" selected.');
+          dev.log('User "${_followers[index].username}" selected.');
 
-          final u = _suggests[i].username;
-          final t = u == _me ? MePage.tag : ProfilePage.tag;
+          final u = _followers[index].username;
 
           // Route to profile page
-          await Navigator.of(context).pushNamed(t, arguments: u);
+          await Navigator.of(context).pushNamed(ProfilePage.tag, arguments: u);
         },
         child: new Container(
           child: new Padding(
@@ -268,48 +245,40 @@ class _SearchState extends State<SearchPage> {
     );
   }
 
-  /// Fetch users by using query filter
-  void _fetch() {
-    dev.log('User search triggered.');
-
-    if (_loading) {
-      return;
-    }
-
-    dev.log('User search request sending for "${_sc.text}".');
-
-    // Set loading true
-    setState(() => _loading = true);
+  /// Get follower users
+  void _getFollowers() async {
+    dev.log('Follower users are loading.');
 
     // Handle HTTP response
-    final c = (UserQueryResponse r) async {
-      dev.log('User search request sent.');
+    final sc = (FollowerUserResponse r) async {
+      dev.log('Follower users request sent.');
 
       if (!r.status) {
+        // Route to sign page, if session is expired
+        if (r.expired) {
+          final r = (Route<dynamic> route) => false;
+          await Navigator.of(context).pushNamedAndRemoveUntil(SignInPage.tag, r);
+          return;
+        }
+
         if (r.isNetErr ?? false) {
           // Create network error
           _error = ErrorMessage.network();
         } else {
-          // Create custom error
-          // _message = r.message;
+          // Create network error
+          _error = ErrorMessage.custom(r.message);
         }
 
         return;
       }
 
-      // Set my username
-      _me = r.me;
-
-      // Clear current list
-      _suggests.clear();
-
-      // Add all users
-      _suggests.addAll(r.users);
+      // Update follower users
+      _followers.addAll(r.users);
     };
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown suggestion error. Please try again later.';
+      final msg = 'Unknown followers load error. Please try again later.';
 
       dev.log(msg, stackTrace: s);
 
@@ -328,8 +297,11 @@ class _SearchState extends State<SearchPage> {
     };
 
     // Prepare request
-    final s = UserQueryService.call(_session, _sc.text);
+    final r = FollowerUserService.call(
+      session: _session,
+      username: _profile.username,
+    );
 
-    s.then(c).catchError(e).whenComplete(cc);
+    await r.then(sc).catchError(e).whenComplete(cc);
   }
 }

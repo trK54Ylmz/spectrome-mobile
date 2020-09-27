@@ -132,7 +132,7 @@ class _PostState extends State<PostCard> {
     );
 
     final cl = new Container(
-      width: width - 130,
+      width: width - 124,
       child: uu,
     );
 
