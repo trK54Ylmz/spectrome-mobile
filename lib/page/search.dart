@@ -248,6 +248,7 @@ class _SearchState extends State<SearchPage> {
           // Route to profile page
           await Navigator.of(context).pushNamed(t, arguments: u);
         },
+        behavior: HitTestBehavior.opaque,
         child: new Container(
           child: new Padding(
             padding: EdgeInsets.symmetric(
