@@ -130,7 +130,7 @@ class _PostDetailState extends State<PostDetailCard> {
     );
 
     final cl = new Container(
-      width: width - 130,
+      width: width - 124,
       child: uu,
     );
 
@@ -234,7 +234,7 @@ class _PostDetailState extends State<PostDetailCard> {
     final ct = new Padding(
       padding: EdgeInsets.only(left: 6.0),
       child: new Text(
-        widget.detail.post.comments.toString(),
+        'commented ${widget.detail.post.comments} times',
         style: new TextStyle(
           fontFamily: FontConst.primary,
           fontSize: 14.0,
@@ -260,7 +260,7 @@ class _PostDetailState extends State<PostDetailCard> {
     final wg = new Padding(
       padding: EdgeInsets.symmetric(
         horizontal: 4.0,
-        vertical: 16.0,
+        vertical: 12.0,
       ),
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.start,

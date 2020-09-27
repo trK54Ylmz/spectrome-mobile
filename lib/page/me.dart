@@ -9,6 +9,9 @@ import 'package:spectrome/item/grid.dart';
 import 'package:spectrome/item/thumb.dart';
 import 'package:spectrome/model/post/detail.dart';
 import 'package:spectrome/model/profile/me.dart';
+import 'package:spectrome/model/profile/simple.dart';
+import 'package:spectrome/page/follower.dart';
+import 'package:spectrome/page/following.dart';
 import 'package:spectrome/page/request.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/page/update.dart';
@@ -30,7 +33,10 @@ class MePage extends StatefulWidget {
   // View page controller
   final PageController controller;
 
-  MePage({this.controller}) : super();
+  // Value notifier
+  final ValueNotifier<int> request;
+
+  MePage({this.controller, this.request}) : super();
 
   @override
   _MeState createState() => new _MeState();
@@ -51,6 +57,9 @@ class _MeState extends State<MePage> {
 
   // Has username
   bool _hu = false;
+
+  // Post loader timer
+  Timer _timer;
 
   // Shared preferences instance
   SharedPreferences _sp;
@@ -81,7 +90,7 @@ class _MeState extends State<MePage> {
     final spc = (SharedPreferences s) {
       final session = s.getString('_session');
 
-      setState(() => _session = session);
+      _session = session;
 
       _sp = s;
 
@@ -95,7 +104,7 @@ class _MeState extends State<MePage> {
       _getRequests();
 
       // Set periodic tasks for prefile updates
-      Timer.periodic(Duration(seconds: 60), (_) => _loadProfile());
+      _timer = Timer.periodic(Duration(seconds: 60), (_) => _loadProfile());
     };
 
     Storage.load().then(spc);
@@ -110,6 +119,16 @@ class _MeState extends State<MePage> {
 
     // Add callback for argument
     WidgetsBinding.instance.addPostFrameCallback(ac);
+  }
+
+  @override
+  void dispose() {
+    // Cancel timer
+    if (_timer != null && _timer.isActive) {
+      _timer.cancel();
+    }
+
+    super.dispose();
   }
 
   @override
@@ -250,45 +269,77 @@ class _MeState extends State<MePage> {
       ),
     );
 
+    // Following callback
+    final frc = () async {
+      // Create simple profile based on my profile object
+      final p = new SimpleProfile(
+        name: _profile.name,
+        photoUrl: _profile.photoUrl,
+        username: _profile.username,
+      );
+
+      await Navigator.of(context).pushNamed(FollowingPage.tag, arguments: p);
+    };
+
     // Following count text
     final fr = new Flexible(
       flex: 1,
       fit: FlexFit.tight,
-      child: new Padding(
-        padding: EdgeInsets.symmetric(horizontal: 8.0),
-        child: new RichText(
-          textAlign: TextAlign.center,
-          text: new TextSpan(
-            text: _profile.followings.toString(),
-            style: ts,
-            children: [
-              new TextSpan(
-                text: '  Followings',
-                style: sts,
-              ),
-            ],
+      child: new GestureDetector(
+        onTap: frc,
+        behavior: HitTestBehavior.opaque,
+        child: new Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8.0),
+          child: new RichText(
+            textAlign: TextAlign.center,
+            text: new TextSpan(
+              text: _profile.followings.toString(),
+              style: ts,
+              children: [
+                new TextSpan(
+                  text: '  Followings',
+                  style: sts,
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
 
+    // Follower callback
+    final toc = () async {
+      // Create simple profile based on my profile object
+      final p = new SimpleProfile(
+        name: _profile.name,
+        photoUrl: _profile.photoUrl,
+        username: _profile.username,
+      );
+
+      await Navigator.of(context).pushNamed(FollowerPage.tag, arguments: p);
+    };
+
     // Followers count text
     final to = new Flexible(
       flex: 1,
       fit: FlexFit.tight,
-      child: new Padding(
-        padding: EdgeInsets.symmetric(horizontal: 8.0),
-        child: new RichText(
-          textAlign: TextAlign.right,
-          text: new TextSpan(
-            text: _profile.followers.toString(),
-            style: ts,
-            children: [
-              new TextSpan(
-                text: '  Followers',
-                style: sts,
-              ),
-            ],
+      child: new GestureDetector(
+        onTap: toc,
+        behavior: HitTestBehavior.opaque,
+        child: new Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8.0),
+          child: new RichText(
+            textAlign: TextAlign.right,
+            text: new TextSpan(
+              text: _profile.followers.toString(),
+              style: ts,
+              children: [
+                new TextSpan(
+                  text: '  Followers',
+                  style: sts,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -436,17 +487,24 @@ class _MeState extends State<MePage> {
     return new CupertinoPageScaffold(
       backgroundColor: ColorConst.white,
       navigationBar: new CupertinoNavigationBar(
-        heroTag: 4,
-        transitionBetweenRoutes: false,
-        padding: EdgeInsetsDirectional.only(
-          top: 4.0,
-          bottom: 4.0,
-        ),
-        backgroundColor: ColorConst.white,
-        border: new Border(bottom: BorderSide.none),
-        leading: _hu ? l : ec,
-        trailing: t,
-      ),
+          heroTag: 4,
+          transitionBetweenRoutes: false,
+          padding: EdgeInsetsDirectional.only(
+            top: 4.0,
+            bottom: 4.0,
+          ),
+          backgroundColor: ColorConst.white,
+          border: new Border(bottom: BorderSide.none),
+          leading: _hu ? l : ec,
+          trailing: t,
+          middle: new Text(
+            'Me',
+            style: new TextStyle(
+              fontFamily: FontConst.primary,
+              letterSpacing: 0.33,
+              fontSize: 16.0,
+            ),
+          )),
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -805,6 +863,9 @@ class _MeState extends State<MePage> {
   /// Go to follow requests page
   void _followRequests() async {
     final c = (_) {
+      // Set counter value to zero and notify listeners
+      widget.request.value = 0;
+
       // Set number of unseen requests to zero
       setState(() => _count = 0);
     };

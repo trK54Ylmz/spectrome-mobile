@@ -142,7 +142,7 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
           ),
           child: new Icon(
             IconData(
-              0xf0fe,
+              0xf055,
               fontFamily: FontConst.fal,
             ),
             color: ColorConst.darkGray,
@@ -173,7 +173,7 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
           ),
           child: new Icon(
             IconData(
-              0xf007,
+              0xf2bd,
               fontFamily: FontConst.fal,
             ),
             color: widget.request.value > 0 ? ColorConst.darkRed : ColorConst.darkGray,
@@ -199,6 +199,14 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
         ),
         leading: l,
         trailing: t,
+        middle: new Text(
+          'Waterfall',
+          style: new TextStyle(
+            fontFamily: FontConst.primary,
+            letterSpacing: 0.33,
+            fontSize: 16.0,
+          ),
+        ),
       ),
       body: new SafeArea(
         child: new Column(

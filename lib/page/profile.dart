@@ -7,7 +7,10 @@ import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/grid.dart';
 import 'package:spectrome/item/thumb.dart';
 import 'package:spectrome/model/post/detail.dart';
+import 'package:spectrome/model/profile/simple.dart';
 import 'package:spectrome/model/profile/user.dart';
+import 'package:spectrome/page/follower.dart';
+import 'package:spectrome/page/following.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/service/post/shared.dart';
 import 'package:spectrome/service/profile/user.dart';
@@ -232,45 +235,87 @@ class _ProfileState extends State<ProfilePage> {
       ),
     );
 
+    // Following callback
+    final frc = () async {
+      // User should be followed
+      if (!_followed) {
+        return;
+      }
+
+      // Create simple profile based on my profile object
+      final p = new SimpleProfile(
+        name: _profile.name,
+        photoUrl: _profile.photoUrl,
+        username: _profile.username,
+      );
+
+      await Navigator.of(context).pushNamed(FollowingPage.tag, arguments: p);
+    };
+
     // Following count text
     final fr = new Flexible(
       flex: 1,
       fit: FlexFit.tight,
-      child: new Padding(
-        padding: EdgeInsets.symmetric(horizontal: 8.0),
-        child: new RichText(
-          textAlign: TextAlign.center,
-          text: new TextSpan(
-            text: _profile.followings.toString(),
-            style: ts,
-            children: [
-              new TextSpan(
-                text: '  Followings',
-                style: sts,
-              ),
-            ],
+      child: new GestureDetector(
+        onTap: frc,
+        behavior: HitTestBehavior.opaque,
+        child: new Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8.0),
+          child: new RichText(
+            textAlign: TextAlign.center,
+            text: new TextSpan(
+              text: _profile.followings.toString(),
+              style: ts,
+              children: [
+                new TextSpan(
+                  text: '  Followings',
+                  style: sts,
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
 
+    // Follower callback
+    final toc = () async {
+      // User should be followed
+      if (!_followed) {
+        return;
+      }
+
+      // Create simple profile based on my profile object
+      final p = new SimpleProfile(
+        name: _profile.name,
+        photoUrl: _profile.photoUrl,
+        username: _profile.username,
+      );
+
+      await Navigator.of(context).pushNamed(FollowerPage.tag, arguments: p);
+    };
+
     // Followers count text
     final to = new Flexible(
       flex: 1,
       fit: FlexFit.tight,
-      child: new Padding(
-        padding: EdgeInsets.symmetric(horizontal: 8.0),
-        child: new RichText(
-          textAlign: TextAlign.right,
-          text: new TextSpan(
-            text: _profile.followers.toString(),
-            style: ts,
-            children: [
-              new TextSpan(
-                text: '  Followers',
-                style: sts,
-              ),
-            ],
+      child: new GestureDetector(
+        onTap: toc,
+        behavior: HitTestBehavior.opaque,
+        child: new Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8.0),
+          child: new RichText(
+            textAlign: TextAlign.right,
+            text: new TextSpan(
+              text: _profile.followers.toString(),
+              style: ts,
+              children: [
+                new TextSpan(
+                  text: '  Followers',
+                  style: sts,
+                ),
+              ],
+            ),
           ),
         ),
       ),
