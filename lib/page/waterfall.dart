@@ -53,6 +53,11 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
   void initState() {
     super.initState();
 
+    // Add status listener for follower request count
+    widget.request.addListener(() {
+      setState(() => null);
+    });
+
     // Posts list view scroll controller
     _sc.addListener(() {
       // Load more posts
