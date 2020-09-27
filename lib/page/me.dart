@@ -19,7 +19,6 @@ import 'package:spectrome/service/account/sign_out.dart';
 import 'package:spectrome/service/post/my.dart';
 import 'package:spectrome/service/profile/me.dart';
 import 'package:spectrome/service/response.dart';
-import 'package:spectrome/service/user/count.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
@@ -79,12 +78,14 @@ class _MeState extends State<MePage> {
   // Settings overlay entry
   OverlayEntry _oe;
 
-  // Number of active follow requests
-  int _count = 0;
-
   @override
   void initState() {
     super.initState();
+
+    // Add status listener for follower request count
+    widget.request.addListener(() {
+      setState(() => null);
+    });
 
     // Shared preferences callback
     final spc = (SharedPreferences s) {
@@ -99,9 +100,6 @@ class _MeState extends State<MePage> {
 
       // Load profile from API
       _loadProfile();
-
-      // Load number of follow requests
-      _getRequests();
 
       // Set periodic tasks for prefile updates
       _timer = Timer.periodic(Duration(seconds: 60), (_) => _loadProfile());
@@ -449,7 +447,7 @@ class _MeState extends State<MePage> {
               0xf141,
               fontFamily: FontConst.fal,
             ),
-            color: _count > 0 ? ColorConst.darkRed : ColorConst.darkerGray,
+            color: widget.request.value > 0 ? ColorConst.darkRed : ColorConst.darkerGray,
             size: 32.0,
           ),
         ),
@@ -622,7 +620,7 @@ class _MeState extends State<MePage> {
             height: 16.0,
             child: new Center(
               child: new Text(
-                _count.toString(),
+                widget.request.value.toString(),
                 style: new TextStyle(
                   fontFamily: FontConst.primary,
                   fontSize: 10.0,
@@ -649,7 +647,7 @@ class _MeState extends State<MePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 rbt,
-                _count > 0 ? rbc : new Container(),
+                widget.request.value > 0 ? rbc : new Container(),
               ],
             ),
           ),
@@ -865,12 +863,12 @@ class _MeState extends State<MePage> {
     final c = (_) {
       // Set counter value to zero and notify listeners
       widget.request.value = 0;
-
-      // Set number of unseen requests to zero
-      setState(() => _count = 0);
     };
 
-    await Navigator.of(context).pushNamed(RequestPage.tag, arguments: _count).then(c);
+    // Number of requests
+    final r = widget.request.value;
+
+    await Navigator.of(context).pushNamed(RequestPage.tag, arguments: r).then(c);
   }
 
   /// Sign out from current session
@@ -917,41 +915,5 @@ class _MeState extends State<MePage> {
     };
 
     await SignOutService.call().then(sc).catchError(e).whenComplete(cc);
-  }
-
-  /// Get number of follow requests sent to user
-  void _getRequests() async {
-    dev.log('Follow request count is loading.');
-
-    // Handle HTTP response
-    final sc = (IntentionCountResponse r) async {
-      dev.log('Follow request count request sent.');
-
-      if (!r.status) {
-        // Route to sign page, if session is expired
-        if (r.expired) {
-          final r = (Route<dynamic> route) => false;
-          await Navigator.of(context).pushNamedAndRemoveUntil(SignInPage.tag, r);
-        }
-
-        return;
-      }
-
-      // Clear items
-      setState(() => _count = r.count);
-    };
-
-    // Error callback
-    final e = (e, s) {
-      final msg = 'Unknown request count error. Please try again later.';
-
-      // Create unknown error message
-      dev.log(msg, stackTrace: s);
-    };
-
-    // Prepare request
-    final s = IntentionCountService.call(_session);
-
-    await s.then(sc).catchError(e);
   }
 }

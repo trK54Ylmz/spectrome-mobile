@@ -6,6 +6,7 @@ import 'package:spectrome/service/response.dart';
 import 'package:spectrome/util/http.dart';
 
 class FollowerUserService extends Service {
+  /// Get list of follower users
   static Future<FollowerUserResponse> call({
     String session,
     String username,
@@ -43,7 +44,7 @@ class FollowerUserService extends Service {
 }
 
 class FollowerUserResponse extends BasicResponse {
-  // List of suggested users
+  // List of follower users
   List<SimpleProfile> users;
 
   /// Create empty object

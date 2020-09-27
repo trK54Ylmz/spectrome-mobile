@@ -41,7 +41,7 @@ class _ViewState extends State<ViewPage> {
       _getRequests();
 
       // Set periodic tasks for follow requests
-      Timer.periodic(Duration(seconds: 60), (_) => _getRequests());
+      Timer.periodic(Duration(seconds: 30), (_) => _getRequests());
     };
 
     Storage.load().then(sc);
