@@ -9,13 +9,11 @@ class UserProfile {
 
   final int posts;
 
-  final int followers;
+  final int circles;
 
-  final int followings;
+  final bool request;
 
-  final bool followable;
-
-  final bool followed;
+  final bool circle;
 
   /// Create my profile object
   const UserProfile({
@@ -23,10 +21,9 @@ class UserProfile {
     this.name,
     this.photoUrl,
     this.posts,
-    this.followers,
-    this.followings,
-    this.followable,
-    this.followed,
+    this.circles,
+    this.request,
+    this.circle,
   });
 
   /// Encode profile instance
@@ -36,10 +33,9 @@ class UserProfile {
       'n': name,
       'i': photoUrl,
       'p': posts,
-      'f': followings,
-      't': followers,
-      'a': followable,
-      'd': followed,
+      'f': circles,
+      'a': request,
+      'd': circle,
     };
 
     return jsonEncode(items);
@@ -54,10 +50,9 @@ class UserProfile {
       name: items.containsKey('n') ? items['n'] : null,
       photoUrl: items.containsKey('i') ? items['i'] : null,
       posts: items.containsKey('p') ? items['p'] : null,
-      followings: items.containsKey('f') ? items['f'] : null,
-      followers: items.containsKey('t') ? items['t'] : null,
-      followable: items.containsKey('a') ? items['a'] : null,
-      followed: items.containsKey('d') ? items['d'] : null,
+      circles: items.containsKey('f') ? items['f'] : null,
+      request: items.containsKey('a') ? items['a'] : null,
+      circle: items.containsKey('d') ? items['d'] : null,
     );
   }
 }

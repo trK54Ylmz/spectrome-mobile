@@ -9,9 +9,7 @@ class MyProfile {
 
   final int posts;
 
-  final int followers;
-
-  final int followings;
+  final int circles;
 
   /// Create my profile object
   const MyProfile({
@@ -19,8 +17,7 @@ class MyProfile {
     this.name,
     this.photoUrl,
     this.posts,
-    this.followers,
-    this.followings,
+    this.circles,
   });
 
   /// Encode profile instance
@@ -30,8 +27,7 @@ class MyProfile {
       'n': name,
       'i': photoUrl,
       'p': posts,
-      'f': followings,
-      't': followers,
+      'f': circles,
     };
 
     return jsonEncode(items);
@@ -46,8 +42,7 @@ class MyProfile {
       name: items.containsKey('n') ? items['n'] : null,
       photoUrl: items.containsKey('i') ? items['i'] : null,
       posts: items.containsKey('p') ? items['p'] : null,
-      followings: items.containsKey('f') ? items['f'] : null,
-      followers: items.containsKey('t') ? items['t'] : null,
+      circles: items.containsKey('f') ? items['f'] : null,
     );
   }
 }

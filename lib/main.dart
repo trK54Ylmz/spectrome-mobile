@@ -11,8 +11,7 @@ import 'package:spectrome/page/activation.dart';
 import 'package:spectrome/page/comment.dart';
 import 'package:spectrome/page/detail.dart';
 import 'package:spectrome/page/edit.dart';
-import 'package:spectrome/page/follower.dart';
-import 'package:spectrome/page/following.dart';
+import 'package:spectrome/page/circle.dart';
 import 'package:spectrome/page/forgot.dart';
 import 'package:spectrome/page/guide.dart';
 import 'package:spectrome/page/home.dart';
@@ -47,8 +46,7 @@ final routes = <String, WidgetBuilder>{
   CommentPage.tag: (c) => new CommentPage(),
   DetailPage.tag: (c) => new DetailPage(),
   EditPage.tag: (c) => new EditPage(),
-  FollowerPage.tag: (c) => new FollowerPage(),
-  FollowingPage.tag: (c) => new FollowingPage(),
+  CirclePage.tag: (c) => new CirclePage(),
   ForgotPage.tag: (c) => new ForgotPage(),
   GuidePage.tag: (c) => new GuidePage(),
   HomePage.tag: (c) => new HomePage(),

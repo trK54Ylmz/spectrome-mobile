@@ -9,8 +9,7 @@ import 'package:spectrome/item/thumb.dart';
 import 'package:spectrome/model/post/detail.dart';
 import 'package:spectrome/model/profile/simple.dart';
 import 'package:spectrome/model/profile/user.dart';
-import 'package:spectrome/page/follower.dart';
-import 'package:spectrome/page/following.dart';
+import 'package:spectrome/page/circle.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/service/post/shared.dart';
 import 'package:spectrome/service/profile/user.dart';
@@ -40,8 +39,8 @@ class _ProfileState extends State<ProfilePage> {
   // List of my posts
   final _posts = <PostDetail>[];
 
-  // Is user following
-  bool _followed = false;
+  // Is user in circle
+  bool _circled = false;
 
   // Is following request sent
   bool _requested = false;
@@ -161,7 +160,7 @@ class _ProfileState extends State<ProfilePage> {
       style: new TextStyle(
         fontFamily: FontConst.primary,
         color: ColorConst.black,
-        fontSize: 16.0,
+        fontSize: 15.0,
         letterSpacing: 0.33,
       ),
     );
@@ -171,8 +170,53 @@ class _ProfileState extends State<ProfilePage> {
       style: new TextStyle(
         fontFamily: FontConst.primary,
         color: ColorConst.darkGray,
-        fontSize: 14.0,
+        fontSize: 13.0,
         letterSpacing: 0.33,
+      ),
+    );
+
+    // Circles callback
+    final cpc = () async {
+      // User should be in circle
+      if (!_circled) {
+        return;
+      }
+
+      // Create simple profile based on my profile object
+      final p = new SimpleProfile(
+        name: _profile.name,
+        photoUrl: _profile.photoUrl,
+        username: _profile.username,
+      );
+
+      await Navigator.of(context).pushNamed(CirclePage.tag, arguments: p);
+    };
+
+    final cc = new GestureDetector(
+      onTap: cpc,
+      behavior: HitTestBehavior.opaque,
+      child: new RichText(
+        textAlign: TextAlign.left,
+        text: new TextSpan(
+          text: _profile.circles.toString(),
+          style: new TextStyle(
+            fontFamily: FontConst.bold,
+            fontSize: 13.0,
+            color: ColorConst.darkGray,
+            fontWeight: FontWeight.normal,
+          ),
+          children: [
+            new TextSpan(
+              text: '  Circles',
+              style: new TextStyle(
+                fontFamily: FontConst.primary,
+                fontSize: 13.0,
+                color: ColorConst.darkGray,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
       ),
     );
 
@@ -186,6 +230,8 @@ class _ProfileState extends State<ProfilePage> {
           un,
           pts,
           nm,
+          pts,
+          cc,
         ],
       ),
     );
@@ -196,139 +242,6 @@ class _ProfileState extends State<ProfilePage> {
       children: [
         p,
         i,
-      ],
-    );
-
-    final ts = new TextStyle(
-      fontFamily: FontConst.bold,
-      fontSize: 14.0,
-      letterSpacing: 0.33,
-      color: ColorConst.darkerGray,
-    );
-
-    final sts = new TextStyle(
-      fontFamily: FontConst.primary,
-      fontSize: 14.0,
-      color: ColorConst.gray,
-      fontWeight: FontWeight.normal,
-    );
-
-    // Posts count text
-    final ps = new Flexible(
-      flex: 1,
-      fit: FlexFit.tight,
-      child: new Padding(
-        padding: EdgeInsets.symmetric(horizontal: 8.0),
-        child: new RichText(
-          textAlign: TextAlign.left,
-          text: new TextSpan(
-            text: _profile.posts.toString(),
-            style: ts,
-            children: [
-              new TextSpan(
-                text: '  Posts',
-                style: sts,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-
-    // Following callback
-    final frc = () async {
-      // User should be followed
-      if (!_followed) {
-        return;
-      }
-
-      // Create simple profile based on my profile object
-      final p = new SimpleProfile(
-        name: _profile.name,
-        photoUrl: _profile.photoUrl,
-        username: _profile.username,
-      );
-
-      await Navigator.of(context).pushNamed(FollowingPage.tag, arguments: p);
-    };
-
-    // Following count text
-    final fr = new Flexible(
-      flex: 1,
-      fit: FlexFit.tight,
-      child: new GestureDetector(
-        onTap: frc,
-        behavior: HitTestBehavior.opaque,
-        child: new Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8.0),
-          child: new RichText(
-            textAlign: TextAlign.center,
-            text: new TextSpan(
-              text: _profile.followings.toString(),
-              style: ts,
-              children: [
-                new TextSpan(
-                  text: '  Followings',
-                  style: sts,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-
-    // Follower callback
-    final toc = () async {
-      // User should be followed
-      if (!_followed) {
-        return;
-      }
-
-      // Create simple profile based on my profile object
-      final p = new SimpleProfile(
-        name: _profile.name,
-        photoUrl: _profile.photoUrl,
-        username: _profile.username,
-      );
-
-      await Navigator.of(context).pushNamed(FollowerPage.tag, arguments: p);
-    };
-
-    // Followers count text
-    final to = new Flexible(
-      flex: 1,
-      fit: FlexFit.tight,
-      child: new GestureDetector(
-        onTap: toc,
-        behavior: HitTestBehavior.opaque,
-        child: new Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8.0),
-          child: new RichText(
-            textAlign: TextAlign.right,
-            text: new TextSpan(
-              text: _profile.followers.toString(),
-              style: ts,
-              children: [
-                new TextSpan(
-                  text: '  Followers',
-                  style: sts,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-
-    // Following, followers and settings
-    final d = new Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ps,
-        fr,
-        to,
       ],
     );
 
@@ -375,7 +288,7 @@ class _ProfileState extends State<ProfilePage> {
       flex: 1,
       child: new Padding(
         padding: EdgeInsets.only(top: 8.0),
-        child: _followed ? uf : _requested ? rq : fl,
+        child: _circled ? uf : _requested ? rq : fl,
       ),
     );
 
@@ -392,7 +305,7 @@ class _ProfileState extends State<ProfilePage> {
 
     // User detail container
     final u = new Container(
-      height: 168.0,
+      height: 124.0,
       decoration: new BoxDecoration(
         border: Border(
           bottom: BorderSide(
@@ -413,8 +326,6 @@ class _ProfileState extends State<ProfilePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             f,
-            pt,
-            d,
             pt,
             b,
           ],
@@ -557,7 +468,7 @@ class _ProfileState extends State<ProfilePage> {
       // Update profile instance
       _profile = r.profile;
       _requested = r.request;
-      _followed = r.follow;
+      _circled = r.circle;
 
       // Load posts if number of posts are greater then zero
       if (_profile.posts > 0) {
@@ -740,8 +651,8 @@ class _ProfileState extends State<ProfilePage> {
         return;
       }
 
-      // Set following as false
-      _followed = false;
+      // Set circle as false
+      _circled = false;
     };
 
     // Error callback
