@@ -5,32 +5,32 @@ import 'package:spectrome/service/base.dart';
 import 'package:spectrome/service/response.dart';
 import 'package:spectrome/util/http.dart';
 
-class FollowingUserService extends Service {
-  /// Get list of following users
-  static Future<FollowingUserResponse> call({
+class CircleUserService extends Service {
+  /// Get list of follower users
+  static Future<CircleUserResponse> call({
     String session,
     String username,
   }) {
-    final path = '/profile/following/user/$username';
+    final path = '/profile/circle/user/$username';
     final headers = {Http.TOKEN_HEADER: session};
 
     // Http response handle callback
     final c = (Response r) {
       if (r.code != 200) {
         final m = 'An error occurred';
-        return FollowingUserResponse.bind(status: false, message: m);
+        return CircleUserResponse.bind(status: false, message: m);
       }
 
-      return FollowingUserResponse.fromJson(r.body);
+      return CircleUserResponse.fromJson(r.body);
     };
 
     // Handle error case
     final e = (e, StackTrace s) {
-      final r = FollowingUserResponse.empty();
+      final r = CircleUserResponse.empty();
 
       dev.log('Following users error.', error: e, stackTrace: s);
 
-      return Service.handleError<FollowingUserResponse>(e, s, r);
+      return Service.handleError<CircleUserResponse>(e, s, r);
     };
 
     final r = Http.doGet(
@@ -43,21 +43,21 @@ class FollowingUserService extends Service {
   }
 }
 
-class FollowingUserResponse extends BasicResponse {
-  // List of following users
+class CircleUserResponse extends BasicResponse {
+  // List of follower users
   List<SimpleProfile> users;
 
   /// Create empty object
-  FollowingUserResponse.empty() : super.empty();
+  CircleUserResponse.empty() : super.empty();
 
   /// Create only status and message
-  FollowingUserResponse.bind({
+  CircleUserResponse.bind({
     status,
     message,
   }) : super.bind(status: status, message: message);
 
   /// Create response by using JSON input
-  FollowingUserResponse.fromJson(String input) {
+  CircleUserResponse.fromJson(String input) {
     final json = super.fromJson(input);
 
     if (json['users'] == null) {

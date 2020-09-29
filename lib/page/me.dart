@@ -10,8 +10,7 @@ import 'package:spectrome/item/thumb.dart';
 import 'package:spectrome/model/post/detail.dart';
 import 'package:spectrome/model/profile/me.dart';
 import 'package:spectrome/model/profile/simple.dart';
-import 'package:spectrome/page/follower.dart';
-import 'package:spectrome/page/following.dart';
+import 'package:spectrome/page/circle.dart';
 import 'package:spectrome/page/request.dart';
 import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/page/update.dart';
@@ -57,6 +56,9 @@ class _MeState extends State<MePage> {
   // Has username
   bool _hu = false;
 
+  // Request count
+  int _count = 0;
+
   // Post loader timer
   Timer _timer;
 
@@ -82,10 +84,12 @@ class _MeState extends State<MePage> {
   void initState() {
     super.initState();
 
-    // Add status listener for follower request count
-    widget.request.addListener(() {
-      setState(() => null);
-    });
+    if (widget.request != null) {
+      // Add status listener for follower request count
+      widget.request.addListener(() {
+        setState(() => _count = widget.request.value);
+      });
+    }
 
     // Shared preferences callback
     final spc = (SharedPreferences s) {
@@ -151,10 +155,6 @@ class _MeState extends State<MePage> {
       padding: EdgeInsets.only(top: 4.0),
     );
 
-    final pt = const Padding(
-      padding: EdgeInsets.only(top: 8.0),
-    );
-
     // Http headers for image request
     final h = {Http.TOKEN_HEADER: _session};
 
@@ -193,7 +193,7 @@ class _MeState extends State<MePage> {
       style: new TextStyle(
         fontFamily: FontConst.primary,
         color: ColorConst.black,
-        fontSize: 16.0,
+        fontSize: 15.0,
         letterSpacing: 0.33,
       ),
     );
@@ -203,8 +203,48 @@ class _MeState extends State<MePage> {
       style: new TextStyle(
         fontFamily: FontConst.primary,
         color: ColorConst.darkGray,
-        fontSize: 14.0,
+        fontSize: 13.0,
         letterSpacing: 0.33,
+      ),
+    );
+
+    // Circles callback
+    final cpc = () async {
+      // Create simple profile based on my profile object
+      final p = new SimpleProfile(
+        name: _profile.name,
+        photoUrl: _profile.photoUrl,
+        username: _profile.username,
+      );
+
+      await Navigator.of(context).pushNamed(CirclePage.tag, arguments: p);
+    };
+
+    final cc = new GestureDetector(
+      onTap: cpc,
+      behavior: HitTestBehavior.opaque,
+      child: new RichText(
+        textAlign: TextAlign.left,
+        text: new TextSpan(
+          text: _profile.circles.toString(),
+          style: new TextStyle(
+            fontFamily: FontConst.bold,
+            fontSize: 13.0,
+            color: ColorConst.darkGray,
+            fontWeight: FontWeight.normal,
+          ),
+          children: [
+            new TextSpan(
+              text: '  Circles',
+              style: new TextStyle(
+                fontFamily: FontConst.primary,
+                fontSize: 13.0,
+                color: ColorConst.darkGray,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
       ),
     );
 
@@ -218,6 +258,8 @@ class _MeState extends State<MePage> {
           un,
           pts,
           nm,
+          pts,
+          cc,
         ],
       ),
     );
@@ -228,129 +270,6 @@ class _MeState extends State<MePage> {
       children: [
         p,
         i,
-      ],
-    );
-
-    final ts = new TextStyle(
-      fontFamily: FontConst.bold,
-      fontSize: 14.0,
-      letterSpacing: 0.33,
-      color: ColorConst.darkerGray,
-    );
-
-    final sts = new TextStyle(
-      fontFamily: FontConst.primary,
-      fontSize: 14.0,
-      color: ColorConst.gray,
-      fontWeight: FontWeight.normal,
-    );
-
-    // Posts count text
-    final ps = new Flexible(
-      flex: 1,
-      fit: FlexFit.tight,
-      child: new Padding(
-        padding: EdgeInsets.symmetric(horizontal: 8.0),
-        child: new RichText(
-          textAlign: TextAlign.left,
-          text: new TextSpan(
-            text: _profile.posts.toString(),
-            style: ts,
-            children: [
-              new TextSpan(
-                text: '  Posts',
-                style: sts,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-
-    // Following callback
-    final frc = () async {
-      // Create simple profile based on my profile object
-      final p = new SimpleProfile(
-        name: _profile.name,
-        photoUrl: _profile.photoUrl,
-        username: _profile.username,
-      );
-
-      await Navigator.of(context).pushNamed(FollowingPage.tag, arguments: p);
-    };
-
-    // Following count text
-    final fr = new Flexible(
-      flex: 1,
-      fit: FlexFit.tight,
-      child: new GestureDetector(
-        onTap: frc,
-        behavior: HitTestBehavior.opaque,
-        child: new Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8.0),
-          child: new RichText(
-            textAlign: TextAlign.center,
-            text: new TextSpan(
-              text: _profile.followings.toString(),
-              style: ts,
-              children: [
-                new TextSpan(
-                  text: '  Followings',
-                  style: sts,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-
-    // Follower callback
-    final toc = () async {
-      // Create simple profile based on my profile object
-      final p = new SimpleProfile(
-        name: _profile.name,
-        photoUrl: _profile.photoUrl,
-        username: _profile.username,
-      );
-
-      await Navigator.of(context).pushNamed(FollowerPage.tag, arguments: p);
-    };
-
-    // Followers count text
-    final to = new Flexible(
-      flex: 1,
-      fit: FlexFit.tight,
-      child: new GestureDetector(
-        onTap: toc,
-        behavior: HitTestBehavior.opaque,
-        child: new Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8.0),
-          child: new RichText(
-            textAlign: TextAlign.right,
-            text: new TextSpan(
-              text: _profile.followers.toString(),
-              style: ts,
-              children: [
-                new TextSpan(
-                  text: '  Followers',
-                  style: sts,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-
-    // Following, followers and settings
-    final d = new Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ps,
-        fr,
-        to,
       ],
     );
 
@@ -393,7 +312,7 @@ class _MeState extends State<MePage> {
 
     // User detail container
     final u = new Container(
-      height: 158.0,
+      height: 124.0,
       decoration: new BoxDecoration(
         border: Border(
           bottom: BorderSide(
@@ -414,9 +333,6 @@ class _MeState extends State<MePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             f,
-            pt,
-            d,
-            pt,
             b,
           ],
         ),
@@ -447,7 +363,7 @@ class _MeState extends State<MePage> {
               0xf141,
               fontFamily: FontConst.fal,
             ),
-            color: widget.request.value > 0 ? ColorConst.darkRed : ColorConst.darkerGray,
+            color: _count > 0 ? ColorConst.darkRed : ColorConst.darkerGray,
             size: 32.0,
           ),
         ),
@@ -485,24 +401,25 @@ class _MeState extends State<MePage> {
     return new CupertinoPageScaffold(
       backgroundColor: ColorConst.white,
       navigationBar: new CupertinoNavigationBar(
-          heroTag: 4,
-          transitionBetweenRoutes: false,
-          padding: EdgeInsetsDirectional.only(
-            top: 4.0,
-            bottom: 4.0,
+        heroTag: 4,
+        transitionBetweenRoutes: false,
+        padding: EdgeInsetsDirectional.only(
+          top: 4.0,
+          bottom: 4.0,
+        ),
+        backgroundColor: ColorConst.white,
+        border: new Border(bottom: BorderSide.none),
+        leading: _hu ? l : ec,
+        trailing: t,
+        middle: new Text(
+          'Me',
+          style: new TextStyle(
+            fontFamily: FontConst.primary,
+            letterSpacing: 0.33,
+            fontSize: 16.0,
           ),
-          backgroundColor: ColorConst.white,
-          border: new Border(bottom: BorderSide.none),
-          leading: _hu ? l : ec,
-          trailing: t,
-          middle: new Text(
-            'Me',
-            style: new TextStyle(
-              fontFamily: FontConst.primary,
-              letterSpacing: 0.33,
-              fontSize: 16.0,
-            ),
-          )),
+        ),
+      ),
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -620,7 +537,7 @@ class _MeState extends State<MePage> {
             height: 16.0,
             child: new Center(
               child: new Text(
-                widget.request.value.toString(),
+                _count.toString(),
                 style: new TextStyle(
                   fontFamily: FontConst.primary,
                   fontSize: 10.0,
@@ -647,7 +564,7 @@ class _MeState extends State<MePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 rbt,
-                widget.request.value > 0 ? rbc : new Container(),
+                _count > 0 ? rbc : new Container(),
               ],
             ),
           ),
@@ -861,12 +778,16 @@ class _MeState extends State<MePage> {
   /// Go to follow requests page
   void _followRequests() async {
     final c = (_) {
+      if (widget.request == null) {
+        return;
+      }
+
       // Set counter value to zero and notify listeners
       widget.request.value = 0;
     };
 
     // Number of requests
-    final r = widget.request.value;
+    final r = (widget.request == null) ? 0 : widget.request.value;
 
     await Navigator.of(context).pushNamed(RequestPage.tag, arguments: r).then(c);
   }

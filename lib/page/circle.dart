@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/model/profile/simple.dart';
 import 'package:spectrome/page/profile.dart';
 import 'package:spectrome/page/sign_in.dart';
-import 'package:spectrome/service/profile/following.dart';
+import 'package:spectrome/service/profile/circle.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
@@ -14,24 +14,24 @@ import 'package:spectrome/util/error.dart';
 import 'package:spectrome/util/http.dart';
 import 'package:spectrome/util/storage.dart';
 
-class FollowingPage extends StatefulWidget {
-  static final tag = 'following';
+class CirclePage extends StatefulWidget {
+  static final tag = 'circle';
 
-  FollowingPage() : super();
+  CirclePage() : super();
 
   @override
-  _FollowingState createState() => new _FollowingState();
+  _CircleState createState() => new _CircleState();
 }
 
-class _FollowingState extends State<FollowingPage> {
+class _CircleState extends State<CirclePage> {
   // Scaffold key
   final _sk = new GlobalKey<ScaffoldState>();
 
   // Scroll controller
   final _sc = new ScrollController();
 
-  // List of following users
-  final _followings = <SimpleProfile>[];
+  // List of circle users
+  final _circles = <SimpleProfile>[];
 
   // Loading indicator
   bool _loading = true;
@@ -55,11 +55,9 @@ class _FollowingState extends State<FollowingPage> {
 
       _session = session;
 
-      // Get following users
-      _getFollowings();
+      // Get list of circle users
+      _getCircles();
     };
-
-    Storage.load().then(spc);
 
     // Argument callback
     final ac = (_) {
@@ -69,6 +67,8 @@ class _FollowingState extends State<FollowingPage> {
       if (profile != null) {
         _profile = profile;
       }
+
+      Storage.load().then(spc);
     };
 
     // Add callback for argument
@@ -82,7 +82,7 @@ class _FollowingState extends State<FollowingPage> {
       backgroundColor: ColorConst.white,
       body: new SafeArea(
         child: AppConst.loader(
-          page: FollowingPage.tag,
+          page: CirclePage.tag,
           argument: _loading,
           error: _error,
           callback: _getPage,
@@ -115,7 +115,7 @@ class _FollowingState extends State<FollowingPage> {
         border: new Border(bottom: BorderSide.none),
         leading: l,
         middle: new Text(
-          'Followings',
+          'Followers',
           style: new TextStyle(
             fontFamily: FontConst.primary,
             letterSpacing: 0.33,
@@ -131,16 +131,16 @@ class _FollowingState extends State<FollowingPage> {
           child: new ListView.builder(
             controller: _sc,
             physics: const ClampingScrollPhysics(),
-            itemCount: _followings.length,
-            itemBuilder: _followingBuilder,
+            itemCount: _circles.length,
+            itemBuilder: _circleBuilder,
           ),
         ),
       ),
     );
   }
 
-  // Following user widget builder
-  Widget _followingBuilder(BuildContext context, int index) {
+  // Circle user widget builder
+  Widget _circleBuilder(BuildContext context, int index) {
     // Http headers for image request
     final h = {Http.TOKEN_HEADER: _session};
 
@@ -161,7 +161,7 @@ class _FollowingState extends State<FollowingPage> {
       child: new ClipRRect(
         borderRadius: BorderRadius.circular(30.0),
         child: new Image.network(
-          _followings[index].photoUrl,
+          _circles[index].photoUrl,
           headers: h,
           width: 40.0,
           height: 40.0,
@@ -176,7 +176,7 @@ class _FollowingState extends State<FollowingPage> {
 
     // Username text
     final un = new Text(
-      _followings[index].username,
+      _circles[index].username,
       style: new TextStyle(
         fontFamily: FontConst.primary,
         color: ColorConst.black,
@@ -187,7 +187,7 @@ class _FollowingState extends State<FollowingPage> {
 
     // Real name text
     final nm = new Text(
-      _followings[index].name,
+      _circles[index].name,
       style: new TextStyle(
         fontFamily: FontConst.primary,
         color: ColorConst.darkGray,
@@ -218,9 +218,9 @@ class _FollowingState extends State<FollowingPage> {
       button: true,
       child: new GestureDetector(
         onTap: () async {
-          dev.log('User "${_followings[index].username}" selected.');
+          dev.log('User "${_circles[index].username}" selected.');
 
-          final u = _followings[index].username;
+          final u = _circles[index].username;
 
           // Route to profile page
           await Navigator.of(context).pushNamed(ProfilePage.tag, arguments: u);
@@ -245,13 +245,13 @@ class _FollowingState extends State<FollowingPage> {
     );
   }
 
-  /// Get following users
-  void _getFollowings() async {
-    dev.log('Following users are loading.');
+  /// Get circle users
+  void _getCircles() async {
+    dev.log('Circle users are loading.');
 
     // Handle HTTP response
-    final sc = (FollowingUserResponse r) async {
-      dev.log('Following users request sent.');
+    final sc = (CircleUserResponse r) async {
+      dev.log('Circle users request sent.');
 
       if (!r.status) {
         // Route to sign page, if session is expired
@@ -272,13 +272,13 @@ class _FollowingState extends State<FollowingPage> {
         return;
       }
 
-      // Update following users
-      _followings.addAll(r.users);
+      // Update follower users
+      _circles.addAll(r.users);
     };
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown followings load error. Please try again later.';
+      final msg = 'Unknown circle load error. Please try again later.';
 
       dev.log(msg, stackTrace: s);
 
@@ -297,7 +297,7 @@ class _FollowingState extends State<FollowingPage> {
     };
 
     // Prepare request
-    final r = FollowingUserService.call(
+    final r = CircleUserService.call(
       session: _session,
       username: _profile.username,
     );

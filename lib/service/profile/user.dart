@@ -43,10 +43,10 @@ class UserProfileResponse extends BasicResponse {
   // User profile details
   UserProfile profile;
 
-  // User following
-  bool follow;
+  // User is in circle
+  bool circle;
 
-  // User follow request sent
+  // User circle request sent
   bool request;
 
   /// Create empty object
@@ -62,7 +62,7 @@ class UserProfileResponse extends BasicResponse {
   UserProfileResponse.fromJson(String input) {
     final json = super.fromJson(input);
 
-    follow = json['follow'] ?? false;
+    circle = json['circle'] ?? false;
     request = json['request'] ?? false;
 
     final p = json['user'] as Map<String, dynamic>;
@@ -73,8 +73,7 @@ class UserProfileResponse extends BasicResponse {
         name: p['name'] as String,
         photoUrl: p['photo_url'] as String,
         posts: p['posts'] as int,
-        followers: p['followers'] as int,
-        followings: p['followings'] as int,
+        circles: p['circles'] as int,
       );
     }
   }
