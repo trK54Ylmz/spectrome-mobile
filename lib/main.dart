@@ -16,7 +16,7 @@ import 'package:spectrome/page/forgot.dart';
 import 'package:spectrome/page/guide.dart';
 import 'package:spectrome/page/home.dart';
 import 'package:spectrome/page/me.dart';
-import 'package:spectrome/page/message.dart';
+import 'package:spectrome/page/history.dart';
 import 'package:spectrome/page/profile.dart';
 import 'package:spectrome/page/request.dart';
 import 'package:spectrome/page/search.dart';
@@ -52,7 +52,7 @@ final routes = <String, WidgetBuilder>{
   HomePage.tag: (c) => new HomePage(),
   InvitePage.tag: (c) => new InvitePage(),
   MePage.tag: (c) => new MePage(),
-  MessagePage.tag: (c) => new MessagePage(),
+  HistoryPage.tag: (c) => new HistoryPage(),
   ProfilePage.tag: (c) => new ProfilePage(),
   RequestPage.tag: (c) => new RequestPage(),
   ResetPage.tag: (c) => new ResetPage(),

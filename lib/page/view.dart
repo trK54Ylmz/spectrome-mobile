@@ -24,7 +24,7 @@ class _ViewState extends State<ViewPage> {
   // Select home page as initial page
   final _pc = new PageController(initialPage: 1);
 
-  // Number of active follow requests
+  // Number of active incoming requests
   final _request = new ValueNotifier<int>(0);
 
   // Account session key
@@ -40,7 +40,7 @@ class _ViewState extends State<ViewPage> {
       // Load number of requests
       _getRequests();
 
-      // Set periodic tasks for follow requests
+      // Set periodic tasks for incoming requests
       Timer.periodic(Duration(seconds: 30), (_) => _getRequests());
     };
 
@@ -63,13 +63,13 @@ class _ViewState extends State<ViewPage> {
     );
   }
 
-  /// Get number of follow requests sent to user
+  /// Get number of incoming circle requests sent to user
   void _getRequests() async {
-    dev.log('Follow request count is loading.');
+    dev.log('Circle request count is loading.');
 
     // Handle HTTP response
     final sc = (IntentionCountResponse r) async {
-      dev.log('Follow request count request sent.');
+      dev.log('Circle request count request sent.');
 
       if (!r.status) {
         return;

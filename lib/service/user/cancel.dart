@@ -5,7 +5,7 @@ import 'package:spectrome/service/response.dart';
 import 'package:spectrome/util/http.dart';
 
 class IntentionCancelService extends Service {
-  /// Cancel user follow request by username
+  /// Cancel user circle request by username
   static Future<IntentionCancelResponse> call(String session, String username) {
     final path = '/users/cancel/p/$username';
     final headers = {Http.TOKEN_HEADER: session};

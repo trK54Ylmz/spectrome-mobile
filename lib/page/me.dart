@@ -85,7 +85,7 @@ class _MeState extends State<MePage> {
     super.initState();
 
     if (widget.request != null) {
-      // Add status listener for follower request count
+      // Add status listener for incoming request count
       widget.request.addListener(() {
         setState(() => _count = widget.request.value);
       });
@@ -299,7 +299,7 @@ class _MeState extends State<MePage> {
       ),
     );
 
-    // Follow button container
+    // Circle button container
     final b = new Container(
       child: new Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -515,9 +515,9 @@ class _MeState extends State<MePage> {
         onPressed: _closeSettings,
       );
 
-      // Follow requets text
+      // Circle requets text
       final rbt = new Text(
-        'Follow requests',
+        'Incoming requests',
         style: new TextStyle(
           fontFamily: FontConst.primary,
           color: ColorConst.darkerGray,
@@ -526,7 +526,7 @@ class _MeState extends State<MePage> {
         ),
       );
 
-      // Follow request button request count
+      // Circle request button request count
       final rbc = new Padding(
         padding: EdgeInsets.all(6.0),
         child: new ClipRRect(
@@ -550,12 +550,12 @@ class _MeState extends State<MePage> {
         ),
       );
 
-      // Follow request button
+      // Circle request button
       final rb = new Semantics(
         button: true,
         focusable: true,
         child: new GestureDetector(
-          onTap: _followRequests,
+          onTap: _circleRequests,
           behavior: HitTestBehavior.opaque,
           child: new Container(
             height: 40.0,
@@ -775,8 +775,8 @@ class _MeState extends State<MePage> {
     await Navigator.of(context).pushNamed(UpdatePage.tag);
   }
 
-  /// Go to follow requests page
-  void _followRequests() async {
+  /// Go to circle requests page
+  void _circleRequests() async {
     final c = (_) {
       if (widget.request == null) {
         return;

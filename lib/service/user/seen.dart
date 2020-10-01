@@ -28,7 +28,7 @@ class IntentionSeenService extends Service {
     final e = (e, StackTrace s) {
       final r = IntentionSeenResponse.empty();
 
-      dev.log('Follow intention seen error.', error: e, stackTrace: s);
+      dev.log('Circle intention seen error.', error: e, stackTrace: s);
 
       return Service.handleError<IntentionSeenResponse>(e, s, r);
     };
