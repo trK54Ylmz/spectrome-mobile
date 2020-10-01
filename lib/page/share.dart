@@ -268,7 +268,7 @@ class _ShareState extends State<SharePage> {
         style: new TextStyle(
           fontFamily: FontConst.primary,
           color: ColorConst.darkGray,
-          fontSize: 14.0,
+          fontSize: 13.0,
           letterSpacing: 0.33,
         ),
       ),
@@ -277,7 +277,14 @@ class _ShareState extends State<SharePage> {
     // Disposible button
     final db = new Button(
       text: _disposible ? 'Yes'.toUpperCase() : 'No'.toUpperCase(),
-      width: 64.0,
+      width: 60.0,
+      fontSize: 12.0,
+      padding: EdgeInsets.all(6.0),
+      color: _disposible ? ColorConst.white : ColorConst.darkGray,
+      background: _disposible ? ColorConst.yellow : ColorConst.white,
+      border: Border.all(
+        color: _disposible ? ColorConst.yellow : ColorConst.gray,
+      ),
       onPressed: () {
         if (_loading) {
           return;
@@ -286,12 +293,6 @@ class _ShareState extends State<SharePage> {
         // Update disposibility
         setState(() => _disposible = !_disposible);
       },
-      padding: EdgeInsets.all(6.0),
-      color: _disposible ? ColorConst.white : ColorConst.darkGray,
-      background: _disposible ? ColorConst.button : ColorConst.white,
-      border: Border.all(
-        color: _disposible ? ColorConst.button : ColorConst.gray,
-      ),
     );
 
     // Disposibility row
@@ -310,30 +311,17 @@ class _ShareState extends State<SharePage> {
       ),
     );
 
-    final ts = new TextStyle(
-      fontFamily: FontConst.primary,
-      fontSize: 14.0,
-      letterSpacing: 0.33,
-    );
-
-    final hs = new TextStyle(
-      fontFamily: FontConst.primary,
-      fontSize: 14.0,
-      letterSpacing: 0.33,
-      color: ColorConst.gray,
-    );
-
     final tsn = new TextStyle(
       fontFamily: FontConst.primary,
       color: ColorConst.darkGray,
-      fontSize: 14.0,
+      fontSize: 13.0,
       letterSpacing: 0.33,
     );
 
     final tsb = new TextStyle(
       fontFamily: FontConst.primary,
       color: ColorConst.darkGray,
-      fontSize: 14.0,
+      fontSize: 13.0,
       letterSpacing: 0.33,
       fontWeight: FontWeight.bold,
     );
@@ -385,8 +373,15 @@ class _ShareState extends State<SharePage> {
 
     // Share with friends button
     final sb = new Button(
-      text: _restricted ? 'Yes'.toUpperCase() : 'No'.toUpperCase(),
-      width: 64.0,
+      text: _restricted ? 'Edit'.toUpperCase() : 'Select'.toUpperCase(),
+      width: 60.0,
+      fontSize: 12.0,
+      padding: EdgeInsets.all(6.0),
+      color: _restricted ? ColorConst.white : ColorConst.darkGray,
+      background: _restricted ? ColorConst.button : ColorConst.white,
+      border: Border.all(
+        color: _restricted ? ColorConst.button : ColorConst.gray,
+      ),
       onPressed: () async {
         if (_loading) {
           return;
@@ -407,12 +402,6 @@ class _ShareState extends State<SharePage> {
         // Show restriction bottom sheet to add or remove users
         showCupertinoModalPopup(context: context, builder: b).then(c);
       },
-      padding: EdgeInsets.all(6.0),
-      color: _restricted ? ColorConst.white : ColorConst.darkGray,
-      background: _restricted ? ColorConst.button : ColorConst.white,
-      border: Border.all(
-        color: _restricted ? ColorConst.button : ColorConst.gray,
-      ),
     );
 
     // Share with friends row
@@ -445,6 +434,19 @@ class _ShareState extends State<SharePage> {
     } else {
       cm = 'share a message with your friends';
     }
+
+    final ts = new TextStyle(
+      fontFamily: FontConst.primary,
+      fontSize: 14.0,
+      letterSpacing: 0.33,
+    );
+
+    final hs = new TextStyle(
+      fontFamily: FontConst.primary,
+      fontSize: 14.0,
+      letterSpacing: 0.33,
+      color: ColorConst.gray,
+    );
 
     // Comment text field
     final ct = new Padding(
@@ -488,8 +490,8 @@ class _ShareState extends State<SharePage> {
                 ptl,
                 i,
                 pt,
-                ds,
                 sf,
+                ds,
                 pt,
                 ct,
                 pt,
@@ -1181,7 +1183,7 @@ class _ShareState extends State<SharePage> {
     );
 
     final gt = new Text(
-      'Your can search on users in your circle',
+      'Your can search to users in your circle',
       style: new TextStyle(
         fontFamily: FontConst.primary,
         fontSize: 12.0,

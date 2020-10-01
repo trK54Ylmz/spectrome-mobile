@@ -44,7 +44,7 @@ class CircleUserService extends Service {
 }
 
 class CircleUserResponse extends BasicResponse {
-  // List of users in circles
+  // List of users in circle
   List<SimpleProfile> users;
 
   /// Create empty object
