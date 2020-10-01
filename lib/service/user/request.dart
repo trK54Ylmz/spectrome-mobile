@@ -7,7 +7,7 @@ import 'package:spectrome/service/response.dart';
 import 'package:spectrome/util/http.dart';
 
 class IntentionService extends Service {
-  /// Get following requests by using session code
+  /// Get incoing circle requests by using session code
   static Future<IntentionResponse> call(String session) {
     final path = '/users/request';
     final headers = {Http.TOKEN_HEADER: session};
@@ -26,7 +26,7 @@ class IntentionService extends Service {
     final e = (e, StackTrace s) {
       final r = IntentionResponse.empty();
 
-      dev.log('Follow intention error.', error: e, stackTrace: s);
+      dev.log('Circle intention error.', error: e, stackTrace: s);
 
       return Service.handleError<IntentionResponse>(e, s, r);
     };

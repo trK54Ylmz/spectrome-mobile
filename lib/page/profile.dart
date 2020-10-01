@@ -14,8 +14,8 @@ import 'package:spectrome/page/sign_in.dart';
 import 'package:spectrome/service/post/shared.dart';
 import 'package:spectrome/service/profile/user.dart';
 import 'package:spectrome/service/user/cancel.dart';
-import 'package:spectrome/service/user/follow.dart';
-import 'package:spectrome/service/user/unfollow.dart';
+import 'package:spectrome/service/user/add.dart';
+import 'package:spectrome/service/user/remove.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
@@ -42,7 +42,7 @@ class _ProfileState extends State<ProfilePage> {
   // Is user in circle
   bool _circled = false;
 
-  // Is following request sent
+  // Is circle request sent
   bool _requested = false;
 
   // Loading indicator
@@ -246,7 +246,7 @@ class _ProfileState extends State<ProfilePage> {
     );
 
     final fl = new Button(
-      text: 'Follow',
+      text: 'Add',
       disabled: _action,
       fontSize: 13.0,
       padding: EdgeInsets.all(6.0),
@@ -255,7 +255,7 @@ class _ProfileState extends State<ProfilePage> {
       border: new Border.all(
         color: ColorConst.button,
       ),
-      onPressed: _follow,
+      onPressed: _addCircle,
     );
 
     final rq = new Button(
@@ -272,7 +272,7 @@ class _ProfileState extends State<ProfilePage> {
     );
 
     final uf = new Button(
-      text: 'Unfollow',
+      text: 'Remove',
       disabled: _action,
       fontSize: 13.0,
       padding: EdgeInsets.all(6.0),
@@ -281,7 +281,7 @@ class _ProfileState extends State<ProfilePage> {
       border: new Border.all(
         color: ColorConst.button,
       ),
-      onPressed: _unfollow,
+      onPressed: _removeCircle,
     );
 
     final fb = new Expanded(
@@ -292,7 +292,7 @@ class _ProfileState extends State<ProfilePage> {
       ),
     );
 
-    // Follow button container
+    // Circle button container
     final b = new Container(
       child: new Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -568,9 +568,9 @@ class _ProfileState extends State<ProfilePage> {
     request.then(sc).catchError(e).whenComplete(cc);
   }
 
-  /// Follow user
-  void _follow() async {
-    dev.log('Follow button clicked.');
+  /// Add user in circle
+  void _addCircle() async {
+    dev.log('Add circle button clicked.');
 
     if (_action) {
       return;
@@ -578,10 +578,10 @@ class _ProfileState extends State<ProfilePage> {
 
     setState(() => _action = true);
 
-    dev.log('Follow request sending.');
+    dev.log('Add circle request sending.');
 
-    final sc = (FollowingResponse r) async {
-      dev.log('Follow request sent.');
+    final sc = (CircleAddResponse r) async {
+      dev.log('Add circle request sent.');
 
       if (!r.status) {
         if (r.isNetErr ?? false) {
@@ -601,7 +601,7 @@ class _ProfileState extends State<ProfilePage> {
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown follow error. Please try again later.';
+      final msg = 'Unknown add circle error. Please try again later.';
 
       dev.log(msg, stackTrace: s);
 
@@ -619,14 +619,14 @@ class _ProfileState extends State<ProfilePage> {
     };
 
     // Prepare request
-    final s = FollowingService.call(_session, _username);
+    final s = CircleAddService.call(_session, _username);
 
     await s.then(sc).catchError(e).whenComplete(cc);
   }
 
-  /// Unfollow current user
-  void _unfollow() async {
-    dev.log('Unfollow button clicked.');
+  /// Remove user from circle
+  void _removeCircle() async {
+    dev.log('Remove circle button clicked.');
 
     if (_action) {
       return;
@@ -634,10 +634,10 @@ class _ProfileState extends State<ProfilePage> {
 
     setState(() => _action = true);
 
-    dev.log('Unfollow request sending.');
+    dev.log('Remove circle request sending.');
 
-    final sc = (UnfollowingResponse r) async {
-      dev.log('Unfollow request sent.');
+    final sc = (CircleRemoveResponse r) async {
+      dev.log('Remove circle request sent.');
 
       if (!r.status) {
         if (r.isNetErr ?? false) {
@@ -657,7 +657,7 @@ class _ProfileState extends State<ProfilePage> {
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown unfollow error. Please try again later.';
+      final msg = 'Unknown remove circle error. Please try again later.';
 
       dev.log(msg, stackTrace: s);
 
@@ -675,12 +675,12 @@ class _ProfileState extends State<ProfilePage> {
     };
 
     // Prepare request
-    final s = UnfollowingService.call(_session, _username);
+    final s = CircleRemoveService.call(_session, _username);
 
     await s.then(sc).catchError(e).whenComplete(cc);
   }
 
-  /// Cancel follow request
+  /// Cancel circle request
   void _cancel() async {
     dev.log('Intention cancel button clicked.');
 

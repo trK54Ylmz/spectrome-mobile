@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:spectrome/page/message.dart';
+import 'package:spectrome/page/history.dart';
 import 'package:spectrome/page/search.dart';
 import 'package:spectrome/page/waterfall.dart';
 import 'package:spectrome/theme/color.dart';
@@ -11,7 +11,7 @@ class HomePage extends StatefulWidget {
   // View page controller
   final PageController controller;
 
-  // Number of active follow requests
+  // Number of incoming requests
   final ValueNotifier<int> request;
 
   HomePage({this.controller, this.request}) : super();
@@ -108,7 +108,7 @@ class _HomeState extends State<HomePage> {
             return new SearchPage();
             break;
           case 2:
-            return new MessagePage();
+            return new HistoryPage();
             break;
           default:
             return new WaterFallPage(

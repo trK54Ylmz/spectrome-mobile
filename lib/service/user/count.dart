@@ -5,7 +5,7 @@ import 'package:spectrome/service/response.dart';
 import 'package:spectrome/util/http.dart';
 
 class IntentionCountService extends Service {
-  /// Get follow requuest count by using session code
+  /// Get incoming circle requuest count by using session code
   static Future<IntentionCountResponse> call(String session) {
     final path = '/users/request/count';
     final headers = {Http.TOKEN_HEADER: session};
@@ -28,7 +28,7 @@ class IntentionCountService extends Service {
     final e = (e, StackTrace s) {
       final r = IntentionCountResponse.empty();
 
-      dev.log('Follow intention count error.', error: e, stackTrace: s);
+      dev.log('Circle intention count error.', error: e, stackTrace: s);
 
       return Service.handleError<IntentionCountResponse>(e, s, r);
     };

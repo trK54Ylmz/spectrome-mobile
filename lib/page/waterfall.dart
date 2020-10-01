@@ -18,7 +18,7 @@ class WaterFallPage extends StatefulWidget {
   // View page controller
   final PageController controller;
 
-  // Number of active follow requests
+  // Number of incoming circle requests
   final ValueNotifier<int> request;
 
   WaterFallPage({this.controller, this.request}) : super();
@@ -53,7 +53,7 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
   void initState() {
     super.initState();
 
-    // Add status listener for follower request count
+    // Add status listener for incoming request count
     widget.request.addListener(() {
       setState(() => null);
     });
@@ -248,7 +248,7 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
         new TextSpan(
           children: [
             new TextSpan(
-              text: 'You can find and follow users by using',
+              text: 'You can find and add users in your circle by using',
             ),
             new WidgetSpan(
               child: new Padding(
@@ -267,12 +267,11 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
         ),
         textAlign: TextAlign.center,
         style: new TextStyle(
-          fontFamily: FontConst.primary,
-          fontSize: 12.0,
-          letterSpacing: 0.33,
-          color: ColorConst.gray,
-          height: 1.6
-        ),
+            fontFamily: FontConst.primary,
+            fontSize: 12.0,
+            letterSpacing: 0.33,
+            color: ColorConst.gray,
+            height: 1.6),
       ),
     );
 

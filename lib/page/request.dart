@@ -57,7 +57,7 @@ class _RequestState extends State<RequestPage> {
 
       setState(() => _session = session);
 
-      // Load follow requests from API
+      // Load circle requests from API
       _getRequests();
 
       if (_count > 0) {
@@ -157,7 +157,7 @@ class _RequestState extends State<RequestPage> {
     );
   }
 
-  /// Follow request users list builder
+  /// Incoming request users list builder
   Widget _requestBuilder(BuildContext context, int i) {
     final width = MediaQuery.of(context).size.width;
 
@@ -300,13 +300,13 @@ class _RequestState extends State<RequestPage> {
     _sk.currentState.showSnackBar(snackBar);
   }
 
-  /// Get list of follow requests
+  /// Get list of incoming requests
   void _getRequests() async {
-    dev.log('Follow requests is loading.');
+    dev.log('Circle requests is loading.');
 
     // Handle HTTP response
     final sc = (IntentionResponse r) async {
-      dev.log('Follow requests request sent.');
+      dev.log('Circle requests request sent.');
 
       if (!r.status) {
         // Route to sign page, if session is expired
@@ -362,11 +362,11 @@ class _RequestState extends State<RequestPage> {
 
   /// Set request count as seen
   void _setSeen() async {
-    dev.log('Follow requests seen request sending.');
+    dev.log('Circle requests seen request sending.');
 
     // Handle HTTP response
     final sc = (IntentionSeenResponse r) async {
-      dev.log('Follow requests seen request sent.');
+      dev.log('Circle requests seen request sent.');
 
       if (!r.status) {
         // Route to sign page, if session is expired
@@ -383,22 +383,22 @@ class _RequestState extends State<RequestPage> {
     await IntentionSeenService.call(_session).then(sc);
   }
 
-  /// Accept following request
+  /// Accept incoming circle request
   void _accept(int index) async {
-    dev.log('Follow accept button clicked.');
+    dev.log('Accept circle button clicked.');
 
     if (_action) {
       return;
     }
 
-    dev.log('Follow accept request sending.');
+    dev.log('Accept circle request sending.');
 
     // Set loading true
     setState(() => _action = true);
 
     // Handle HTTP response
-    final c = (FollowAcceptResponse r) async {
-      dev.log('Follow accept request sent.');
+    final c = (CircleAcceptResponse r) async {
+      dev.log('Accept circle request sent.');
 
       if (!r.status) {
         if (r.isNetErr ?? false) {
@@ -418,7 +418,7 @@ class _RequestState extends State<RequestPage> {
 
     // Error callback
     final e = (e, s) {
-      final msg = 'Unknown following accept error. Please try again later.';
+      final msg = 'Unknown circle accept error. Please try again later.';
 
       dev.log(msg, stackTrace: s);
 
@@ -437,7 +437,7 @@ class _RequestState extends State<RequestPage> {
     };
 
     // Prepare request
-    final s = FollowAcceptService.call(_session, _requests[index].intention.code);
+    final s = CircleAcceptService.call(_session, _requests[index].intention.code);
 
     s.then(c).catchError(e).whenComplete(cc);
   }

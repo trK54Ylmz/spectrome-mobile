@@ -5,7 +5,7 @@ class Intention {
 
   final DateTime createTime;
 
-  /// Create follow intention object
+  /// Create circle intention object
   const Intention({
     this.code,
     this.createTime,

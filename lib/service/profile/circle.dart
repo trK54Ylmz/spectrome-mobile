@@ -6,7 +6,7 @@ import 'package:spectrome/service/response.dart';
 import 'package:spectrome/util/http.dart';
 
 class CircleUserService extends Service {
-  /// Get list of follower users
+  /// Get list of users in circle
   static Future<CircleUserResponse> call({
     String session,
     String username,
@@ -28,7 +28,7 @@ class CircleUserService extends Service {
     final e = (e, StackTrace s) {
       final r = CircleUserResponse.empty();
 
-      dev.log('Following users error.', error: e, stackTrace: s);
+      dev.log('Circle users error.', error: e, stackTrace: s);
 
       return Service.handleError<CircleUserResponse>(e, s, r);
     };
@@ -44,7 +44,7 @@ class CircleUserService extends Service {
 }
 
 class CircleUserResponse extends BasicResponse {
-  // List of follower users
+  // List of users in circles
   List<SimpleProfile> users;
 
   /// Create empty object

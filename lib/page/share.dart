@@ -11,7 +11,7 @@ import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/item/video.dart';
 import 'package:spectrome/model/profile/simple.dart';
 import 'package:spectrome/page/view.dart';
-import 'package:spectrome/service/query/following.dart';
+import 'package:spectrome/service/query/circle.dart';
 import 'package:spectrome/service/share/share.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
@@ -366,7 +366,7 @@ class _ShareState extends State<SharePage> {
       );
     } else {
       sm = new Text(
-        'Share post with only few followers?',
+        'Select users in your circle to share with',
         style: tsn,
       );
     }
@@ -1172,7 +1172,7 @@ class _ShareState extends State<SharePage> {
         }
 
         // Send request and collect suggestions
-        _searchFollowers();
+        _search();
 
         setState(() => null);
 
@@ -1181,7 +1181,7 @@ class _ShareState extends State<SharePage> {
     );
 
     final gt = new Text(
-      'Your can search in your followers',
+      'Your can search on users in your circle',
       style: new TextStyle(
         fontFamily: FontConst.primary,
         fontSize: 12.0,
@@ -1549,7 +1549,7 @@ class _ShareState extends State<SharePage> {
   }
 
   /// Fetch users by using query filter
-  void _searchFollowers() {
+  void _search() {
     dev.log('User search triggered.');
 
     if (_action) {
@@ -1562,7 +1562,7 @@ class _ShareState extends State<SharePage> {
     setState(() => _action = true);
 
     // Handle HTTP response
-    final c = (FollowingQueryResponse r) async {
+    final c = (CircleQueryResponse r) async {
       dev.log('User search request sent.');
 
       if (!r.status) {
@@ -1605,7 +1605,7 @@ class _ShareState extends State<SharePage> {
     };
 
     // Prepare request
-    final s = FollowingQueryService.call(_session, _sc.text);
+    final s = CircleQueryService.call(_session, _sc.text);
 
     s.then(c).catchError(e).whenComplete(cc);
   }

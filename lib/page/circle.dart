@@ -115,7 +115,7 @@ class _CircleState extends State<CirclePage> {
         border: new Border(bottom: BorderSide.none),
         leading: l,
         middle: new Text(
-          'Followers',
+          'Your circle',
           style: new TextStyle(
             fontFamily: FontConst.primary,
             letterSpacing: 0.33,
@@ -272,7 +272,7 @@ class _CircleState extends State<CirclePage> {
         return;
       }
 
-      // Update follower users
+      // Update users in your circle
       _circles.addAll(r.users);
     };
 
