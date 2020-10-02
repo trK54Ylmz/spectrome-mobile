@@ -16,7 +16,8 @@ dependencies:
   crypto: ^2.1.5
   path_provider: ^1.6.14
   better_player: ^0.0.13
-  flutter_local_notifications: ^1.4.4+2
+  firebase_messaging: ^7.0.2
+  firebase_crashlytics: ^0.2.1
   flutter_swipe_action_cell: ^1.0.8
 
 dev_dependencies:

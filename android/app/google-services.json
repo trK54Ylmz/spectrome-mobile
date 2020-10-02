@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "541925923381",
+    "firebase_url": "https://spectrome-app.firebaseio.com",
+    "project_id": "spectrome-app",
+    "storage_bucket": "spectrome-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:541925923381:android:56c8a4b7b97a3ab5b06f7c",
+        "android_client_info": {
+          "package_name": "com.spectromeapp.spectrome"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "541925923381-o00sj8ovi9ua8tg9uikiopmo1timbdqb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8IdxOGACk2nqmA7BMG4H6fmRgbD0t_60"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "541925923381-o00sj8ovi9ua8tg9uikiopmo1timbdqb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "541925923381-1eniqm52ffkvlr8ilnhh78t4u4l3tgq2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.spectromeapp.spectrome"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
