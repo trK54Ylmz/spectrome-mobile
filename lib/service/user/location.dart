@@ -9,7 +9,11 @@ class LocationService extends Service {
   static Future<LocationResponse> call(String session, String country, String language) {
     final path = '/users/location';
     final headers = {Http.TOKEN_HEADER: session};
-    final body = {'session': session, 'country': country, 'language': language};
+    final body = {
+      'session': session,
+      'country': country,
+      'language': language,
+    };
 
     // Http response handle callback
     final c = (Response r) {

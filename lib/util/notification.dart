@@ -1,23 +1,51 @@
 import 'dart:developer' as dev;
 
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:spectrome/service/user/notification.dart';
 
-class Notification {
-  /// Initialize plugin
-  Future<void> init(FlutterLocalNotificationsPlugin p) async {
-    final ir = (int id, String title, String body, String payload) async {};
+class NotificationSystem {
+  static final _fb = new FirebaseMessaging();
 
-    final oc = (String payload) async {
-      dev.log(payload);
+  /// Initialize firebase
+  static Future<void> init(String session) async {
+    dev.log('Firebase cloud message initializing.');
+
+    // Request permissiopn notification
+    _fb.requestNotificationPermissions();
+
+    // Create configurations of firebase
+    _fb.configure();
+
+    // Token callback
+    final c = (String token) async {
+      dev.log('Token update request sending.');
+
+      final cc = (NotificationTokenResponse r) {
+        // create log according to status
+        if (r.status) {
+          dev.log('Notification token is updated.');
+        } else {
+          dev.log('Notification token could not updated.');
+        }
+      };
+
+      // Error callback
+      final e = (Object e, StackTrace s) {
+        dev.log(e);
+      };
+
+      // Prepare request
+      final r = NotificationTokenService.call(
+        session: session,
+        token: token,
+      );
+
+      await r.then(cc).catchError(e);
     };
 
-    var a = new AndroidInitializationSettings('ic_launcher');
-    var i = IOSInitializationSettings(onDidReceiveLocalNotification: ir);
+    dev.log('Firebase token is loading.');
 
-    // Initialize platform settings
-    var s = new InitializationSettings(a, i);
-
-    // Initialize plugin
-    await p.initialize(s, onSelectNotification: oc);
+    // Get device token
+    _fb.getToken().then(c);
   }
 }

@@ -10,6 +10,7 @@ import 'package:spectrome/service/user/location.dart';
 import 'package:spectrome/service/account/session.dart';
 import 'package:spectrome/util/const.dart';
 import 'package:spectrome/util/error.dart';
+import 'package:spectrome/util/notification.dart';
 import 'package:spectrome/util/route.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/util/storage.dart';
@@ -66,6 +67,9 @@ class _SessionState extends State<SessionPage> {
         r = routes[SignInPage.tag](context);
       } else {
         r = routes[ViewPage.tag](context);
+
+        // Initialize notification system
+        NotificationSystem.init(res.session);
 
         // Detect location and send by using session code
         final language = ui.window.locale.languageCode;
