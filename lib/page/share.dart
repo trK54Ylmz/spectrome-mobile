@@ -76,8 +76,8 @@ class _ShareState extends State<SharePage> {
   // Action loading indicator
   bool _action = false;
 
-  // Post is disposible
-  bool _disposible = false;
+  // Post is disposable
+  bool _disposable = false;
 
   // Post is restricted for users
   bool _restricted = false;
@@ -274,16 +274,16 @@ class _ShareState extends State<SharePage> {
       ),
     );
 
-    // Disposible button
+    // Disposable button
     final db = new Button(
-      text: _disposible ? 'Yes'.toUpperCase() : 'No'.toUpperCase(),
+      text: _disposable ? 'Yes'.toUpperCase() : 'No'.toUpperCase(),
       width: 60.0,
       fontSize: 12.0,
       padding: EdgeInsets.all(6.0),
-      color: _disposible ? ColorConst.white : ColorConst.darkGray,
-      background: _disposible ? ColorConst.yellow : ColorConst.white,
+      color: _disposable ? ColorConst.white : ColorConst.darkGray,
+      background: _disposable ? ColorConst.yellow : ColorConst.white,
       border: Border.all(
-        color: _disposible ? ColorConst.yellow : ColorConst.gray,
+        color: _disposable ? ColorConst.yellow : ColorConst.gray,
       ),
       onPressed: () {
         if (_loading) {
@@ -291,7 +291,7 @@ class _ShareState extends State<SharePage> {
         }
 
         // Update disposibility
-        setState(() => _disposible = !_disposible);
+        setState(() => _disposable = !_disposable);
       },
     );
 
@@ -1673,7 +1673,7 @@ class _ShareState extends State<SharePage> {
     // Create http request
     final r = ShareService.call(
       session: _session,
-      disposible: _disposible,
+      disposable: _disposable,
       restricted: _restricted,
       comment: _cc.text,
       size: _size,

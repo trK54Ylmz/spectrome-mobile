@@ -10,7 +10,7 @@ class ShareService extends Service {
   /// Create new post
   static Future<SharePostResponse> call({
     String session,
-    bool disposible,
+    bool disposable,
     bool restricted,
     String comment,
     String message,
@@ -24,7 +24,7 @@ class ShareService extends Service {
       Http.TOKEN_HEADER: session,
     };
     final body = <String, dynamic>{
-      'disposible': disposible,
+      'disposable': disposable,
       'restricted': restricted,
       'comment': comment,
       'message': message,
