@@ -33,7 +33,7 @@ class Post {
 
   final int size;
 
-  final bool disposible;
+  final bool disposable;
 
   final int users;
 
@@ -49,7 +49,7 @@ class Post {
   const Post({
     this.code,
     this.size,
-    this.disposible,
+    this.disposable,
     this.comments,
     this.users,
     this.items,

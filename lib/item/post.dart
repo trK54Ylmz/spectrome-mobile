@@ -139,7 +139,7 @@ class _PostState extends State<PostCard> {
     final ec = new Container();
 
     final dt = new Text(
-      'Disposible'.toUpperCase(),
+      'Disposable'.toUpperCase(),
       textAlign: TextAlign.right,
       style: new TextStyle(
         fontFamily: FontConst.primary,
@@ -151,7 +151,7 @@ class _PostState extends State<PostCard> {
     final ds = new Container(
       width: 64.0,
       height: 14.0,
-      child: widget.detail.post.disposible ? dt : ec,
+      child: widget.detail.post.disposable ? dt : ec,
     );
 
     final i = new Row(
