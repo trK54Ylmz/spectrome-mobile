@@ -17,6 +17,7 @@ import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
 import 'package:spectrome/util/error.dart';
+import 'package:spectrome/util/notification.dart';
 import 'package:spectrome/util/storage.dart';
 
 class SignInPage extends StatefulWidget {
@@ -322,6 +323,9 @@ class _SignInState extends State<SignInPage> {
 
       // Create new auth key
       _sp.setString('_session', r.session);
+
+      // Initialize notification system
+      NotificationSystem.init(r.session);
 
       // Show invitation control
       final ac = _sp.getBool('_ac');

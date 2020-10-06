@@ -835,6 +835,6 @@ class _MeState extends State<MePage> {
       await Navigator.of(context).pushNamedAndRemoveUntil(SignInPage.tag, r);
     };
 
-    await SignOutService.call().then(sc).catchError(e).whenComplete(cc);
+    await SignOutService.call(_session).then(sc).catchError(e).whenComplete(cc);
   }
 }

@@ -136,6 +136,8 @@ class _MainState extends State<MainPage> {
     );
 
     if (kReleaseMode) {
+      Http.domain = 'api.spectrome.app';
+
       // Select API endpoint domain, if app is in release mode
       return new CupertinoApp(
         title: 'Spectrome',
