@@ -6,8 +6,9 @@ import 'package:spectrome/util/http.dart';
 
 class SignOutService extends Service {
   /// Sign out from current session
-  static Future<BasicResponse> call() {
+  static Future<BasicResponse> call(String session) {
     final path = '/account/out';
+    final headers = {Http.TOKEN_HEADER: session};
 
     // Http response handle callback
     final c = (Response r) {
@@ -28,7 +29,7 @@ class SignOutService extends Service {
       return Service.handleError<BasicResponse>(e, s, r);
     };
 
-    final r = Http.doGet(path: path);
+    final r = Http.doGet(path: path, headers: headers);
 
     return r.then(c).catchError(e);
   }
