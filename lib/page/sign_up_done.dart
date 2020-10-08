@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spectrome/item/button.dart';
 import 'package:spectrome/item/loading.dart';
-import 'package:spectrome/page/sign_in.dart';
+import 'package:spectrome/page/session.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/storage.dart';
@@ -89,10 +89,10 @@ class _SignUpDoneState extends State<SignUpDonePage> {
       ),
     );
 
-    // Sign in button
-    final sib = new Button(
-      text: 'Sign In',
-      onPressed: () => Navigator.of(context).pushReplacementNamed(SignInPage.tag),
+    // Get started button
+    final gsb = new Button(
+      text: 'Get started',
+      onPressed: () => Navigator.of(context).pushReplacementNamed(SessionPage.tag),
     );
 
     return new Padding(
@@ -110,7 +110,7 @@ class _SignUpDoneState extends State<SignUpDonePage> {
           ptl,
           msg,
           ptl,
-          sib,
+          gsb,
         ],
       ),
     );

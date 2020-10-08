@@ -8,7 +8,7 @@ class SessionService extends Service {
   /// Check user session by using session code
   static Future<SessionResponse> call(String session) {
     final path = '/session/check';
-    final body = {'session': session};
+    final headers = {Http.TOKEN_HEADER: session};
 
     // Http response handle callback
     final c = (Response r) {
@@ -29,10 +29,9 @@ class SessionService extends Service {
       return Service.handleError<SessionResponse>(e, s, r);
     };
 
-    final r = Http.doPost(
+    final r = Http.doGet(
       path: path,
-      body: body,
-      type: Http.FORM,
+      headers: headers,
     );
 
     return r.then(c).catchError(e);
@@ -40,6 +39,13 @@ class SessionService extends Service {
 }
 
 class SessionResponse extends BasicResponse {
+  // Is account banned
+  bool banned;
+
+  // Is account removed
+  bool removed;
+
+  // Session key
   String session;
 
   /// Create empty object
@@ -56,5 +62,7 @@ class SessionResponse extends BasicResponse {
     final json = super.fromJson(input);
 
     session = json['session'] ?? null;
+    banned = json['banned'] ?? false;
+    removed = json['removed'] ?? false;
   }
 }
