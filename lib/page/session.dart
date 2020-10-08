@@ -55,21 +55,33 @@ class _SessionState extends State<SessionPage> {
       setState(() => _loading = false);
     };
 
-    final sc = (SharedPreferences sp, SessionResponse res) async {
+    final sc = (SharedPreferences sp, SessionResponse r) async {
       dev.log('Session check request sent.');
 
+      // Account is banned for a while
+      if (r.banned) {
+        dev.log('Account banned.');
+        return;
+      }
+
+      // Account removed completely
+      if (r.removed) {
+        dev.log('Account removed.');
+        return;
+      }
+
       // Update new session
-      sp.setString('_session', res.session);
+      sp.setString('_session', r.session);
 
       // Create route according to response
-      Widget r;
-      if (!res.status || res.expired ?? false) {
-        r = routes[SignInPage.tag](context);
+      var w;
+      if (!r.status || r.expired ?? false) {
+        w = routes[SignInPage.tag](context);
       } else {
-        r = routes[ViewPage.tag](context);
+        w = routes[ViewPage.tag](context);
 
         // Initialize notification system
-        NotificationSystem.init(res.session);
+        NotificationSystem.init(r.session);
 
         // Detect location and send by using session code
         final language = ui.window.locale.languageCode;
@@ -79,11 +91,11 @@ class _SessionState extends State<SessionPage> {
           dev.log('Location request sent.');
 
           // Update location by using session
-          LocationService.call(res.session, country.toLowerCase(), language);
+          LocationService.call(r.session, country.toLowerCase(), language);
         }
       }
 
-      final route = new DefaultRoute(widget: r);
+      final route = new DefaultRoute(widget: w);
 
       // Replace page with sign in screen
       await Navigator.of(context).pushReplacement(route);
