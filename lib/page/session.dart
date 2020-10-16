@@ -58,18 +58,6 @@ class _SessionState extends State<SessionPage> {
     final sc = (SharedPreferences sp, SessionResponse r) async {
       dev.log('Session check request sent.');
 
-      // Account is banned for a while
-      if (r.banned) {
-        dev.log('Account banned.');
-        return;
-      }
-
-      // Account removed completely
-      if (r.removed) {
-        dev.log('Account removed.');
-        return;
-      }
-
       // Update new session
       sp.setString('_session', r.session);
 

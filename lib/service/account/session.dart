@@ -39,12 +39,6 @@ class SessionService extends Service {
 }
 
 class SessionResponse extends BasicResponse {
-  // Is account banned
-  bool banned;
-
-  // Is account removed
-  bool removed;
-
   // Session key
   String session;
 
@@ -62,7 +56,5 @@ class SessionResponse extends BasicResponse {
     final json = super.fromJson(input);
 
     session = json['session'] ?? null;
-    banned = json['banned'] ?? false;
-    removed = json['removed'] ?? false;
   }
 }

@@ -118,10 +118,6 @@ class _ProfileState extends State<ProfilePage> {
       padding: EdgeInsets.only(top: 4.0),
     );
 
-    final pt = const Padding(
-      padding: EdgeInsets.only(top: 8.0),
-    );
-
     // Http headers for image request
     final h = {Http.TOKEN_HEADER: _session};
 
@@ -326,7 +322,6 @@ class _ProfileState extends State<ProfilePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             f,
-            pt,
             b,
           ],
         ),
@@ -376,6 +371,14 @@ class _ProfileState extends State<ProfilePage> {
           child: new Icon(
             IconData(0xf104, fontFamily: FontConst.fal),
             color: ColorConst.darkerGray,
+          ),
+        ),
+        middle: new Text(
+          'Profile',
+          style: new TextStyle(
+            fontFamily: FontConst.primary,
+            letterSpacing: 0.33,
+            fontSize: 16.0,
           ),
         ),
       ),

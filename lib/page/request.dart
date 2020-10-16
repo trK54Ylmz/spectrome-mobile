@@ -406,7 +406,7 @@ class _RequestState extends State<RequestPage> {
           _error = ErrorMessage.network();
         } else {
           // Create custom error
-          // _message = r.message;
+          _showSnackBar(r.message, isError: true);
         }
 
         return;

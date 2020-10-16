@@ -87,6 +87,10 @@ class _MeState extends State<MePage> {
     if (widget.request != null) {
       // Add status listener for incoming request count
       widget.request.addListener(() {
+        if (!this.mounted) {
+          return;
+        }
+
         setState(() => _count = widget.request.value);
       });
     }
