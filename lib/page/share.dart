@@ -10,6 +10,7 @@ import 'package:spectrome/item/input.dart';
 import 'package:spectrome/item/loading.dart';
 import 'package:spectrome/item/video.dart';
 import 'package:spectrome/model/profile/simple.dart';
+import 'package:spectrome/page/status.dart';
 import 'package:spectrome/page/view.dart';
 import 'package:spectrome/service/query/circle.dart';
 import 'package:spectrome/service/share/share.dart';
@@ -1643,7 +1644,7 @@ class _ShareState extends State<SharePage> {
       dev.log('Post created with ${r.code}.');
 
       // Route to view page with code arguments
-      await Navigator.of(context).pushReplacementNamed(ViewPage.tag);
+      await Navigator.of(context).pushReplacementNamed(StatusPage.tag, arguments: r.code);
     };
 
     // Error callback
