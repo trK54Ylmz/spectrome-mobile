@@ -140,7 +140,7 @@ class _StatusState extends State<StatusPage> {
       style: new TextStyle(
         fontFamily: FontConst.primary,
         fontSize: 14.0,
-        color: ColorConst.darkGray,
+        color: ColorConst.darkerGray,
       ),
     );
     
