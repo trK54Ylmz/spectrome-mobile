@@ -7,7 +7,7 @@ import 'package:spectrome/util/http.dart';
 class ShareStatusService extends Service {
   /// Get status of post creation
   static Future<ShareStatusResponse> call({String session, String code}) {
-    final path = '/share/status/$code';
+    final path = '/shares/status/$code';
     final headers = {Http.TOKEN_HEADER: session};
 
     // Http response handle callback
