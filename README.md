@@ -27,10 +27,10 @@ Screens for the application
 <p align="center">
     <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/7.png" width="264"></kbd>
     <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/8.png" width="264"></kbd>
-    <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/8.jpg" width="264"></kbd>
+    <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/9.png" width="264"></kbd>
 </p>
 <p align="center">
-    <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/9.jpg" width="264"></kbd>
+    <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/10.png" width="264"></kbd>
     <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/10.jpg" width="264"></kbd>
     <kbd><img src="https://github.com/trK54Ylmz/spectrome-mobile/raw/develop/assets/screens/11.jpg" width="264"></kbd>
 </p>
