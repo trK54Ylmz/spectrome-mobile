@@ -176,6 +176,7 @@ class _ShareState extends State<SharePage> {
         BottomNavigationBarItem(
           icon: new Center(
             child: new Loading(
+              color: ColorConst.transparent,
               iconWidth: 40.0,
               iconHeight: 40.0,
             ),
@@ -1621,6 +1622,13 @@ class _ShareState extends State<SharePage> {
     if (!_fk.currentState.validate()) {
       _loading = false;
       _showSnackBar(_fk.currentState.errors.first);
+      return;
+    }
+
+    // User must be selected
+    if (_users.isEmpty) {
+      _loading = false;
+      _showSnackBar('Please select users in your circle.');
       return;
     }
 

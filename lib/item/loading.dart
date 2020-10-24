@@ -10,11 +10,14 @@ class Loading extends StatelessWidget {
 
   final double iconHeight;
 
+  final Color color;
+
   const Loading({
     this.width,
     this.height,
     this.iconWidth = 60.0,
     this.iconHeight = 60.0,
+    this.color = ColorConst.white,
   });
 
   @override
@@ -22,7 +25,7 @@ class Loading extends StatelessWidget {
     return new Container(
       width: this.width,
       height: this.height,
-      color: ColorConst.white,
+      color: this.color,
       child: new Center(
         child: new Image.asset(
           'assets/images/loading.gif',
