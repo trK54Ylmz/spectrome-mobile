@@ -280,8 +280,8 @@ class GalleryState extends State<GalleryPage> {
 
         return new Padding(
           padding: EdgeInsets.only(
-            bottom: index < _thumbs.length - 3 ? 1.0 : 0.0,
-            left: index % 3 > 0 ? 1.0 : 0.0,
+            bottom: index < _thumbs.length - 2 ? 1.0 : 0.0,
+            left: index % 2 > 0 ? 1.0 : 0.0,
           ),
           child: new GestureDetector(
             onTap: () => _tap(index),
@@ -298,8 +298,8 @@ class GalleryState extends State<GalleryPage> {
       } else {
         return new Padding(
           padding: EdgeInsets.only(
-            bottom: index < _thumbs.length - 3 ? 1.0 : 0.0,
-            left: index % 3 > 0 ? 1.0 : 0.0,
+            bottom: index < _thumbs.length - 2 ? 1.0 : 0.0,
+            left: index % 2 > 0 ? 1.0 : 0.0,
           ),
           child: new GestureDetector(
             onTap: () => _tap(index),
@@ -317,7 +317,7 @@ class GalleryState extends State<GalleryPage> {
 
     return new SizedBox.expand(
       child: GridView.count(
-        crossAxisCount: 3,
+        crossAxisCount: 2,
         controller: _sc,
         scrollDirection: Axis.vertical,
         children: List.generate(_items.length, b),
