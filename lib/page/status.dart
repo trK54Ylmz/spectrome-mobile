@@ -143,10 +143,10 @@ class _StatusState extends State<StatusPage> {
         color: ColorConst.darkerGray,
       ),
     );
-    
+
     final l = new Loading();
     final ec = new Container(height: 41.0, width: 60.0);
-    
+
     // Report button
     final b = new Button(
       text: 'Report',

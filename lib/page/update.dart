@@ -25,7 +25,7 @@ class UpdatePage extends StatefulWidget {
 }
 
 class _UpdateState extends State<UpdatePage> {
-    // Form validation key
+  // Form validation key
   final _fk = new GlobalKey<FormValidationState>();
 
   // User real name input controller

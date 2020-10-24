@@ -218,7 +218,7 @@ class Http {
 
               r.write('\n');
             } else {
-              final v = body[key] is bool ? body[key] ? 1 : 0 : body[key];
+              final v = body[key] is bool ? (body[key] ? 1 : 0) : body[key];
 
               // Write plain text data
               r.write('Content-Disposition: form-data; name="$key"\n');
@@ -246,13 +246,13 @@ class Http {
 
               // Iterate over list params
               for (var value in body[key] as List) {
-                final v = value is bool ? value ? 1 : 0 : value;
+                final v = value is bool ? (value ? 1 : 0) : value;
 
                 form.add('$k-$i=$v');
                 i++;
               }
             } else {
-              final v = body[key] is bool ? body[key] ? 1 : 0 : body[key];
+              final v = body[key] is bool ? (body[key] ? 1 : 0) : body[key];
               final value = Uri.encodeQueryComponent(v);
 
               form.add('$k=$value');

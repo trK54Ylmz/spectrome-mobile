@@ -247,9 +247,7 @@ class _DetailState extends State<DetailPage> {
             setState(() => _disabled = i.length < 2);
 
             // Check if autocomplete is usable
-            if (i[0] == '@') {
-
-            }
+            if (i[0] == '@') {}
 
             return i.replaceAll('\n', ' ');
           },
