@@ -284,7 +284,7 @@ class _ProfileState extends State<ProfilePage> {
       flex: 1,
       child: new Padding(
         padding: EdgeInsets.only(top: 8.0),
-        child: _circled ? uf : _requested ? rq : fl,
+        child: _circled ? uf : (_requested ? rq : fl),
       ),
     );
 

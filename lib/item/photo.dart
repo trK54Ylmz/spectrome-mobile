@@ -78,7 +78,7 @@ class _PhotoState extends State<Photo> {
       height: widget.height,
       key: new ValueKey(widget.url),
       errorBuilder: _callback,
-      image: new NetworkImage( 
+      image: new NetworkImage(
         widget.url,
         headers: widget.headers,
       ),
