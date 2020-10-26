@@ -57,10 +57,8 @@ class _RequestState extends State<RequestPage> {
     // Set default value
     _count = n.value;
 
-    // Add listener on request count notifier
-    n.addListener(() {
-      setState(() => _count = n.value);
-    });
+    // Set request count as zero because user saw them
+    n.value = 0;
 
     // Shared preferences callback
     final spc = (SharedPreferences s) {
