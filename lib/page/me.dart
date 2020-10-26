@@ -23,6 +23,7 @@ import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
 import 'package:spectrome/util/error.dart';
 import 'package:spectrome/util/http.dart';
+import 'package:spectrome/util/request.dart';
 import 'package:spectrome/util/storage.dart';
 
 class MePage extends StatefulWidget {
@@ -31,10 +32,7 @@ class MePage extends StatefulWidget {
   // View page controller
   final PageController controller;
 
-  // Value notifier
-  final ValueNotifier<int> request;
-
-  MePage({this.controller, this.request}) : super();
+  MePage({this.controller}) : super();
 
   @override
   _MeState createState() => new _MeState();
@@ -84,16 +82,15 @@ class _MeState extends State<MePage> {
   void initState() {
     super.initState();
 
-    if (widget.request != null) {
-      // Add status listener for incoming request count
-      widget.request.addListener(() {
-        if (!this.mounted) {
-          return;
-        }
+    final n = RequestNotifier.getNotifier();
 
-        setState(() => _count = widget.request.value);
-      });
-    }
+    // Set default value
+    _count = n.value;
+
+    // Add listener on request count notifier
+    n.addListener(() {
+      setState(() => _count = n.value);
+    });
 
     // Shared preferences callback
     final spc = (SharedPreferences s) {
@@ -352,29 +349,50 @@ class _MeState extends State<MePage> {
       ),
     );
 
-    // Settings button
-    final t = new Semantics(
-      button: true,
-      child: new GestureDetector(
-        onTap: _showSettings,
-        child: new Padding(
-          padding: EdgeInsets.symmetric(
-            vertical: 4.0,
-            horizontal: 4.0,
-          ),
-          child: new Icon(
-            IconData(
-              0xf141,
-              fontFamily: FontConst.fal,
-            ),
-            color: _count > 0 ? ColorConst.darkRed : ColorConst.darkerGray,
-            size: 32.0,
-          ),
+    final t = new Padding(
+      padding: EdgeInsets.symmetric(
+        vertical: 4.0,
+        horizontal: 12.0,
+      ),
+      child: new Icon(
+        IconData(
+          0xf0c9,
+          fontFamily: FontConst.fal,
+        ),
+        color: ColorConst.darkGray,
+        size: 20.0,
+      ),
+    );
+
+    final ec = new Container(width: 0, height: 0);
+
+    final rc = new Padding(
+      padding: EdgeInsets.only(left: 32.0),
+      child: new Container(
+        width: 6.0,
+        height: 6.0,
+        decoration: new BoxDecoration(
+          borderRadius: new BorderRadius.circular(6.0),
+          color: ColorConst.darkRed,
         ),
       ),
     );
 
-    final ec = new Container();
+    // Show settings button
+    final ts = new Semantics(
+      button: true,
+      child: new GestureDetector(
+        onTap: _showSettings,
+        behavior: HitTestBehavior.opaque,
+        child: new Stack(
+          children: [
+            t,
+            _count > 0 ? rc : ec,
+          ],
+        ),
+      ),
+    );
+
     final dg = const SliverGridDelegateWithFixedCrossAxisCount(
       crossAxisCount: 2,
       childAspectRatio: 1 / 1,
@@ -414,7 +432,7 @@ class _MeState extends State<MePage> {
         backgroundColor: ColorConst.white,
         border: new Border(bottom: BorderSide.none),
         leading: _hu ? l : ec,
-        trailing: t,
+        trailing: ts,
         middle: new Text(
           'Me',
           style: new TextStyle(
@@ -559,7 +577,7 @@ class _MeState extends State<MePage> {
         button: true,
         focusable: true,
         child: new GestureDetector(
-          onTap: _circleRequests,
+          onTap: () => Navigator.of(context).pushNamed(RequestPage.tag),
           behavior: HitTestBehavior.opaque,
           child: new Container(
             height: 40.0,
@@ -777,23 +795,6 @@ class _MeState extends State<MePage> {
   /// Go to profile update page
   void _updateProfile() async {
     await Navigator.of(context).pushNamed(UpdatePage.tag);
-  }
-
-  /// Go to circle requests page
-  void _circleRequests() async {
-    final c = (_) {
-      if (widget.request == null) {
-        return;
-      }
-
-      // Set counter value to zero and notify listeners
-      widget.request.value = 0;
-    };
-
-    // Number of requests
-    final r = (widget.request == null) ? 0 : widget.request.value;
-
-    await Navigator.of(context).pushNamed(RequestPage.tag, arguments: r).then(c);
   }
 
   /// Sign out from current session

@@ -9,6 +9,7 @@ import 'package:spectrome/page/me.dart';
 import 'package:spectrome/page/select.dart';
 import 'package:spectrome/service/user/count.dart';
 import 'package:spectrome/theme/color.dart';
+import 'package:spectrome/util/request.dart';
 import 'package:spectrome/util/storage.dart';
 
 class ViewPage extends StatefulWidget {
@@ -23,9 +24,6 @@ class ViewPage extends StatefulWidget {
 class _ViewState extends State<ViewPage> {
   // Select home page as initial page
   final _pc = new PageController(initialPage: 1);
-
-  // Number of active incoming requests
-  final _request = new ValueNotifier<int>(0);
 
   // Account session key
   String _session;
@@ -56,8 +54,8 @@ class _ViewState extends State<ViewPage> {
         physics: const ClampingScrollPhysics(),
         children: [
           new SelectPage(),
-          new HomePage(controller: _pc, request: _request),
-          new MePage(controller: _pc, request: _request),
+          new HomePage(controller: _pc),
+          new MePage(controller: _pc),
         ],
       ),
     );
@@ -75,8 +73,10 @@ class _ViewState extends State<ViewPage> {
         return;
       }
 
+      final n = RequestNotifier.getNotifier();
+
       // Clear items
-      _request.value = r.count;
+      n.value = r.count;
     };
 
     // Error callback

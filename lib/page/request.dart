@@ -14,6 +14,7 @@ import 'package:spectrome/theme/font.dart';
 import 'package:spectrome/util/const.dart';
 import 'package:spectrome/util/error.dart';
 import 'package:spectrome/util/http.dart';
+import 'package:spectrome/util/request.dart';
 import 'package:spectrome/util/storage.dart';
 
 class RequestPage extends StatefulWidget {
@@ -51,6 +52,14 @@ class _RequestState extends State<RequestPage> {
   void initState() {
     super.initState();
 
+    final n = RequestNotifier.getNotifier();
+
+    // Set default value
+    _count = n.value;
+
+    // Set request count as zero because user saw them
+    n.value = 0;
+
     // Shared preferences callback
     final spc = (SharedPreferences s) {
       final session = s.getString('_session');
@@ -66,19 +75,7 @@ class _RequestState extends State<RequestPage> {
       }
     };
 
-    // Request count callback
-    final ac = (_) {
-      final count = ModalRoute.of(context).settings.arguments as int;
-
-      if (count != null && count > 0) {
-        _count = count;
-      }
-
-      Storage.load().then(spc);
-    };
-
-    // Add callback for argument
-    WidgetsBinding.instance.addPostFrameCallback(ac);
+    Storage.load().then(spc);
   }
 
   @override

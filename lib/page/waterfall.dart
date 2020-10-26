@@ -10,6 +10,7 @@ import 'package:spectrome/model/post/detail.dart';
 import 'package:spectrome/service/post/waterfall.dart';
 import 'package:spectrome/theme/color.dart';
 import 'package:spectrome/theme/font.dart';
+import 'package:spectrome/util/request.dart';
 import 'package:spectrome/util/storage.dart';
 
 class WaterFallPage extends StatefulWidget {
@@ -18,10 +19,7 @@ class WaterFallPage extends StatefulWidget {
   // View page controller
   final PageController controller;
 
-  // Number of incoming circle requests
-  final ValueNotifier<int> request;
-
-  WaterFallPage({this.controller, this.request}) : super();
+  WaterFallPage({this.controller}) : super();
 
   @override
   _WaterFallState createState() => new _WaterFallState();
@@ -49,13 +47,21 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
   // Cursor timestamp value
   String _timestamp;
 
+  // Request count
+  int _count = 0;
+
   @override
   void initState() {
     super.initState();
 
-    // Add status listener for incoming request count
-    widget.request.addListener(() {
-      setState(() => null);
+    final n = RequestNotifier.getNotifier();
+
+    // Set default value
+    _count = n.value;
+
+    // Add listener on request count notifier
+    n.addListener(() {
+      setState(() => _count = n.value);
     });
 
     // Posts list view scroll controller
@@ -166,24 +172,46 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
       widget.controller.animateToPage(2, duration: d, curve: c);
     };
 
+    final t = new Padding(
+      padding: EdgeInsets.symmetric(
+        vertical: 4.0,
+        horizontal: 12.0,
+      ),
+      child: new Icon(
+        IconData(
+          0xf2bd,
+          fontFamily: FontConst.fal,
+        ),
+        color: ColorConst.darkGray,
+        size: 20.0,
+      ),
+    );
+
+    final ec = new Container(width: 0, height: 0);
+
+    final rc = new Padding(
+      padding: EdgeInsets.only(left: 32.0),
+      child: new Container(
+        width: 6.0,
+        height: 6.0,
+        decoration: new BoxDecoration(
+          borderRadius: new BorderRadius.circular(6.0),
+          color: ColorConst.darkRed,
+        ),
+      ),
+    );
+
     // Profile page button
-    final t = new Semantics(
+    final ts = new Semantics(
       button: true,
       child: new GestureDetector(
         onTap: pc,
-        child: new Padding(
-          padding: EdgeInsets.symmetric(
-            vertical: 4.0,
-            horizontal: 12.0,
-          ),
-          child: new Icon(
-            IconData(
-              0xf2bd,
-              fontFamily: FontConst.fal,
-            ),
-            color: widget.request.value > 0 ? ColorConst.darkRed : ColorConst.darkGray,
-            size: 20.0,
-          ),
+        behavior: HitTestBehavior.opaque,
+        child: new Stack(
+          children: [
+            t,
+            _count > 0 ? rc : ec,
+          ],
         ),
       ),
     );
@@ -203,7 +231,7 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
           bottom: BorderSide.none,
         ),
         leading: l,
-        trailing: t,
+        trailing: ts,
         middle: new Text(
           'Waterfall',
           style: new TextStyle(
@@ -267,11 +295,12 @@ class _WaterFallState extends State<WaterFallPage> with AutomaticKeepAliveClient
         ),
         textAlign: TextAlign.center,
         style: new TextStyle(
-            fontFamily: FontConst.primary,
-            fontSize: 12.0,
-            letterSpacing: 0.33,
-            color: ColorConst.gray,
-            height: 1.6),
+          fontFamily: FontConst.primary,
+          fontSize: 12.0,
+          letterSpacing: 0.33,
+          color: ColorConst.gray,
+          height: 1.6,
+        ),
       ),
     );
 
