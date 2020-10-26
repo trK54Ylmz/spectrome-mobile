@@ -74,7 +74,7 @@ class _SignUpDoneState extends State<SignUpDonePage> {
     );
 
     final si = new Icon(
-      new IconData(0xf00c, fontFamily: FontConst.fa),
+      new IconData(0xf00c, fontFamily: FontConst.fal),
       color: ColorConst.success,
       size: 48.0,
     );

@@ -11,10 +11,7 @@ class HomePage extends StatefulWidget {
   // View page controller
   final PageController controller;
 
-  // Number of incoming requests
-  final ValueNotifier<int> request;
-
-  HomePage({this.controller, this.request}) : super();
+  HomePage({this.controller}) : super();
 
   @override
   _HomeState createState() => new _HomeState();
@@ -111,10 +108,7 @@ class _HomeState extends State<HomePage> {
             return new HistoryPage();
             break;
           default:
-            return new WaterFallPage(
-              controller: widget.controller,
-              request: widget.request,
-            );
+            return new WaterFallPage(controller: widget.controller);
             break;
         }
       },
