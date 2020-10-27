@@ -15,10 +15,13 @@ class Video extends StatefulWidget {
 
   final double height;
 
+  final Map<String, String> headers;
+
   const Video({
     Key key,
     this.path,
     this.type,
+    this.headers,
     this.width = 0,
     this.height = 0,
   })  : assert(path != null),
@@ -55,7 +58,7 @@ class _VideoState extends State<Video> {
     final r = widget.width > 0 && widget.height > 0 ? widget.width / widget.height : null;
 
     // Create data source
-    final ds = new BetterPlayerDataSource(type, widget.path);
+    final ds = new BetterPlayerDataSource(type, widget.path, headers: widget.headers);
 
     final cc = new BetterPlayerControlsConfiguration(
       showControls: false,

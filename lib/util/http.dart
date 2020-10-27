@@ -184,7 +184,7 @@ class Http {
               // Get file name
               final name = file.path.split('/').last.replaceAll('"', '\\"');
 
-              final ft = name.split('.').last;
+              final ft = name.split('.').last.toLowerCase();
 
               // Only mp4 and jpg allowed
               if (!['mp4', 'jpg'].contains(ft)) {

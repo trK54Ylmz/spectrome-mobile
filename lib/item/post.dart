@@ -2,6 +2,7 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 import 'package:spectrome/item/photo.dart';
+import 'package:spectrome/item/video.dart';
 import 'package:spectrome/model/post/detail.dart';
 import 'package:spectrome/page/detail.dart';
 import 'package:spectrome/page/me.dart';
@@ -328,11 +329,18 @@ class _PostState extends State<PostCard> {
     // Get resolution
     final wh = ScreenConst.fromValue(widget.detail.post.size);
 
+    // Http headers for image request
+    final h = {Http.TOKEN_HEADER: widget.session};
+
     // Get post width and height
     final pw = width;
     final ph = (width / wh[0]) * wh[1];
 
-    return new Container(
+    return new Video(
+      key: new ValueKey(widget.detail.post.items[index].large),
+      path: widget.detail.post.items[index].large,
+      headers: h,
+      type: VideoType.NETWORK,
       width: pw,
       height: ph,
     );

@@ -768,7 +768,7 @@ class _ShareState extends State<SharePage> {
             // Go to previous page
             _pc.animateToPage(
               _ci - 1,
-              duration: Duration(seconds: 1),
+              duration: Duration(milliseconds: 500),
               curve: Curves.ease,
             );
           },
@@ -807,7 +807,7 @@ class _ShareState extends State<SharePage> {
             // Go to next page
             _pc.animateToPage(
               _ci + 1,
-              duration: Duration(seconds: 1),
+              duration: Duration(milliseconds: 500),
               curve: Curves.easeInOut,
             );
           },
