@@ -43,7 +43,7 @@ class ShareService extends Service {
 
     // Create post files which are photos and videos
     for (int i = 0; i < files.length; i++) {
-      final ext = files[i].path.split('.').last;
+      final ext = files[i].path.split('.').last.toLowerCase();
       final type = ext == 'mp4' ? AppConst.video : AppConst.photo;
 
       body['types-$i'] = type;
